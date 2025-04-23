@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido";
+}
+
+<!-- Carrusel Principal -->
+<div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="~/img/Destino1.jpeg" class="d-block w-100" alt="Cordoba">
+            <div class="carousel-caption">
+                <h5>Cordoba</h5>
+                <p><a href="#">Más información</a></p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="~/img/Destino2.webp" class="d-block w-100" alt="Viniedos Mendocinos">
+            <div class="carousel-caption">
+                <h5>Mendoza</h5>
+                <p><a href="#">Más información</a></p>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+</div>
+
+
+<!-- Carrusel Secundario -->
+<div class="row mt-4">
+    @* @foreach (var destino in Model.DestinosSecundarios)
+    {
+        <div class="col-md-3">
+            <div class="card">
+                <img src="@destino.Imagen" class="card-img-top" alt="@destino.Nombre">
+                <div class="card-body">
+                    <h5 class="card-title">@destino.Nombre</h5>
+                </div>
+            </div>
+        </div>
+    } *@
+</div>
