@@ -1,0 +1,4 @@
+﻿.carousel-item img {
+    height: 500px; /* Ajusta la altura */
+    object-fit: cover; /* Recorta la imagen para que encaje */
+}

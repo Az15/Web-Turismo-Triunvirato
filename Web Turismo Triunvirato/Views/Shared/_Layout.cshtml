@@ -4,16 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Agencia de Turismo</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Font Awesome para los íconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- Tu archivo CSS personalizado -->
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/carrousel.css" />
 </head>
 <body>
-    <!-- Navbar -->
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
@@ -22,9 +18,9 @@
                     <input class="form-control me-2" type="search" placeholder="Buscar destinos" aria-label="Buscar" />
                 </form>
                 <div class="navbar-nav">
-                    <a class="nav-link" href="/Account/Login">
+                    <button id="showLoginBtn" class="nav-link btn btn-link" style="padding: 0; border: none; background: none;">
                         <i class="fas fa-user"></i> Iniciar sesión
-                    </a>
+                    </button>
                     <a class="nav-link" href="/Bookings">
                         <i class="fas fa-book"></i> Reservas
                     </a>
@@ -36,18 +32,38 @@
         </nav>
     </header>
 
-    <!-- Contenedor principal -->
     <main class="container">
         @RenderBody()
     </main>
 
-    <!-- Footer -->
+    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Iniciar Sesión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    @await Html.PartialAsync("~/Views/Home/Login.cshtml")
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="text-center mt-4">
         <p>&copy; 2025 Agencia de Turismo</p>
     </footer>
 
-    <!-- Bootstrap JS y Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#showLoginBtn").click(function () {
+                var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            });
+        });
+    </script>
 
 </body>
 </html>
