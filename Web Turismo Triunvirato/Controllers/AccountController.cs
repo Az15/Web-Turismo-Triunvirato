@@ -6,7 +6,7 @@ using Web_Turismo_Triunvirato.Models;
 namespace Web_Turismo_Triunvirato.Controllers
 {
 
-    public class LoginController : Controller
+    public class AccountController : Controller
     {
         [HttpGet]
         public IActionResult Index()
