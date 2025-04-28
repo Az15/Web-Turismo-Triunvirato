@@ -1,0 +1,140 @@
+﻿.navbar {
+    background-color: #00234B !important;
+    padding: 10px 20px; /* Ajusta el padding vertical y horizontal según necesites */
+    border-radius: 5px; /* Añadido: Bordes redondeados para la navbar */
+}
+
+.navbar-brand {
+    color: white !important;
+    font-size: 1.5rem; /* Ajusta el tamaño de la fuente del logo */
+    margin-right: 20px; /* Espacio entre el logo y el primer ícono */
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    margin-left: 15px; /* Espacio entre los íconos/enlaces */
+    display: flex;
+    align-items: center; /* Centra verticalmente el ícono y el texto */
+}
+
+    .navbar-nav .nav-link i {
+        margin-right: 5px; /* Espacio entre el ícono y el texto */
+        font-size: 1.2rem; /* Ajusta el tamaño de los íconos */
+    }
+
+.search-container {
+    position: relative; /* Añadido: Para posicionar el ícono dentro */
+    display: flex;
+    align-items: center;
+    margin: 0 auto; /* Centra horizontalmente el buscador */
+    max-width: 400px; /* Ancho máximo del buscador */
+    width: 100%;
+    border-radius: 5px; /* Añadido: Bordes redondeados para el contenedor del buscador */
+    overflow: hidden; /* Añadido: Asegura que el ícono respete el borde */
+}
+
+    .search-container .search-input {
+        border: none;
+        padding: 8px 15px;
+        padding-left: 35px; /* Añadido: Espacio para el ícono de búsqueda */
+        flex-grow: 1; /* El input ocupa el espacio restante */
+        border-radius: 5px; /* Añadido: Bordes redondeados para el input */
+    }
+
+        .search-container .search-input:focus {
+            outline: none; /* Elimina el outline al enfocar */
+        }
+
+    .search-container .search-icon {
+        position: absolute;
+        left: 10px; /* Ajusta la posición horizontal del ícono */
+        top: 50%; /* Centra verticalmente el ícono */
+        transform: translateY(-50%); /* Ajuste fino del centrado vertical */
+        color: #6c757d; /* Color del ícono de búsqueda */
+        font-size: 1.2rem; /* Ajusta el tamaño del ícono si es necesario */
+    }
+
+.user-menu .dropdown-toggle {
+    color: white !important;
+}
+
+    .user-menu .dropdown-toggle i {
+        margin-right: 5px;
+    }
+
+.dropdown-menu {
+    left: auto !important; /* Alinea el menú desplegable a la derecha */
+    right: 0 !important;
+}
+
+/* Media query para pantallas de hasta 768px (típicamente móviles y tablets pequeñas) */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column; /* Apilamos los elementos verticalmente */
+        align-items: stretch; /* Los elementos ocupan todo el ancho */
+    }
+
+    .navbar-brand {
+        justify-content: center; /* Centramos el logo */
+        margin-bottom: 5px;
+    }
+
+    .navbar-nav.me-auto,
+    .navbar-nav.ms-auto {
+        flex-direction: row; /* Volvemos a la disposición horizontal para los enlaces */
+        justify-content: space-around; /* Espaciamos los enlaces */
+        width: 100%; /* Ocupan todo el ancho */
+        margin-bottom: 5px;
+    }
+
+    .navbar-nav .nav-link {
+        margin-left: 0; /* Eliminamos márgenes */
+        padding: 8px 0; /* Añadimos padding vertical */
+        justify-content: center; /* Centramos el texto e ícono */
+    }
+
+    .search-container {
+        margin: 10px auto; /* Más margen vertical */
+        max-width: 95%; /* Ocupa aún más ancho */
+    }
+
+    .user-menu {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .dropdown-menu {
+        position: absolute; /* Ajustamos la posición del menú desplegable */
+        top: 100%;
+        left: 0;
+        right: auto;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Opcional: Para pantallas aún más pequeñas */
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 0.8rem;
+        padding: 5px 0;
+    }
+
+    .search-container .search-input {
+        font-size: 0.8rem;
+    }
+
+    .user-menu .dropdown-toggle {
+        font-size: 0.8rem;
+    }
+
+    .dropdown-menu {
+        font-size: 0.8rem;
+    }
+}

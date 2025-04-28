@@ -1,0 +1,6 @@
+﻿.mi-footer-personalizado {
+    background-color: #00234B !important;
+    color: #fff !important; /* Asegurarse de que el texto sea blanco */
+    padding-top: 1rem; /* Puedes ajustar el padding */
+    padding-bottom: 1rem;
+}

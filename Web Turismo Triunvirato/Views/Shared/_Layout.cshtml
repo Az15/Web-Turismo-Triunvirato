@@ -6,24 +6,50 @@
     <title>@ViewData["Title"] - Agencia de Turismo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+
+    @* Esto es estilo global(OJO) *@
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/css/carrousel.css" />
-    <link rel="stylesheet" href="~/css/login.css" /> </head>
-     
+    <link rel="stylesheet" href="~/css/GPSico.css" />
+    
+
+    @* Si esto solo impacta al login, solo deberia estar en el login, si tiene micro css se tiene que separar en otro archivo como navbar_login o navbar-login o NavbarLogin *@
+    <link rel="stylesheet" href="~/css/login.css" />
+
+    <link rel="stylesheet" href="~/css/navbar.css" />
+
+    <link rel="stylesheet" href="~/css/Footer.css" />
+
+
+</head>
+
+
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Agencia de Turismo</a>
-                <form class="d-flex ms-auto">
-                    <input class="form-control me-2" type="search" placeholder="Buscar destinos" aria-label="Buscar" />
-                </form>
-                <div class="navbar-nav">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-compass"></i> Turismo Triunvirato
+                </a>
+                <div class="navbar-nav me-auto">
+                    <a class="nav-link" asp-controller="Home" asp-action="Booking">
+                        <i class="fas fa-book"></i> Reservas
+                    </a>
+                </div>
+                <div class="search-container">
+                    <input class="form-control search-input" type="search" placeholder="Buscar destinos" aria-label="Buscar" />
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" asp-controller="Home" asp-action="Help">
+                        <i class="fas fa-question-circle"></i> Ayuda
+                    </a>
                     <div class="user-menu">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <div class="dropdown">
-                                <button class="btn btn-link nav-link dropdown-toggle" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0; border: none; background: none;">
+                                <button class="btn btn-link nav-link dropdown-toggle" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user"></i> @User.Identity.Name
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
@@ -38,23 +64,17 @@
                         }
                         else
                         {
-                            <button id="showLoginBtn" class="nav-link btn btn-link" style="padding: 0; border: none; background: none;">
-                                <i class="fas fa-user"></i> 
+                            <button id="showLoginBtn" class="nav-link btn btn-link">
+                                <i class="fas fa-user"></i> Iniciar sesión
                             </button>
                         }
                     </div>
-                    <a class="nav-link" href="/Bookings">
-                        <i class="fas fa-book"></i> Reservas
-                    </a>
-                    <a class="nav-link" href="/Help">
-                        <i class="fas fa-question-circle"></i> Ayuda
-                    </a>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main class="container">
+    <main class="container-fluid">
         @RenderBody()
     </main>
 
@@ -72,14 +92,45 @@
         </div>
     </div>
 
-    <footer class="text-center mt-4">
-        <p>&copy; 2025 Agencia de Turismo</p>
-    </footer>
 
-    
+
+
+    <footer class="mi-footer-personalizado py-4 mt-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Contacto</h5>
+                        <p><i class="bi bi-telephone-fill"></i> 011-4741-5511</p>
+                        <p><i class="bi bi-whatsapp"></i> 011-2229-6405</p>
+                        <p><i class="bi bi-envelope-fill"></i> reservas@turismotriunvirato.tur.ar</p>
+                        <p><i class="bi bi-geo-fill"></i> Av. Ángel T. De Alvear 2831, Don Torcuato, Buenos Aires</p>
+                    </div>
+                    <div class="col-md-4 text-center">    
+                        <p><i class="fas fa-compass"></i>  Turismo Triunvirato</p>
+                        <p class="small">Desde 1993 (Leg. 16274)</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <h5>Síguenos</h5>
+                        <a href="https://www.facebook.com/turismo.triunvirato.3" class="btn btn-outline-light btn-sm rounded-circle me-2" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="https://www.instagram.com/turismotriunvirato/" class="btn btn-outline-light btn-sm rounded-circle me-2" target="_blank"><i class="bi bi-instagram"></i></a>
+                            @* <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-twitter"></i></a> *@
+                    </div> 
+                </div>
+                <hr class="mt-4">
+   @*          <div class="gps-icon"></div> *@
+                <p class="text-center small">© 2025 Agencia de Turismo - Todos los derechos reservados</p>
+            </div>
+        </footer>
+
+
+
+
+
+
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/login.js"></script>
+    @* <script src="~/js/login.js"></script> *@
 
     <script>
         $(document).ready(function () {

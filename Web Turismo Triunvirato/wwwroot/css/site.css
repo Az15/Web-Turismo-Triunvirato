@@ -18,7 +18,9 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 0 !important; /* Intenta eliminar el margen inferior del body */
+    padding-bottom: 0 !important; /* Intenta eliminar el padding inferior del body */
+    min-height: auto !important; /* Si tienes min-height, intenta anularlo */
 }
 
 /*PRUEBA 1*/

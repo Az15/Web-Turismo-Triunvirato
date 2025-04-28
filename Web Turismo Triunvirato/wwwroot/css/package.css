@@ -1,0 +1,89 @@
+﻿/* Contenedor de la sección horizontal de destacados */
+.destacados-horizontal {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+/* Contenedor de la fila horizontal con desplazamiento */
+.destacados-row {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 15px;
+}
+
+    /* Estilos para las tarjetas */
+    .destacados-row .card {
+        border: none;
+        border-radius: 0.3rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: row;
+        height: 120px;
+        width: 350px;
+        margin-right: 15px;
+        flex: 0 0 auto;
+    }
+
+        /* Estilo para la imagen a la izquierda */
+        .destacados-row .card .card-img-left {
+            width: 150px;
+            height: 100%;
+            object-fit: cover;
+            border-top-left-radius: 0.3rem;
+            border-bottom-left-radius: 0.3rem;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .destacados-row .card .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-left: 1rem;
+        }
+
+        .destacados-row .card .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+        .destacados-row .card .card-subtitle {
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .destacados-row .card .card-text {
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+            margin-bottom: 0;
+        }
+
+
+
+
+/* Ajuste para pantallas más pequeñas (opcional) */
+@media (max-width: 768px) {
+    .destacados-horizontal {
+        max-width: 95%;
+        margin: 15px auto;
+    }
+
+    .destacados-row .card {
+        width: 90%;
+        height: auto;
+        flex-direction: column;
+    }
+
+        .destacados-row .card .card-img-left {
+            width: 100%;
+            height: 150px;
+            border-radius: 0.3rem 0.3rem 0 0;
+        }
+
+        .destacados-row .card .card-body {
+            padding: 1rem;
+        }
+}

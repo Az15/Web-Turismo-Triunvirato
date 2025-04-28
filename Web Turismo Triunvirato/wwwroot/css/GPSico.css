@@ -1,0 +1,24 @@
+﻿.gps-icon {
+    width: 50px;
+    height: 50px;
+    border: 5px solid white;
+    border-radius: 50%;
+    position: relative;
+    background-color: #00234B; /* El color de fondo azul oscuro */
+    overflow: hidden;
+}
+
+    .gps-icon::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg); /* Rotación arriba-derecha */
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 15px solid white; /* Lado derecho más largo */
+        border-top: 8px solid transparent;
+        border-bottom: 18px solid white; /* Base más ancha */
+        border-radius: 2px; /* Suavizado ligero */
+    }

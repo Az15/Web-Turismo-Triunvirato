@@ -1,4 +1,42 @@
 ﻿.carousel-item img {
-    height: 500px; /* Ajusta la altura */
+    height: 800px; /* Ajusta la altura */
     object-fit: cover; /* Recorta la imagen para que encaje */
 }
+
+.carousel-caption {
+    /* Eliminamos la posición absolute por defecto para usar flexbox */
+    text-align: center; /* Alinea el texto a la izquierda para que no esté centrado */
+    padding-bottom: 20px; /* Espacio desde la parte inferior */
+    left: 15%; /* Ajusta el margen izquierdo */
+    right: 15%; /* Ajusta el margen derecho */
+    bottom: 0; /* Asegura que esté en la parte inferior */
+
+    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Línea sutil en la parte superior */
+    padding: 2px; /* Añadimos un padding general */
+}
+
+    .carousel-caption h4,
+    .carousel-caption h5 {
+        font-size: 2rem; /* Tamaño del título */
+        margin-bottom: 5px; /* Espacio debajo del título */
+        font-weight: bold; /* Texto en negrita */
+    }
+
+    .carousel-caption p a {
+        color: #f8f9fa; /* Color del enlace */
+        text-decoration: none; /* Sin subrayado */
+        border: 1px solid #f8f9fa; /* Borde alrededor del enlace */
+        padding: 8px 15px; /* Espaciado dentro del botón */
+        border-radius: 5px; /* Bordes redondeados */
+        display: inline-block; /* Para que el padding y el border funcionen correctamente */
+        transition: background-color 0.3s ease; /* Transición suave al pasar el mouse */
+    }
+
+        .carousel-caption p a:hover {
+            background-color: #f8f9fa; /* Fondo blanco al pasar el mouse */
+            color: #000; /* Color del texto negro al pasar el mouse */
+        }
+
+
+
+
