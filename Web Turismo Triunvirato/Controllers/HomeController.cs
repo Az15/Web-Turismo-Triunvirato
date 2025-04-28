@@ -13,32 +13,43 @@ namespace Web_Turismo_Triunvirato.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
 
                     return View();
 
         }
-
+       
+        [HttpGet]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [HttpGet]
         public IActionResult Booking()
         {
             return View();
         }
 
+        [HttpGet]
         public IActionResult Help() 
         {
             return View();
         }
 
+        [HttpGet]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpGet]
+        public IActionResult SendBox()
+        {
+            return View();
         }
     }
 }
