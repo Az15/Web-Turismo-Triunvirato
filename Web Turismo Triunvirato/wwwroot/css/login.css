@@ -1,12 +1,12 @@
-﻿.carousel-item img {
-    height: 500px; /* Ajusta la altura */
-    object-fit: cover; /* Recorta la imagen para que encaje */
-}
+﻿/*.carousel-item img {
+    height: 500px;*/ /* Ajusta la altura */
+    /*object-fit: cover;*/ /* Recorta la imagen para que encaje */
+/*}*/
 
 /* wwwroot/css/user-menu.css */
-.user-menu .dropdown-menu {
-    margin-top: 5px; /* Ajusta el espacio entre el botón y el menú */
-}
+/*.user-menu .dropdown-menu {
+    margin-top: 5px;*/ /* Ajusta el espacio entre el botón y el menú */
+/*}
 
 .user-menu .dropdown-item button {
     padding: 0.25rem 1rem;
@@ -17,5 +17,45 @@
 }
 
     .user-menu .dropdown-item button:hover {
-        background-color: #f8f9fa; /* Color de fondo al pasar el ratón */
+        background-color: #f8f9fa;*/ /* Color de fondo al pasar el ratón */
+    /*}*/
+
+/* wwwroot/css/Login.css */
+
+/* Estilos existentes para el contenedor de login, formulario, etc. */
+
+/* wwwroot/css/Login.css */
+
+/* Estilos existentes */
+
+.login-options button {
+    margin-right: 5px; /* Espacio entre los botones */
+    padding: 8px 15px; /* Ajustar el relleno */
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer;
+    font-size: 0.9em; /* Tamaño de la fuente */
+    transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
+}
+
+    .login-options button:hover {
+        /* Estilo general para todos los botones al pasar el mouse (si aplica) */
+    }
+
+/* Estilos para los botones de Gmail y Email (si los usaras con esas clases) */
+/*.login-options .gmail-button { ... }
+.login-options .gmail-button:hover { ... }
+.login-options .email-button { ... }
+.login-options .email-button:hover { ... }*/
+
+/* Estilo para los botones que usan la clase de Bootstrap 'btn-secondary' */
+.btn-secondary {
+    background-color: #6c757d; /* El color gris predeterminado de Bootstrap para btn-secondary */
+    color: #fff;
+    border-color: #6c757d;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268; /* Un tono de gris ligeramente más oscuro al pasar el mouse */
+        border-color: #545b62;
     }
