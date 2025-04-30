@@ -1,8 +1,8 @@
-﻿@* Views/Login/Login.cshtml *@
-@model Web_Turismo_Triunvirato.Models.LoginViewModel // Reemplaza con tu modelo si lo tienes
+﻿@* Views/Account/Login.cshtml *@
+@model Web_Turismo_Triunvirato.Models.LoginViewModel
 
 <div class="login-container">
-    <h2>Iniciar Sesión</h2>
+    <h2>Bienvenido</h2>
     <form asp-controller="Account" asp-action="Authenticate" method="post">
         <div class="form-group">
             <label for="Email">Correo Electrónico:</label>
@@ -12,16 +12,20 @@
             <label for="Password">Contraseña:</label>
             <input type="password" class="form-control" id="Password" name="Password" required>
         </div>
+        <br>
         <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+
     </form>
     <div class="login-options">
         <p>¿No tienes cuenta?</p>
-        <button class="btn btn-danger">Crear cuenta con Gmail</button>
-        <button class="btn btn-info">Crear cuenta con Email </button>
+        <button class="btn btn-secondary btn-sm">Crear cuenta con Gmail</button>
+        <br>
+        <button class="btn btn-secondary btn-sm">Crear cuenta con Email </button>
     </div>
 </div>
 
 <link rel="stylesheet" href="~/css/Login.css" />
-<link rel="stylesheet" href="~/js/login.js" />
 
 <script src="~/js/login.js"></script>
+
+
