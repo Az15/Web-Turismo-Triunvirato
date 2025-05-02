@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Completar Perfil";
+}
+
+<h2>Crear Cuenta - Paso 3</h2>
+<form method="post" asp-action="CompletarPerfil">
+    <div class="form-group">
+        <label>Nombre:</label>
+        <input type="text" name="Nombre" required class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Apellido:</label>
+        <input type="text" name="Apellido" required class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>País:</label>
+        <input type="text" name="Pais" required class="form-control" />
+    </div>
+    <br>
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
