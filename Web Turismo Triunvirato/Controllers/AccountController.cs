@@ -114,7 +114,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             // _context.Usuarios.Add(nuevoUsuario);
             // _context.SaveChanges();
 
-            return RedirectToAction("Index"); // Redirige al login
+            return RedirectToAction("Index", "Home"); // Redirige al login
         }
     }
 }
