@@ -1,0 +1,71 @@
+﻿.requisitos-container {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.seccion-requisitos {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.titulo-seccion {
+    background-color: #f9f9f9;
+    color: #007bff; /* Color azul */
+    padding: 10px 15px;
+    margin: 0;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid #ddd;
+    display: flex; /* Usamos flex para la alineación */
+    align-items: center; /* Centramos verticalmente */
+}
+
+    .titulo-seccion > span { /* Nuevo elemento para el texto del título */
+        flex-grow: 1; /* Ocupa el máximo espacio posible a la izquierda */
+    }
+
+    .titulo-seccion::before {
+        content: '\25BE';
+        font-size: 1em;
+        color: #777;
+        margin-left: auto; /* Empuja la flecha hacia la derecha */
+    }
+
+    .titulo-seccion.activo::before {
+        content: '\25B4';
+    }
+
+.contenido-seccion {
+    padding: 10px;
+    margin: 25px;
+    background-color: #f4f4f4;
+}
+
+    .contenido-seccion.oculto {
+        display: none;
+    }
+
+    .contenido-seccion > ol > li,
+    .contenido-seccion > ul > li {
+        display: list-item; /* Aseguramos que se comporte como un item de lista */
+        list-style-position: outside; /* La viñeta/número está fuera del flujo del texto */
+        margin-left: 20px; /* Margen izquierdo para el espacio de la viñeta/número */
+        padding-left: 5px; /* Pequeño relleno para separar la viñeta/número del texto */
+        margin-bottom: 5px;
+        text-indent: 0; /* Reiniciamos el text-indent por si acaso */
+    }
+
+.nota {
+    font-size: 0.9em;
+    color: #777;
+    margin-top: 15px;
+}
