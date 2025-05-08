@@ -28,55 +28,65 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-compass"></i> Turismo Triunvirato
-                </a>
-                <div class="navbar-nav me-auto">
-                    <a class="nav-link" asp-controller="Home" asp-action="Booking">
-                        <i class="fas fa-book"></i> Reservas
-                    </a>
-                    <a class="nav-link" asp-controller="Home" asp-action="SendBox">
-                        <i class="fa-solid fa-truck"></i> Encomiendas
-                    </a>
-                </div>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-compass"></i> Turismo Triunvirato
+                        </a>
+                    </div>
 
-                <div class="search-container">
-                    <input class="form-control search-input" type="search" placeholder="Buscar destinos" aria-label="Buscar" />
-                    <i class="fas fa-search search-icon"></i>
-                </div>
-                <div class="navbar-nav ms-auto">
-                    <a class="nav-link" asp-controller="Home" asp-action="Help">
-                        <i class="fas fa-question-circle"></i> Ayuda
-                    </a>
-                    <div class="user-menu">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <div class="dropdown">
-                                <button class="btn btn-link nav-link dropdown-toggle" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user"></i> @User.Identity.Name
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
-                                    <li><a class="dropdown-item" href="/Profile/Edit"><i class="fas fa-user-edit"></i> Modificar perfil</a></li>
-                                    <li>
-                                        <form method="post" asp-controller="Account" asp-action="Logout">
-                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
-                                        </form>
-                                    </li>
-                                </ul>
+                    <div class="d-flex align-items-center">
+                        <div class="navbar-nav d-flex flex-row">
+                            <a class="nav-link me-3" asp-controller="Home" asp-action="Booking">
+                                <i class="fas fa-book"></i> Reservas
+                            </a>
+                            <a class="nav-link" asp-controller="Home" asp-action="SendBox">
+                                <i class="fa-solid fa-truck"></i> Encomiendas
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="search-container">
+                        <input class="form-control search-input" type="search" placeholder="Buscar destinos" aria-label="Buscar" />
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <div class="navbar-nav d-flex flex-row">
+                            <a class="nav-link me-3" asp-controller="Home" asp-action="Help">
+                                <i class="fas fa-question-circle"></i> Ayuda
+                            </a>
+                            <div class="user-menu">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="dropdown">
+                                        <button class="btn btn-link nav-link dropdown-toggle" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-user"></i> @User.Identity.Name
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
+                                            <li><a class="dropdown-item" href="/Profile/Edit"><i class="fas fa-user-edit"></i> Modificar perfil</a></li>
+                                            <li>
+                                                <form method="post" asp-controller="Account" asp-action="Logout">
+                                                    <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button id="showLoginBtn" class="nav-link btn btn-link">
+                                        <i class="fas fa-user"></i> Iniciar sesión
+                                    </button>
+                                }
                             </div>
-                        }
-                        else
-                        {
-                            <button id="showLoginBtn" class="nav-link btn btn-link">
-                                <i class="fas fa-user"></i> Iniciar sesión
-                            </button>
-                        }
+                        </div>
                     </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </header>
     </header>
 
     <main class="container-fluid">

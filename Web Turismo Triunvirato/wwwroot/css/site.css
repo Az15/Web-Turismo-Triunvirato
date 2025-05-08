@@ -23,4 +23,42 @@ body {
     min-height: auto !important; /* Si tienes min-height, intenta anularlo */
 }
 
-/*PRUEBA 1*/
+/*08/05/2025*/
+
+/* Estilos para alinear elementos de navegación en responsive */
+/* Estilos responsive para la barra de navegación */
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        justify-content: center !important; /* Centra los elementos colapsados */
+    }
+
+    .navbar-nav.me-auto,
+    .navbar-nav.ms-auto {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100%; /* Ocupan todo el ancho */
+        display: flex;
+        justify-content: space-around; /* Distribuyen el espacio entre los elementos */
+        align-items: center;
+        margin-bottom: 10px; /* Espacio entre los grupos */
+    }
+
+    .search-container {
+        width: 100%; /* La barra de búsqueda ocupa todo el ancho */
+        margin-bottom: 10px;
+    }
+
+    .navbar-brand {
+        margin-bottom: 10px; /* Espacio debajo del logo */
+    }
+
+    .navbar-toggler {
+        margin-left: auto; /* Mueve el botón del toggler a la derecha */
+    }
+
+    .navbar-expand-lg .navbar-collapse {
+        display: flex !important; /* Asegura que los elementos colapsados usen flex */
+        flex-direction: column; /* Apila los elementos en columna */
+        align-items: center; /* Centra horizontalmente los elementos colapsados */
+    }
+}
