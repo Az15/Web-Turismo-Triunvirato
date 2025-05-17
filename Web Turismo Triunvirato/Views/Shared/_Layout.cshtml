@@ -22,13 +22,14 @@
 
     <link rel="stylesheet" href="~/css/Footer.css" />
 
+    <link rel="stylesheet" href="~/css/iconbar.css" />
 
 </head>
 
 
 <body>
     <header>
-        <header>
+        
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
@@ -66,7 +67,11 @@
                                             <i class="fas fa-user"></i> @User.Identity.Name
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuBtn">
-                                            <li><a class="dropdown-item" href="/Profile/Edit"><i class="fas fa-user-edit"></i> Modificar perfil</a></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Account" asp-action="EditProfile">
+                                                <i class="fas fa-user-edit"></i> Modificar perfil
+                                            </a>
+                                        </li>
                                             <li>
                                                 <form method="post" asp-controller="Account" asp-action="Logout">
                                                     <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
@@ -86,27 +91,14 @@
                     </div>
                 </div>
             </nav>
-        </header>
+        
     </header>
 
     <main class="container-fluid">
         @RenderBody()
     </main>
 
-    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Iniciar Sesión</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    @await Html.PartialAsync("~/Views/Account/Login.cshtml")
-                </div>
-            </div>
-        </div>
-    </div>
-
+@*     <partial name="_LoginModal" /> *@
 
 
 
@@ -166,3 +158,4 @@
 
 </body>
 </html>
+

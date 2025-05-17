@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Web_Turismo_Triunvirato.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Web_Turismo_Triunvirato.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Account/Logout"; // La ruta a tu acción de cierre de sesión
         options.AccessDeniedPath = "/Account/AccessDenied"; // Ruta para cuando el acceso es denegado
     });
+builder.Services.AddScoped<IUserService, InMemoryUserService>();
 
 var app = builder.Build();
 
@@ -42,3 +44,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+ 
+
+ 

@@ -1,0 +1,10 @@
+﻿using System.Collections.Generic;
+using Web_Turismo_Triunvirato.Models;
+
+namespace Web_Turismo_Triunvirato.ViewModels
+{
+    public class DestinationsViewModel
+    {
+        public List<Destination> PopularDestinations { get; set; }
+    }
+}
