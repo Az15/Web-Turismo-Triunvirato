@@ -1,0 +1,59 @@
+﻿.seguimiento-container {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.seguimiento-title {
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.empresas-seguimiento {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las "fotos" pasen a la siguiente línea en pantallas pequeñas */
+    gap: 15px; /* Espacio entre las "fotos" */
+}
+
+.empresa-seguimiento {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    width: calc(33.33% - 15px); /* Tres "fotos" por línea con un poco de espacio */
+    box-sizing: border-box; /* Incluye el padding y el borde en el ancho */
+    display: flex;
+    justify-content: center; /* Centra el logo horizontalmente */
+    align-items: center; /* Centra el logo verticalmente */
+    min-height: 100px; /* Altura mínima para todas las "fotos" */
+    transition: transform 0.2s ease-in-out; /* Suave efecto al pasar el ratón */
+}
+
+    .empresa-seguimiento:hover {
+        transform: scale(1.05); /* Ligeramente más grande al pasar el ratón */
+    }
+
+    .empresa-seguimiento img {
+        max-width: 100%;
+        max-height: 80px; /* Altura máxima para los logos */
+        object-fit: contain; /* Asegura que la imagen se ajuste dentro sin deformarse */
+    }
+
+/* Ajustes para pantallas más pequeñas (ej: tablets) */
+@media (max-width: 768px) {
+    .empresa-seguimiento {
+        width: calc(50% - 15px); /* Dos "fotos" por línea */
+    }
+}
+
+/* Ajustes para pantallas aún más pequeñas (ej: móviles) */
+@media (max-width: 480px) {
+    .empresa-seguimiento {
+        width: 100%; /* Una "foto" por línea */
+    }
+}
