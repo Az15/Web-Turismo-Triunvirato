@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@model Web_Turismo_Triunvirato.Models.LoginViewModel
+<!DOCTYPE html>
 <html lang="es">
+    
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,16 +14,12 @@
     @* Esto es estilo global(OJO) *@
     <link rel="stylesheet" href="~/css/site.css" />
     @* Estoy practicando para crear el icono por css porque pesa menos, aun no lo logre *@
-    <link rel="stylesheet" href="~/css/GPSico.css" />
-    
+    <link rel="stylesheet" href="~/css/GPSico.css" /> 
 
     @* Si esto solo impacta al login, solo deberia estar en el login, si tiene micro css se tiene que separar en otro archivo como navbar_login o navbar-login o NavbarLogin *@
     <link rel="stylesheet" href="~/css/login.css" />
-
     <link rel="stylesheet" href="~/css/navbar.css" />
-
     <link rel="stylesheet" href="~/css/Footer.css" />
-
     <link rel="stylesheet" href="~/css/iconbar.css" />
 
 </head>
@@ -98,7 +96,7 @@
         @RenderBody()
     </main>
 
-@*     <partial name="_LoginModal" /> *@
+    <partial name="_LoginModal" />
 
 
 
