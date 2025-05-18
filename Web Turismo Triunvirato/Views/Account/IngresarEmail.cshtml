@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Ingresar Email";
+}
+
+<h2>Crear Cuenta - Paso 1</h2>
+<form method="post" asp-action="EnviarCodigo">
+    <label>Email:</label>
+    <input type="email" name="Email" required class="form-control" />
+    <br>
+    <button type="submit" class="btn btn-primary">Enviar Código</button>
+</form>

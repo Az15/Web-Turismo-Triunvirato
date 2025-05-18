@@ -1,6 +1,7 @@
 ﻿@* Views/Account/Login.cshtml *@
 @model Web_Turismo_Triunvirato.Models.LoginViewModel
 
+
 <div class="login-container">
     <h2>Bienvenido</h2>
     <form asp-controller="Account" asp-action="Authenticate" method="post">
@@ -20,8 +21,10 @@
         <p>¿No tienes cuenta?</p>
         <button class="btn btn-secondary btn-sm">Crear cuenta con Gmail</button>
         <br>
+
+        <a asp-controller="Account" asp-action="IngresarEmail" class="btn btn-secondary btn-sm">Crear cuenta con Email</a>
         <br>
-        <button class="btn btn-secondary btn-sm">Crear cuenta con Email </button>
+
     </div>
 </div>
 

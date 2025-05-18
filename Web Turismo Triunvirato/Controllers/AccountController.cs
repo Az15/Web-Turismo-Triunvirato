@@ -1,39 +1,46 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using Web_Turismo_Triunvirato.Models;
-    using System;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Collections.Generic;
 using System.Security.Claims;
-//using System.Windows.Forms;
+using System.Threading.Tasks;
+using Web_Turismo_Triunvirato.Models;
+using Web_Turismo_Triunvirato.Services;
+
 namespace Web_Turismo_Triunvirato.Controllers
 {
-
     public class AccountController : Controller
     {
+        private readonly IUserService _userService;
+
+        public AccountController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
-            return View(); 
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Authenticate(string email, string password)
         {
-            if (email == "alan@alan.com" && password == "123456")
+            var user = await _userService.GetByEmailAsync(email);
+
+            if (user != null && user.Password == password) // ¡Recuerda el tema de las contraseñas seguras!
             {
                 var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, email)
-            // Puedes agregar más claims si lo deseas
-        };
+                {
+                    new Claim(ClaimTypes.Name, email),
+                    new Claim("Nombre", user.Nombre ?? ""), // Guarda el nombre en las claims
+                    new Claim("Apellido", user.Apellido ?? ""), // Guarda el apellido
+                    new Claim("Pais", user.Pais ?? "") // Guarda el país
+                };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var authProperties = new AuthenticationProperties
-                {
-                    // Puedes configurar la duración de la cookie, si es persistente, etc.
-                };
+                var authProperties = new AuthenticationProperties { };
 
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
@@ -49,8 +56,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
         }
 
-
-
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
@@ -58,5 +63,137 @@ namespace Web_Turismo_Triunvirato.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        // -----------------------------
+        // Flujo de registro paso a paso
+        // -----------------------------
+
+        [HttpGet]
+        public IActionResult IngresarEmail()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult EnviarCodigo(string Email)
+        {
+            TempData["Email"] = Email;
+            TempData["Codigo"] = "123456"; // Código fijo por ahora
+            return RedirectToAction("VerificarCodigo");
+        }
+
+        [HttpGet]
+        public IActionResult VerificarCodigo()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerificarCodigo(string CodigoIngresado)
+        {
+            var codigoCorrecto = TempData["Codigo"]?.ToString();
+            if (CodigoIngresado == codigoCorrecto)
+            {
+                TempData.Keep("Email");
+                return RedirectToAction("CompletarPerfil");
+            }
+
+            ViewBag.Error = "El código ingresado no es correcto.";
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult CompletarPerfil()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CompletarPerfil(string Nombre, string Apellido, string Pais, string Contraseña)
+        {
+            var email = TempData["Email"]?.ToString();
+            if (email == null)
+                return RedirectToAction("IngresarEmail");
+
+            var nuevoUsuario = new User { Email = email, Nombre = Nombre, Apellido = Apellido, Pais = Pais, Password = Contraseña }; // Guarda la contraseña
+            await _userService.AddAsync(nuevoUsuario);
+
+            // Iniciar sesión automáticamente después del registro
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, email),
+                new Claim("Nombre", Nombre ?? ""),
+                new Claim("Apellido", Apellido ?? ""),
+                new Claim("Pais", Pais ?? "")
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties { };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        // -----------------------------
+        // Modificar Perfil
+        // -----------------------------
+
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var email = User.Identity.Name;
+                var user = await _userService.GetByEmailAsync(email);
+                if (user != null)
+                {
+                    return View(user); // Pasa el objeto User a la vista de edición
+                }
+            }
+            return RedirectToAction("Index", "Home"); // Si no está autenticado o no se encuentra el usuario
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EditProfile(User model)
+        {
+            if (ModelState.IsValid)
+            {
+                var existingUser = await _userService.GetByEmailAsync(model.Email);
+                if (existingUser != null)
+                {
+                    existingUser.Nombre = model.Nombre;
+                    existingUser.Apellido = model.Apellido;
+                    existingUser.Pais = model.Pais;
+                    existingUser.Password = model.Password; // Permite cambiar la contraseña
+                    await _userService.UpdateAsync(existingUser);
+
+                    // Actualizar las Claims del usuario si es necesario
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, model.Email),
+                        new Claim("Nombre", model.Nombre ?? ""),
+                        new Claim("Apellido", model.Apellido ?? ""),
+                        new Claim("Pais", model.Pais ?? "")
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authProperties = new AuthenticationProperties { IsPersistent = true }; // Mantener la sesión
+
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity),
+                        authProperties);
+
+                    return RedirectToAction("Index", "Home"); // Redirigir a la página principal
+                }
+                ViewBag.ErrorMessage = "Error al guardar el perfil.";
+                return View(model);
+            }
+            return View(model);
+        }
     }
 }

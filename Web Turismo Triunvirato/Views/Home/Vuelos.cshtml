@@ -1,0 +1,77 @@
+﻿ @model Web_Turismo_Triunvirato.ViewModels.DestinationsViewModel
+@{
+    ViewData["Title"] = "Vuelos";
+
+} 
+<link rel="stylesheet" href="~/css/vuelos.css" />
+
+<div class="flight-search-container">
+    <h2>Encuentra tu vuelo ideal</h2>
+    <div class="flight-search-options">
+        <label>
+            <input type="radio" name="flight-type" value="round-trip" checked> Ida y Vuelta
+        </label>
+        <label>
+            <input type="radio" name="flight-type" value="one-way"> Solo Ida
+        </label>
+        <label>
+            <input type="radio" name="flight-type" value="multi-destination"> Multidestino
+        </label>
+    </div>
+    <div class="flight-search-inputs">
+        <div class="input-group">
+            <label for="origin">Origen</label>
+            <input type="text" id="origin" placeholder="Ingresa ciudad, país o región">
+        </div>
+        <div class="input-group">
+            <label for="destination">Destino</label>
+            <input type="text" id="destination" placeholder="¿Adónde vas?">
+        </div>
+        <div class="input-group">
+            <label for="departure-date">Fecha de Ida</label>
+            <input type="date" id="departure-date">
+        </div>
+        <div class="input-group">
+            <label for="return-date">Fecha de Vuelta</label>
+            <input type="date" id="return-date">
+        </div>
+        <div class="input-group">
+            <label for="passengers">Pasajeros, Clase</label>
+            <select id="passengers">
+                <option value="1">1 pasajero, Económica</option>
+                <option value="2">2 pasajeros, Económica</option>
+            </select>
+        </div>
+        <button class="search-button">Buscar</button>
+    </div>
+    <div class="more-options">
+        <label>
+            <input type="checkbox"> Ver fechas más baratas
+        </label>
+    </div>
+</div>
+
+<section class="destinations-section">
+    <h2>Destinos Populares</h2>
+    <div class="destinations-grid">
+        @foreach (var destination in Model.PopularDestinations)
+        {
+            <div class="destination-card">
+                @if (destination.IsHotWeek)
+                {
+                    <span class="hot-week-badge">HOT WEEK</span>
+                }
+                <div class="image-container">
+                    <img src="@Url.Content(destination.ImagenDestino)" alt="@destination.NombreDestio">
+                    <div class="image-overlay">
+                        <h3>@destination.NombreDestio</h3>
+                        <p class="price">@destination.Precio.ToString("C0")</p>
+                        <p class="from">@destination.From</p>
+                    </div>
+                </div>
+                <a href="@destination.DetalleDestino" class="view-details-button">Ver Detalles</a>
+            </div>
+        }
+    </div>
+</section>
+

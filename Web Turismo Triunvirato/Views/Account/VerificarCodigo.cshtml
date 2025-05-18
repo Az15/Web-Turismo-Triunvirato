@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Verificar Código";
+}
+
+<h2>Crear Cuenta - Paso 2</h2>
+<form method="post" asp-action="VerificarCodigo">
+    <label>Ingrese el código:</label>
+    <input type="text" name="CodigoIngresado" required class="form-control" />
+    <br>
+    <button type="submit" class="btn btn-primary">Verificar</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
