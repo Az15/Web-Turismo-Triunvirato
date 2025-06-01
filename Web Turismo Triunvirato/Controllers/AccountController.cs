@@ -19,7 +19,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Login()
         {
             return View();
         }
@@ -36,7 +36,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     new Claim(ClaimTypes.Name, email),
                     new Claim("Nombre", user.Nombre ?? ""), // Guarda el nombre en las claims
                     new Claim("Apellido", user.Apellido ?? ""), // Guarda el apellido
-                    new Claim("Pais", user.Pais ?? "") // Guarda el país
+                   // new Claim("Pais", user.Pais ?? "") // Guarda el país
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -114,7 +114,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (email == null)
                 return RedirectToAction("IngresarEmail");
 
-            var nuevoUsuario = new User { Email = email, Nombre = Nombre, Apellido = Apellido, Pais = Pais, Password = Contraseña }; // Guarda la contraseña
+            var nuevoUsuario = new User { Email = email, Nombre = Nombre, Apellido = Apellido, /*Pais = Pais,*/ Password = Contraseña }; // Guarda la contraseña
             await _userService.AddAsync(nuevoUsuario);
 
             // Iniciar sesión automáticamente después del registro
@@ -167,7 +167,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     existingUser.Nombre = model.Nombre;
                     existingUser.Apellido = model.Apellido;
-                    existingUser.Pais = model.Pais;
+                    //existingUser.Pais = model.Pais;
                     existingUser.Password = model.Password; // Permite cambiar la contraseña
                     await _userService.UpdateAsync(existingUser);
 
@@ -177,7 +177,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         new Claim(ClaimTypes.Name, model.Email),
                         new Claim("Nombre", model.Nombre ?? ""),
                         new Claim("Apellido", model.Apellido ?? ""),
-                        new Claim("Pais", model.Pais ?? "")
+                       // new Claim("Pais", model.Pais ?? "")
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
