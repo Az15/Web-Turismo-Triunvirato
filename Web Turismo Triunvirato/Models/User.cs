@@ -1,41 +1,28 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations; // Para atributos como [Required] si usas validación o EF Core
+using System.ComponentModel.DataAnnotations;
 
-namespace Fenix.Models // Ajusta el namespace a tu proyecto
+namespace Web_Turismo_Triunvirato.Models
 {
     public class User
     {
-        [Key] // Indica que esta es la clave primaria si usas Entity Framework Core
-        public int Id { get; set; } // Identificador único del usuario
+        [Key]
+        public int Id { get; set; }
 
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
-        [StringLength(100)]
-        public string Name { get; set; }
-
-        [Required(ErrorMessage = "El apellido es obligatorio.")]
-        [StringLength(100)]
-        public string Surname { get; set; }
-
-        [Required(ErrorMessage = "El DNI es obligatorio.")]
-        [StringLength(20)] // Ajusta el tamaño según el formato de DNI que uses (ej. "XX.XXX.XXX")
-        public string DNI { get; set; }
-
-        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
-        [DataType(DataType.Date)] // Sugiere que es solo una fecha, sin hora
-        public DateTime DateOfBirth { get; set; }
-
-        [Required(ErrorMessage = "El email es obligatorio.")]
-        [EmailAddress(ErrorMessage = "Formato de email inválido.")]
-        [StringLength(255)]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "La contraseña es obligatoria.")]
-        [StringLength(255)] // Almacena el hash de la contraseña, no la contraseña en texto plano
-        [DataType(DataType.Password)] // Sugiere que es un campo de contraseña
-        public string Password { get; set; } // Nota: En una aplicación real, almacenarías un hash de la contraseña, no el texto plano.
+        [Required]
+        public string Password { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
 
-        [StringLength(500)]
-        public string Address { get; set; }
+        public string Pais { get; set; }
+
+
+
+
+        //public string Rol { get; set; } 
+
+
     }
 }

@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Perfil del Administrador";
+}
+
+<div class="container-fluid">
+    <h1 class="mt-4">@ViewData["Title"]</h1>
+    <p>Aquí puedes ver y gestionar la información de tu perfil de administrador.</p>
+
+    <div class="card p-4 mt-4">
+        <p><strong>Email:</strong> @User.Identity.Name</p>
+        <p><strong>Nombre:</strong> @User.Claims.FirstOrDefault(c => c.Type == "Nombre")?.Value</p>
+        <p><strong>Apellido:</strong> @User.Claims.FirstOrDefault(c => c.Type == "Apellido")?.Value</p>
+        <p><strong>Rol:</strong> @(User.IsInRole("Admin") ? "Administrador" : "Usuario Estándar")</p>
+
+        <hr />
+        <a asp-controller="Account" asp-action="EditProfile" class="btn btn-primary">Modificar Datos de Perfil</a>
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary mt-2">Volver al Dashboard</a>
+    </div>
+</div>

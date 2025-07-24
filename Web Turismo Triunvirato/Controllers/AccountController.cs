@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Web_Turismo_Triunvirato.Models;
 using Web_Turismo_Triunvirato.Services;
+using Microsoft.AspNetCore.Localization;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -23,21 +24,27 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        public async Task<IActionResult> Authenticate(string email, string password)
+        public async Task<IActionResult> Authenticate(string email, string password) // <--- CORREGIDO AQUÍ: "string password"
         {
             var user = await _userService.GetByEmailAsync(email);
 
+            // La lógica de verificación de contraseña y asignación de claims es correcta
             if (user != null && user.Password == password) // ¡Recuerda el tema de las contraseñas seguras!
             {
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, email),
-                    new Claim("Nombre", user.Nombre ?? ""), // Guarda el nombre en las claims
-                    new Claim("Apellido", user.Apellido ?? ""), // Guarda el apellido
-                   // new Claim("Pais", user.Pais ?? "") // Guarda el país
+                    new Claim("Nombre", user.Nombre ?? ""),
+                    new Claim("Apellido", user.Apellido ?? ""),
+                    // new Claim("Pais", user.Pais ?? "")
                 };
+                // ***** ROL DE ADMIN *****
+                if (email == "admin@admin.com")
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                }
+                // ********************************************
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var authProperties = new AuthenticationProperties { };
@@ -47,14 +54,23 @@ namespace Web_Turismo_Triunvirato.Controllers
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
-                return RedirectToAction("Index", "Home");
+                // MODIFICACIÓN CLAVE PARA LA REDIRECCIÓN
+                if (email == "admin@admin.com")
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
             else
             {
                 ViewBag.ErrorMessage = "Credenciales incorrectas.";
-                return View("Index");
+                return View("Login");
             }
-        }
+        
+    }
 
         [HttpPost]
         public async Task<IActionResult> Logout()

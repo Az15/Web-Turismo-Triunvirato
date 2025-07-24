@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Admin"; // El título se toma del controlador
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mt-4">Bienvenido al Panel de Administración</h1>
+            <p class="lead">Desde aquí podrás gestionar todos los aspectos de tu agencia de turismo.</p>
+            <div class="alert alert-info mt-3" role="alert">
+                Utiliza el menú de la izquierda para navegar entre las diferentes secciones.
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center p-3">
+                        <i class="fas fa-plane fa-5x text-primary mb-3"></i>
+                        <h5>Gestión de Vuelos</h5>
+                        <p>Administra vuelos y promociones aéreas.</p>
+                        <a asp-controller="Admin" asp-action="Vuelos" class="btn btn-primary">Ir a Vuelos</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center p-3">
+                        <i class="fas fa-hotel fa-5x text-success mb-3"></i>
+                        <h5>Gestión de Hoteles</h5>
+                        <p>Administra hoteles y ofertas de alojamiento.</p>
+                        <a asp-controller="Admin" asp-action="Hoteles" class="btn btn-success">Ir a Hoteles</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center p-3">
+                        <i class="fas fa-bus-alt fa-5x text-warning mb-3"></i>
+                        <h5>Gestión de Buses</h5>
+                        <p>Administra rutas de bus y promociones terrestres.</p>
+                        <a asp-controller="Admin" asp-action="Buses" class="btn btn-warning">Ir a Buses</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center p-3">
+                        <i class="fas fa-suitcase fa-5x text-info mb-3"></i>
+                        <h5>Gestión de Paquetes</h5>
+                        <p>Crea y administra paquetes turísticos completos.</p>
+                        <a asp-controller="Admin" asp-action="Paquetes" class="btn btn-info">Ir a Paquetes</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center p-3">
+                        <i class="fas fa-user-cog fa-5x text-secondary mb-3"></i>
+                        <h5>Mi Perfil</h5>
+                        <p>Configura tu información de administrador.</p>
+                        <a asp-controller="Admin" asp-action="Perfil" class="btn btn-secondary">Ver Perfil</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
