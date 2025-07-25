@@ -37,8 +37,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         public IActionResult Vuelos()
         {
             ViewData["Title"] = "Administración de Vuelos";
-            // Aquí puedes añadir TempData o ViewBag si necesitas pasar mensajes a la vista Vuelos
-            return View(); // Esta vista contendrá el enlace a AltaPromocion
+            return View(); // Esta vista contendrá el enlace a AltaPromocion y GestionarPromocionesVuelos
         }
 
         public IActionResult Hoteles()
@@ -86,14 +85,14 @@ namespace Web_Turismo_Triunvirato.Controllers
 
                 await _promotionService.AddPromotionAsync(promotion);
                 TempData["SuccessMessage"] = "¡Promoción agregada exitosamente!";
-                return RedirectToAction(nameof(ListarPromociones)); // Redirige a una lista de promociones
+                return RedirectToAction(nameof(ListarPromociones)); // O podrías redirigir a GestionarPromocionesVuelos si siempre es de vuelos
             }
             // Si el modelo no es válido, vuelve a mostrar el formulario con los errores
             ViewData["Title"] = "Alta de Promoción"; // Vuelve a establecer el título si hay errores
             return View(promotion);
         }
 
-        // GET: Admin/ListarPromociones (Muestra todas las promociones)
+        // GET: Admin/ListarPromociones (Muestra todas las promociones - usada como lista general)
         [HttpGet]
         public async Task<IActionResult> ListarPromociones()
         {
@@ -101,6 +100,22 @@ namespace Web_Turismo_Triunvirato.Controllers
             var promotions = await _promotionService.GetAllPromotionsAsync();
             return View(promotions);
         }
+
+        // GET: Admin/GestionarPromocionesVuelos (Muestra SOLO promociones de Vuelos para edición)
+        [HttpGet]
+        public async Task<IActionResult> GestionarPromocionesVuelos()
+        {
+            ViewData["Title"] = "Gestionar Promociones de Vuelos";
+            // Obtener solo las promociones de tipo Vuelos
+            var flightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
+
+            // Opcional: Filtrar solo las activas si solo quieres modificar las activas aquí
+            // (La fecha actual es Jueves, 24 de julio de 2025. Se asume que las fechas de las promociones de prueba son anteriores a hoy o cubren el futuro)
+            flightPromotions = flightPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
+
+            return View(flightPromotions.OrderByDescending(p => p.Id)); // Pasar la lista de promociones a la vista
+        }
+
 
         // GET: Admin/EditarPromocion/{id}
         [HttpGet]
@@ -129,6 +144,13 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
                 await _promotionService.UpdatePromotionAsync(promotion);
                 TempData["SuccessMessage"] = "¡Promoción actualizada exitosamente!";
+
+                // Redirige a la lista específica de vuelos después de editar si el tipo es Vuelos
+                if (promotion.ServiceType == ServiceType.Vuelos)
+                {
+                    return RedirectToAction(nameof(GestionarPromocionesVuelos));
+                }
+                // Si editas otro tipo de promo (ej: Hotel), redirige a la lista general
                 return RedirectToAction(nameof(ListarPromociones));
             }
             ViewData["Title"] = "Editar Promoción"; // Vuelve a establecer el título si hay errores
@@ -142,7 +164,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             await _promotionService.DeletePromotionAsync(id);
             TempData["SuccessMessage"] = "¡Promoción eliminada exitosamente!";
-            return RedirectToAction(nameof(ListarPromociones));
+            return RedirectToAction(nameof(ListarPromociones)); // Siempre redirige a la lista general
         }
     }
 }

@@ -57,11 +57,16 @@
                                                 <i class="fas fa-user-edit"></i> Modificar perfil
                                             </a>
                                         </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Admin">
-                                                <i class="fas fa-user-edit"></i> Menu Admin
-                                            </a>
-                                        </li>
+                                        @* ***** INICIO DEL CAMBIO ***** *@
+                                        @if (User.IsInRole("Admin")) // <--- Esta condición es la clave
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Admin" asp-action="Index">
+                                                    <i class="fas fa-cog"></i> Menu Admin
+                                                </a>
+                                            </li>
+                                        }
+                                        @* ***** FIN DEL CAMBIO ***** *@
                                             <li>
                                                 <form method="post" asp-controller="Account" asp-action="Logout">
                                                     <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>

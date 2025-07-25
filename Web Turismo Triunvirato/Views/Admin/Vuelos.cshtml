@@ -2,45 +2,49 @@
     ViewData["Title"] = "Administración de Vuelos";
 }
 
-<div class="container-fluid">
-    <h1 class="mt-4">@ViewData["Title"]</h1>
-    <p>Desde aquí gestionarás las promociones y precios de vuelos.</p>
+<h2 class="mt-4">@ViewData["Title"]</h2>
+<p>Desde aquí gestionarás las promociones y precios de vuelos.</p>
 
-    <div class="row mt-4">
-        <div class="col-md-4 mb-4">
-            <div class="card text-center p-3">
-                <i class="fas fa-plus-circle fa-4x text-success mb-3"></i>
-                <h5 class="card-title">Alta de Promociones de Vuelo</h5>
-                <p class="card-text">Agrega nuevas ofertas y precios para vuelos.</p>
-                <a asp-controller="Admin" asp-action="AltaPromocion" asp-route-serviceType="@Web_Turismo_Triunvirato.Models.ServiceType.Vuelos" class="btn btn-success">Ir a Alta</a>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-center p-3">
-                <i class="fas fa-edit fa-4x text-primary mb-3"></i>
-                <h5 class="card-title">Modificación de Promociones de Vuelo</h5>
-                <p class="card-text">Edita los detalles de promociones de vuelos existentes.</p>
-                <a href="#" class="btn btn-primary disabled">Seleccionar de la lista</a> @* Se manejará desde la tabla *@
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-center p-3">
-                <i class="fas fa-minus-circle fa-4x text-danger mb-3"></i>
-                <h5 class="card-title">Baja de Promociones de Vuelo</h5>
-                <p class="card-text">Elimina promociones de vuelos que ya no son válidas.</p>
-                <a href="#" class="btn btn-danger disabled">Seleccionar de la lista</a> @* Se manejará desde la tabla *@
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AltaPromocion" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-plus-circle fa-4x text-success mb-3"></i>
+                    <h5 class="card-title text-dark">Alta de Promociones de Vuelo</h5>
+                    <p class="card-text text-muted">Agrega nuevas ofertas y precios para vuelos.</p>
+                </a>
             </div>
         </div>
     </div>
 
-    <hr class="my-4" />
-    <h2 class="mt-4">Promociones de Vuelos Actuales</h2>
-    <p class="text-muted">Aquí iría la tabla con las promociones de vuelos cargadas.</p>
-
-    <div class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle"></i> Aquí mostraremos la lista de promociones de vuelos.
-        Necesitarás pasar el modelo de promociones a esta vista desde el controlador y renderizarlas en una tabla.
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="GestionarPromocionesVuelos" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-pencil-alt fa-4x text-primary mb-3"></i>
+                    <h5 class="card-title text-dark">Modificar Promociones de Vuelo</h5>
+                    <p class="card-text text-muted">Edita promociones existentes.</p>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary mt-3">Volver al Dashboard</a>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="ListarPromociones" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-list fa-4x text-secondary mb-3"></i>
+                    <h5 class="card-title text-dark">Ver Todas las Promociones</h5>
+                    <p class="card-text text-muted">Lista todas las promociones (vuelos, hoteles, etc.)</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver al Panel de Administración</a>
 </div>

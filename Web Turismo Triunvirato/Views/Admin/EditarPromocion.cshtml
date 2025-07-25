@@ -1,14 +1,15 @@
 ﻿@model Web_Turismo_Triunvirato.Models.Promotion
 
 @{
-    ViewData["Title"] = "Modificar Promoción";
+    ViewData["Title"] = "Editar Promoción"; // Cambié el título a "Editar Promoción" para ser consistente
 }
 
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
 
     <div class="card p-4">
-        <form asp-action="ModificarPromocion" method="post">
+        <form asp-action="EditarPromocion" method="post">
+            @* <--- ASEGÚRATE DE QUE SEA 'EditarPromocion' *@
             @Html.AntiForgeryToken()
 
             <input type="hidden" asp-for="Id" />
@@ -19,6 +20,11 @@
                 <input asp-for="ServiceType" class="form-control" readonly />
             </div>
 
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
             <div class="mb-3">
                 <label asp-for="DestinationName" class="form-label"></label>
                 <input asp-for="DestinationName" class="form-control" />
@@ -42,11 +48,6 @@
             <hr />
 
             <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
                 <label asp-for="OriginalPrice" class="form-label"></label>
                 <input asp-for="OriginalPrice" type="number" step="0.01" class="form-control" />
                 <span asp-validation-for="OriginalPrice" class="text-danger"></span>
@@ -56,6 +57,11 @@
                 <input asp-for="OfferPrice" type="number" step="0.01" class="form-control" />
                 <span asp-validation-for="OfferPrice" class="text-danger"></span>
             </div>
+            @* El DiscountPercentage se calcula automáticamente, no necesita campo de entrada *@
+            @* <div class="mb-3">
+            <label asp-for="DiscountPercentage" class="form-label"></label>
+            <input asp-for="DiscountPercentage" type="number" step="0.01" class="form-control" readonly />
+            </div> *@
             <div class="mb-3">
                 <label asp-for="StartDate" class="form-label"></label>
                 <input asp-for="StartDate" type="date" class="form-control" />
@@ -72,7 +78,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
-            <a asp-action="@Model.ServiceType.ToString()" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a @Model.ServiceType</a>
+            <a asp-action="GestionarPromocionesVuelos" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a Promociones de Vuelos</a> @* <-- ENLACE DE VOLVER A LA LISTA DE VUELOS *@
         </form>
     </div>
 </div>
