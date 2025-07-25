@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Web_Turismo_Triunvirato.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Web_Turismo_Triunvirato.Services;
+using Web_Turismo_Triunvirato.Services; // Asegúrate de tener este using para IPromotionService y InMemoryPromotionService
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Account/Logout"; // La ruta a tu acción de cierre de sesión
         options.AccessDeniedPath = "/Account/AccessDenied"; // Ruta para cuando el acceso es denegado
     });
+
+// Registro de tus servicios personalizados
 builder.Services.AddScoped<IUserService, InMemoryUserService>();
+// *** AGREGAR ESTA LÍNEA PARA EL SERVICIO DE PROMOCIONES ***
+builder.Services.AddScoped<IPromotionService, InMemoryPromotionService>(); // <--- ¡Esta es la línea que faltaba!
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -44,7 +49,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
- 
-
- 

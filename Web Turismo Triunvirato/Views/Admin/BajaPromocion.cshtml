@@ -1,0 +1,64 @@
+﻿@model Web_Turismo_Triunvirato.Models.Promotion
+
+@{
+    ViewData["Title"] = "Baja de Promoción";
+}
+
+<div class="container mt-4">
+    <h1>@ViewData["Title"]</h1>
+    <h3>¿Estás seguro de que quieres eliminar esta promoción?</h3>
+
+    <div class="alert alert-warning" role="alert">
+        Esta acción es irreversible.
+    </div>
+
+    <div class="card p-4">
+        <dl class="row">
+            <dt class="col-sm-3">ID:</dt>
+            <dd class="col-sm-9">@Model.Id</dd>
+
+            <dt class="col-sm-3">Tipo de Servicio:</dt>
+            <dd class="col-sm-9">@Model.ServiceType</dd>
+
+            <dt class="col-sm-3">Destino:</dt>
+            <dd class="col-sm-9">@Model.DestinationName</dd>
+
+            <dt class="col-sm-3">Origen:</dt>
+            <dd class="col-sm-9">@Model.OriginName</dd>
+
+            <dt class="col-sm-3">URL Imagen:</dt>
+            <dd class="col-sm-9">@Model.ImageUrl</dd>
+
+            <dt class="col-sm-3">Es Hot Week:</dt>
+            <dd class="col-sm-9">@(Model.IsHotWeek ? "Sí" : "No")</dd>
+
+            <dt class="col-sm-3">Descripción:</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3">Precio Original:</dt>
+            <dd class="col-sm-9">@Model.OriginalPrice.ToString("C0")</dd> @* Usamos C0 para sin decimales como tu ejemplo *@
+
+            <dt class="col-sm-3">Precio de Oferta:</dt>
+            <dd class="col-sm-9">@Model.OfferPrice.ToString("C0")</dd> @* Usamos C0 para sin decimales como tu ejemplo *@
+
+            <dt class="col-sm-3">% Descuento:</dt>
+            <dd class="col-sm-9">@Model.DiscountPercentage.ToString("F2")%</dd>
+
+            <dt class="col-sm-3">Fecha de Inicio:</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-3">Fecha de Fin:</dt>
+            <dd class="col-sm-9">@Model.EndDate.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-3">Activa:</dt>
+            <dd class="col-sm-9">@(Model.IsActive ? "Sí" : "No")</dd>
+        </dl>
+
+        <form asp-action="BajaPromocion" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Confirmar Eliminación</button>
+            <a asp-action="@Model.ServiceType.ToString()" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancelar y Volver</a>
+        </form>
+    </div>
+</div>
