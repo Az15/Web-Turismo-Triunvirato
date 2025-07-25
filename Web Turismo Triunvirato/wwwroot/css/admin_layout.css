@@ -1,0 +1,95 @@
+﻿/* Estilos generales para el Admin Layout */
+body {
+    overflow-x: hidden; /* Evita scroll horizontal */
+}
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: #343a40; /* Color oscuro similar al navbar */
+    color: #fff;
+    transition: all 0.3s;
+    height: 100vh; /* Ocupa toda la altura de la ventana */
+    position: fixed; /* Fijo a la izquierda */
+    top: 0;
+    left: 0;
+    padding-top: 56px; /* Espacio para el navbar superior */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+}
+
+    #sidebar.active {
+        margin-left: -250px; /* Para ocultar la sidebar si se implementa un toggle */
+    }
+
+    #sidebar .sidebar-header {
+        padding: 20px;
+        background: #212529; /* Un tono más oscuro para el header del sidebar */
+    }
+
+    #sidebar ul.components {
+        padding: 20px 0;
+        border-bottom: 1px solid #47748b; /* Separador */
+    }
+
+    #sidebar ul li a {
+        padding: 10px;
+        font-size: 1.1em;
+        display: block;
+        color: #fff;
+        text-decoration: none;
+    }
+
+        #sidebar ul li a:hover {
+            color: #343a40;
+            background: #fff;
+        }
+
+    #sidebar ul li.active > a, a[aria-expanded="true"] {
+        color: #fff;
+        background: #6d7fcc; /* Un color de resaltado para elementos activos/expandidos */
+    }
+
+    #sidebar ul ul a {
+        font-size: 0.9em !important;
+        padding-left: 30px !important;
+        background: #495057; /* Fondo para sub-menú */
+    }
+
+#content {
+    width: 100%;
+    padding: 20px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    margin-left: 250px; /* Deja espacio para la sidebar */
+    padding-top: 76px; /* Espacio para el navbar superior */
+}
+
+/* Opcional: para pantallas más pequeñas, podrías hacer la sidebar colapsable */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+
+        #sidebar.active {
+            margin-left: 0;
+        }
+
+    #content {
+        width: 100%;
+        margin-left: 0;
+    }
+
+        #content.active {
+            margin-left: 250px;
+        }
+
+    .navbar-toggler {
+        display: block; /* Muestra el botón de hamburguesa */
+    }
+}

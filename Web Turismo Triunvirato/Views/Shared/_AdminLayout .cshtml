@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Panel Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" /> @* Asegúrate de que tu site.css exista y tenga estilos básicos *@
+    <link rel="stylesheet" href="~/css/admin_layout.css" /> @* NUEVO CSS para el layout de admin *@
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-compass"></i> Panel de Administración
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-shield"></i> @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="EditProfile"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" asp-controller="Account" asp-action="Logout">
+                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <nav id="sidebar" class="bg-dark">
+            <div class="sidebar-header text-white text-center py-3">
+                <h3>Opciones Admin</h3>
+            </div>
+            <ul class="list-unstyled components">
+                <li>
+                    <a asp-controller="Admin" asp-action="Index">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Admin" asp-action="Perfil">
+                        <i class="fas fa-user-cog"></i> Perfil Admin
+                    </a>
+                </li>
+                <li>
+                    <a href="#promocionesSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                        <i class="fas fa-tags"></i> Promociones
+                    </a>
+                    <ul class="collapse list-unstyled" id="promocionesSubmenu">
+                        <li>
+                            <a asp-controller="Admin" asp-action="Vuelos"><i class="fas fa-plane"></i> Vuelos</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Admin" asp-action="Hoteles"><i class="fas fa-hotel"></i> Hoteles</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Admin" asp-action="Buses"><i class="fas fa-bus-alt"></i> Buses</a>
+                        </li>
+                        <li>
+                            <a asp-controller="Admin" asp-action="Paquetes"><i class="fas fa-suitcase"></i> Paquetes</a>
+                        </li>
+                    </ul>
+                </li>
+                @* Agrega más elementos al menú aquí si los necesitas *@
+            </ul>
+        </nav>
+
+        <div id="content">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

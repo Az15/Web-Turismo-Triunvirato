@@ -1,28 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Web_Turismo_Triunvirato.Models;
-using Web_Turismo_Triunvirato.ViewModels;
+using Web_Turismo_Triunvirato.ViewModels; // Aseg√∫rate de tenerlo si usas otros ViewModels, si no, puedes quitarlo
+using Web_Turismo_Triunvirato.Services;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System; // Para DateTime
+
 using Web_Turismo_Triunvirato.Data;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
     public class HomeController : Controller
     {
+
         private readonly ILogger<HomeController> _logger; 
         private readonly ApplicationDbContext _dbContext;
+        private readonly IPromotionService _promotionService; // Campo privado para almacenar el servicio
 
-        public HomeController(ILogger<HomeController> logger , ApplicationDbContext dbContext)
+        public HomeController(ILogger<HomeController> logger , ApplicationDbContext dbContext , IPromotionService promotionService)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _promotionService = promotionService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index() // <-- °IMPORTANTE! Hacer el mÈtodo async Task<IActionResult>
+        public async Task<IActionResult> Index() // <-- ¬°IMPORTANTE! Hacer el m√©todo async Task<IActionResult>
         {
-            // Ejecuta la tarea asÌncrona y espera su resultado
+
+            // Ejecuta la tarea as√≠ncrona y espera su resultado
             var Carousel = await _dbContext.GetCarouselItemsAsync();
-            // Verifica si la lista de Carousel es nula o est· vacÌa
+            // Verifica si la lista de Carousel es nula o est√° vac√≠a
             var Destinys = await _dbContext.GetHotDestinyItemsAsync();
 
             //Comente esta linea porque tengo que hacer unas pruebas de integridad de datos antes de continuar
@@ -31,7 +41,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             //{
             //    // Maneja el caso donde no hay elementos en el carrusel
             //    _logger.LogWarning("No carousel items found or Destinys Not Found.");
-            //    return View(new View_Index_Collection()); // Retorna una vista vacÌa o con un modelo vacÌo
+            //    return View(new View_Index_Collection()); // Retorna una vista vac√≠a o con un modelo vac√≠o
             //}
 
             var collection_Index = new View_Index_Collection
@@ -45,28 +55,20 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public IActionResult Vuelos()
+        public async Task<IActionResult> Vuelos() // <--- ESTA ACCI√ìN ES LA QUE DEBE ESTAR ACTUALIZADA
         {
-            ViewData.Clear();
-            var viewModel = new DestinationsViewModel
-            {
-                PopularDestinations = new List<View_Index_Destination>
-                    {
-                        new View_Index_Destination { Title = "Bariloche", PictureDestiny = "~/img/Bariloche.jpg", Price = 1056067, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Madrid", IsHotWeek = true },
-                        new View_Index_Destination { Title = "RÌo de Janeiro", PictureDestiny = "~/img/RiodeJaneiro.jpeg", Price = 217460, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/RioDeJaneiro" },
-                        new View_Index_Destination { Title = "Barcelona", PictureDestiny = "~/img/Barcelona.jpeg", Price = 932300, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Barcelona", IsHotWeek = true },
-                        new View_Index_Destination { Title = "Miami", PictureDestiny = "~/img/Miami.jpeg", Price = 675513, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Miami" },
-                        new View_Index_Destination { Title = "Roma", PictureDestiny = "~/images/roma.jpg", Price = 1096552, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Roma" },
-                        new View_Index_Destination { Title = "San Carlos de Bariloche", PictureDestiny = "~/images/san-carlos-de-bariloche.jpg", Price = 47425, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Bariloche", IsHotWeek = true },
-                        new View_Index_Destination { Title = "Cataratas del Iguaz˙", PictureDestiny = "~/images/cataratas-del-iguazu.jpg", Price = 49738, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Iguazu" },
-                        new View_Index_Destination { Title = "Santiago de Chile", PictureDestiny = "~/images/santiago-de-chile.jpg", Price = 192012, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Santiago" },
-                        new View_Index_Destination { Title = "Punta Cana", PictureDestiny = "~/images/punta-cana.jpg", Price = 636185, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/PuntaCana", IsHotWeek = true },
-                        new View_Index_Destination { Title = "Aruba", PictureDestiny = "~/images/aruba.jpg", Price = 493911, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Aruba" },
-                        new View_Index_Destination { Title = "Canc˙n", PictureDestiny = "~/images/cancun.jpg", Price = 643125, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Cancun" },
-                        new View_Index_Destination { Title = "Nueva York", PictureDestiny = "~/images/nueva-york.jpg", Price = 743758, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/NuevaYork", IsHotWeek = true }
-                    }
-            };
-            return View(viewModel);
+            // Obtener solo las promociones de tipo Vuelos que est√°n activas y dentro del rango de fechas
+            // La fecha actual es Jueves, 24 de julio de 2025.
+            var activeFlightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
+            activeFlightPromotions = activeFlightPromotions
+                                        .Where(p => p.IsActive && p.EndDate >= DateTime.Today)
+                                        .OrderByDescending(p => p.IsHotWeek) // Hot Week primero
+                                        .ThenBy(p => p.OfferPrice)           // Luego por precio
+                                        .ToList();
+
+            ViewData["Title"] = "Vuelos";
+            // Pasar la lista de promociones directamente a la vista
+            return View(activeFlightPromotions); // <--- Aqu√≠ se pasa IEnumerable<Promotion>
         }
 
         [HttpGet]
@@ -82,7 +84,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public IActionResult Help() 
+        public IActionResult Help()
         {
             return View();
         }
@@ -99,9 +101,5 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             return View();
         }
-
-      
-
-
     }
 }

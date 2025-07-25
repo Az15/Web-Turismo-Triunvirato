@@ -10,6 +10,30 @@ namespace Web_Turismo_Triunvirato.Services
         private readonly List<User> _users = new List<User>();
         private int _nextId = 1;
 
+        // Constructor para inicializar la lista de usuarios con datos de prueba
+        public InMemoryUserService()
+        {
+            _users.Add(new User
+            {
+                Id = _nextId++,
+                Email = "alan@alan.com",
+                Password = "123456",
+                Nombre = "Alan",
+                Apellido = "Walker", 
+                
+            });
+
+       
+            _users.Add(new User
+            {
+                Id = _nextId++,
+                Email = "admin@admin.com",
+                Password = "admin",
+                Nombre = "Test",
+                Apellido = "User"
+            });
+        }
+
         public Task AddAsync(User user)
         {
             user.Id = _nextId++;
@@ -53,6 +77,7 @@ namespace Web_Turismo_Triunvirato.Services
 
         public Task<User> GetByEmailAsync(string email)
         {
+            // Busca el usuario por email
             return Task.FromResult(_users.FirstOrDefault(u => u.Email == email));
         }
     }

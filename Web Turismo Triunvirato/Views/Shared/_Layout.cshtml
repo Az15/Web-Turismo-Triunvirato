@@ -57,6 +57,16 @@
                                                 <i class="fas fa-user-edit"></i> Modificar perfil
                                             </a>
                                         </li>
+                                        @* ***** INICIO DEL CAMBIO ***** *@
+                                        @if (User.IsInRole("Admin")) // <--- Esta condición es la clave
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Admin" asp-action="Index">
+                                                    <i class="fas fa-cog"></i> Menu Admin
+                                                </a>
+                                            </li>
+                                        }
+                                        @* ***** FIN DEL CAMBIO ***** *@
                                             <li>
                                                 <form method="post" asp-controller="Account" asp-action="Logout">
                                                     <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
@@ -153,7 +163,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
       <script src="~/js/iconbar.js"></script>  
-    
+    @RenderSection("Scripts", required: false)
 
 </body>
 </html>

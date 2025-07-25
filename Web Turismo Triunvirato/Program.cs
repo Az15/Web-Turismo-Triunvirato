@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using Web_Turismo_Triunvirato.Data;
-using Web_Turismo_Triunvirato.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Web_Turismo_Triunvirato.Services; // Aseg√∫rate de tener este using para IPromotionService y InMemoryPromotionService
 using Pomelo.EntityFrameworkCore.MySql;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +18,11 @@ builder.Services.AddControllersWithViews();
 
 // ...
 
-// Cambia esta lÌnea:
+// Cambia esta l√≠nea:
 // builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Por esta, especificando la versiÛn del servidor MySQL:
+// Por esta, especificando la versi√≥n del servidor MySQL:
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -28,17 +30,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
-// ConfiguraciÛn de la autenticaciÛn por cookies
+// Configuraci√≥n de la autenticaci√≥n por cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login"; // La ruta a tu p·gina de inicio de sesiÛn
-        options.LogoutPath = "/Account/Logout"; // La ruta a tu acciÛn de cierre de sesiÛn
+        options.LoginPath = "/Account/Login"; // La ruta a tu p√°gina de inicio de sesi√≥n
+        options.LogoutPath = "/Account/Logout"; // La ruta a tu acci√≥n de cierre de sesi√≥n
         options.AccessDeniedPath = "/Account/AccessDenied"; // Ruta para cuando el acceso es denegado
     });
+
+// Registro de tus servicios personalizados
 builder.Services.AddScoped<IUserService, InMemoryUserService>();
+// *** AGREGAR ESTA L√çNEA PARA EL SERVICIO DE PROMOCIONES ***
+builder.Services.AddScoped<IPromotionService, InMemoryPromotionService>(); // <--- ¬°Esta es la l√≠nea que faltaba!
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -54,7 +61,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// °Aseg˙rate de que UseAuthentication estÈ antes de UseAuthorization!
+// ¬°Aseg√∫rate de que UseAuthentication est√© antes de UseAuthorization!
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -63,7 +70,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
- 
-
- 

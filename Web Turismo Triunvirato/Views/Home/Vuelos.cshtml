@@ -1,7 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Vuelos";
+@model IEnumerable<Web_Turismo_Triunvirato.Models.Promotion>  
 
-} 
+@{
+    ViewData["Title"] = "Vuelos";
+} 
 <link rel="stylesheet" href="~/css/vuelos.css" />
 
 <div class="flight-search-container">
@@ -51,26 +52,47 @@
 </div>
 
 <section class="destinations-section">
-    <h2>Destinos Populares</h2>
+    <h2>Destinos Populares (Promociones de Vuelos)</h2> @* Título actualizado *@
     <div class="destinations-grid">
-        @foreach (var destination in Model.PopularDestinations)
+        @if (Model != null && Model.Any())
         {
-            <div class="destination-card">
-                @if (destination.IsHotWeek)
-                {
-                    <span class="hot-week-badge">HOT WEEK</span>
-                }
-                <div class="image-container">
-                    <img src="@Url.Content(destination.PictureDestiny)" alt="@destination.Title">
-                    <div class="image-overlay">
-                        <h3>@destination.Title</h3>
-                        <p class="price">@destination.Price.ToString("C0")</p>
-                        <p class="from">@destination.From</p>
+
+            @foreach (var promotion in Model) @* Iteramos sobre las promociones *@
+            {
+                <div class="destination-card">
+                    @if (promotion.IsHotWeek)
+                    {
+                        <span class="hot-week-badge">HOT WEEK</span>
+                    }
+                    else if (promotion.DiscountPercentage > 0)
+                    {
+                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span> 
+                    }
+                    <div class="image-container">
+                       
+                        <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
+                        <div class="image-overlay">
+                            <h3>@promotion.DestinationName</h3> 
+                            <p class="price">@promotion.OfferPrice.ToString("C0")</p> 
+                            <p class="from">Desde @promotion.OriginName</p> 
+                        </div>
+
                     </div>
+              
+                    @* <a href="#" class="btn btn-success ver-detalles-button">Ver Detalles</a> *@
                 </div>
-                <a href="@destination.DetailDestinyURL" class="view-details-button">Ver Detalles</a>
-            </div>
+            }
+        }
+        else
+        {
+            <p class="col-12 alert alert-info text-center">No hay destinos populares de vuelos disponibles en este momento.</p>
+
         }
     </div>
 </section>
 
+@* Si aún usas el viewModel DestinationsViewModel en algún otro lugar de la vista
+   y quieres mantenerlo por alguna razón, podrías adaptarlo.
+   Pero lo ideal es que la vista reciba directamente el modelo que va a renderizar.
+   En este caso, IEnumerable<Promotion> es lo más directo.
+*@

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
-    public enum GenderType // Enumeración para el tipo de género
+    public enum GenderType // EnumeraciÃ³n para el tipo de gÃ©nero
     {
         Male,
         Female,
@@ -14,7 +14,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
     public class Passenger
     {
         [Key]
-        public int Id { get; set; } // Identificador único del pasajero
+        public int Id { get; set; } // Identificador Ãºnico del pasajero
 
         [Required(ErrorMessage = "El Name es obligatorio.")]
         [StringLength(100)]
@@ -32,12 +32,12 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
-        [EmailAddress(ErrorMessage = "Formato de email inválido.")]
+        [EmailAddress(ErrorMessage = "Formato de email invÃ¡lido.")]
         [StringLength(255)]
         public string Email { get; set; } // Puede ser opcional para un pasajero adicional
 
-        public GenderType Gender { get; set; } // Usa la enumeración definida
+        public GenderType Gender { get; set; } // Usa la enumeraciÃ³n definida
 
-        public bool AssistanceToTraveler { get; set; } // Indica si requiere asistencia (Sí/No)
+        public bool AssistanceToTraveler { get; set; } // Indica si requiere asistencia (SÃ­/No)
     }
 }

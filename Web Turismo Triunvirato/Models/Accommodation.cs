@@ -6,7 +6,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
     public class Accommodation
     {
         [Key]
-        public int Id { get; set; } // Identificador único del alojamiento
+        public int Id { get; set; } // Identificador Ãºnico del alojamiento
 
         [Required(ErrorMessage = "El costo es obligatorio.")]
         [Range(0.01, double.MaxValue, ErrorMessage = "El costo debe ser mayor a cero.")]
@@ -21,11 +21,11 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [DataType(DataType.Date)]
         public DateTime DepartureDate { get; set; }
 
-        [Required(ErrorMessage = "El número de habitaciones es obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Debe haber al menos una habitación.")]
+        [Required(ErrorMessage = "El nÃºmero de habitaciones es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Debe haber al menos una habitaciÃ³n.")]
         public int NumberOfRooms { get; set; }
 
-        [Required(ErrorMessage = "El número de personas es obligatorio.")]
+        [Required(ErrorMessage = "El nÃºmero de personas es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "Debe haber al menos una persona.")]
         public int NumberOfPeople { get; set; }
 
@@ -41,3 +41,4 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         public string Description { get; set; }
     }
 }
+

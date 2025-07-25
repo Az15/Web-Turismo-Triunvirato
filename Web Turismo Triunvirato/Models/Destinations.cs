@@ -1,3 +1,4 @@
+
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,7 +7,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
     public class Destinations
     {
         [Key]
-        public int Id { get; set; } // Identificador único del destino
+        public int Id { get; set; } // Identificador Ãºnico del destino
 
         [Required(ErrorMessage = "El origen es obligatorio.")]
         [StringLength(200)]
@@ -26,12 +27,13 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         public decimal Amount { get; set; }
 
         [StringLength(500)]
-        public string Luggage { get; set; } // Descripción del equipaje (ej. "1 maleta, 1 de mano")
+        public string Luggage { get; set; } // DescripciÃ³n del equipaje (ej. "1 maleta, 1 de mano")
 
         [StringLength(500)]
-        public string Addons { get; set; } // Descripción de adicionales (ej. "Asiento premium, Comida especial")
+        public string Addons { get; set; } // DescripciÃ³n de adicionales (ej. "Asiento premium, Comida especial")
 
         [StringLength(1000)]
-        public string Description { get; set; } // Descripción general del destino o viaje
+        public string Description { get; set; } // DescripciÃ³n general del destino o viaje
     }
 }
+
