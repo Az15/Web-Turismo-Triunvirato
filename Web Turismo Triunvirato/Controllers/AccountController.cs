@@ -25,19 +25,21 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Authenticate(string email, string password) // <--- CORREGIDO AQUÕ: "string password"
+        public async Task<IActionResult> Authenticate(string email, string password) // <--- CORREGIDO AQU√ç: "string password"
         {
             var user = await _userService.GetByEmailAsync(email);
 
-            // La lÛgica de verificaciÛn de contraseÒa y asignaciÛn de claims es correcta
-            if (user != null && user.Password == password) // °Recuerda el tema de las contraseÒas seguras!
+            // La l√≥gica de verificaci√≥n de contrase√±a y asignaci√≥n de claims es correcta
+            if (user != null && user.Password == password) // ¬°Recuerda el tema de las contrase√±as seguras!
             {
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, email),
-                    new Claim("Nombre", user.Nombre ?? ""),
-                    new Claim("Apellido", user.Apellido ?? ""),
-                    // new Claim("Pais", user.Pais ?? "")
+
+                    new Claim("Name", user.Name ?? ""), // Guarda el Name en las claims
+                    new Claim("Surname", user.Surname ?? ""), // Guarda el Surname
+                   // new Claim("Pais", user.Pais ?? "") // Guarda el pa√≠s
+
                 };
                 // ***** ROL DE ADMIN *****
                 if (email == "admin@admin.com")
@@ -54,7 +56,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
-                // MODIFICACI”N CLAVE PARA LA REDIRECCI”N
+                // MODIFICACI√ìN CLAVE PARA LA REDIRECCI√ìN
                 if (email == "admin@admin.com")
                 {
                     return RedirectToAction("Index", "Admin");
@@ -93,7 +95,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         public IActionResult EnviarCodigo(string Email)
         {
             TempData["Email"] = Email;
-            TempData["Codigo"] = "123456"; // CÛdigo fijo por ahora
+            TempData["Codigo"] = "123456"; // C√≥digo fijo por ahora
             return RedirectToAction("VerificarCodigo");
         }
 
@@ -113,7 +115,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return RedirectToAction("CompletarPerfil");
             }
 
-            ViewBag.Error = "El cÛdigo ingresado no es correcto.";
+            ViewBag.Error = "El c√≥digo ingresado no es correcto.";
             return View();
         }
 
@@ -124,21 +126,21 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CompletarPerfil(string Nombre, string Apellido, string Pais, string ContraseÒa)
+        public async Task<IActionResult> CompletarPerfil(string Name, string Surname, string Pais, string Contrase√±a)
         {
             var email = TempData["Email"]?.ToString();
             if (email == null)
                 return RedirectToAction("IngresarEmail");
 
-            var nuevoUsuario = new User { Email = email, Nombre = Nombre, Apellido = Apellido, /*Pais = Pais,*/ Password = ContraseÒa }; // Guarda la contraseÒa
+            var nuevoUsuario = new User { Email = email, Name = Name, Surname = Surname, /*Pais = Pais,*/ Password = Contrase√±a }; // Guarda la contrase√±a
             await _userService.AddAsync(nuevoUsuario);
 
-            // Iniciar sesiÛn autom·ticamente despuÈs del registro
+            // Iniciar sesi√≥n autom√°ticamente despu√©s del registro
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, email),
-                new Claim("Nombre", Nombre ?? ""),
-                new Claim("Apellido", Apellido ?? ""),
+                new Claim("Name", Name ?? ""),
+                new Claim("Surname", Surname ?? ""),
                 new Claim("Pais", Pais ?? "")
             };
 
@@ -166,10 +168,10 @@ namespace Web_Turismo_Triunvirato.Controllers
                 var user = await _userService.GetByEmailAsync(email);
                 if (user != null)
                 {
-                    return View(user); // Pasa el objeto User a la vista de ediciÛn
+                    return View(user); // Pasa el objeto User a la vista de edici√≥n
                 }
             }
-            return RedirectToAction("Index", "Home"); // Si no est· autenticado o no se encuentra el usuario
+            return RedirectToAction("Index", "Home"); // Si no est√° autenticado o no se encuentra el usuario
         }
 
 
@@ -181,30 +183,30 @@ namespace Web_Turismo_Triunvirato.Controllers
                 var existingUser = await _userService.GetByEmailAsync(model.Email);
                 if (existingUser != null)
                 {
-                    existingUser.Nombre = model.Nombre;
-                    existingUser.Apellido = model.Apellido;
+                    existingUser.Name = model.Name;
+                    existingUser.Surname = model.Surname;
                     //existingUser.Pais = model.Pais;
-                    existingUser.Password = model.Password; // Permite cambiar la contraseÒa
+                    existingUser.Password = model.Password; // Permite cambiar la contrase√±a
                     await _userService.UpdateAsync(existingUser);
 
                     // Actualizar las Claims del usuario si es necesario
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, model.Email),
-                        new Claim("Nombre", model.Nombre ?? ""),
-                        new Claim("Apellido", model.Apellido ?? ""),
+                        new Claim("Name", model.Name ?? ""),
+                        new Claim("Surname", model.Surname ?? ""),
                        // new Claim("Pais", model.Pais ?? "")
                     };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var authProperties = new AuthenticationProperties { IsPersistent = true }; // Mantener la sesiÛn
+                    var authProperties = new AuthenticationProperties { IsPersistent = true }; // Mantener la sesi√≥n
 
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
                         authProperties);
 
-                    return RedirectToAction("Index", "Home"); // Redirigir a la p·gina principal
+                    return RedirectToAction("Index", "Home"); // Redirigir a la p√°gina principal
                 }
                 ViewBag.ErrorMessage = "Error al guardar el perfil.";
                 return View(model);

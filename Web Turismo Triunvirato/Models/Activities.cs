@@ -1,21 +1,21 @@
 //using System.ComponentModel.DataAnnotations;
-
 //namespace Fenix.Models // Ajusta el namespace a tu proyecto
 //{
 //    public class Activities
 //    {
 //        [Key]
-//        public int Id { get; set; } // Identificador único de la actividad
+//        public int Id { get; set; } // Identificador Ãºnico de la actividad
 
 //        [Required(ErrorMessage = "El nombre de la actividad es obligatorio.")]
 //        [StringLength(200)]
 //        public string Name { get; set; }
 
+
 //        [Required(ErrorMessage = "El tipo de actividad es obligatorio.")]
 //        [StringLength(100)]
 //        public string Type { get; set; } // Ej. "Tour", "Aventura", "Cultural"
 
-//        [Required(ErrorMessage = "El número de personas es obligatorio.")]
+//        [Required(ErrorMessage = "El nÃºmero de personas es obligatorio.")]
 //        [Range(1, int.MaxValue, ErrorMessage = "Debe haber al menos una persona.")]
 //        public int NumberOfPeople { get; set; }
 
