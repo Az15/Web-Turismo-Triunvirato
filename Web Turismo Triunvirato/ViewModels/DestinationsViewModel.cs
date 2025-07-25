@@ -5,6 +5,6 @@ namespace Web_Turismo_Triunvirato.ViewModels
 {
     public class DestinationsViewModel
     {
-        public List<Destination> PopularDestinations { get; set; }
+        public List<View_Index_Destination> PopularDestinations { get; set; }
     }
 }

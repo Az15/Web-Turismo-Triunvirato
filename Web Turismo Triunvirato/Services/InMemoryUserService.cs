@@ -44,9 +44,9 @@ namespace Web_Turismo_Triunvirato.Services
             {
                 existingUser.Email = user.Email;
                 existingUser.Password = user.Password;
-                existingUser.Nombre = user.Nombre;
-                existingUser.Apellido = user.Apellido;
-                existingUser.Pais = user.Pais;
+                existingUser.Name = user.Name;
+                existingUser.Surname = user.Surname;
+                //existingUser.Pais = user.Pais;
             }
             return Task.CompletedTask;
         }

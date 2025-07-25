@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Fenix.Models // Ajusta el namespace a tu proyecto
+namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
-    public class Destination
+    public class Destinations
     {
         [Key]
         public int Id { get; set; } // Identificador único del destino

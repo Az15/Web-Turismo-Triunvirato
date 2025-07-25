@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Fenix.Models // Ajusta el namespace a tu proyecto
+namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
-    public class Trip
+    public class Shipment
     {
         [Key]
         public int Id { get; set; } // Identificador único del viaje
@@ -15,7 +15,7 @@ namespace Fenix.Models // Ajusta el namespace a tu proyecto
         public List<Passenger> Passengers { get; set; } = new List<Passenger>();
 
         [Required(ErrorMessage = "Debe haber al menos un destino.")]
-        public List<Destination> Destinations { get; set; } = new List<Destination>();
+        public List<View_Index_Destination> Destinations { get; set; } = new List<View_Index_Destination>();
 
         // El alojamiento puede ser opcional si el viaje no incluye pernoctación.
         public List<Accommodation> Accommodations { get; set; } = new List<Accommodation>();

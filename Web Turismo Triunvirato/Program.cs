@@ -1,14 +1,32 @@
-using Microsoft.EntityFrameworkCore;
-using Web_Turismo_Triunvirato.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using Web_Turismo_Triunvirato.Data;
 using Web_Turismo_Triunvirato.Services;
+using Pomelo.EntityFrameworkCore.MySql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+// ...
+
+// Cambia esta línea:
+// builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Por esta, especificando la versión del servidor MySQL:
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
 
 // Configuración de la autenticación por cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -31,6 +49,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();

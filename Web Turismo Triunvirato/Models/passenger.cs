@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Fenix.Models // Ajusta el namespace a tu proyecto
+namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
     public enum GenderType // Enumeración para el tipo de género
     {
@@ -16,11 +16,11 @@ namespace Fenix.Models // Ajusta el namespace a tu proyecto
         [Key]
         public int Id { get; set; } // Identificador único del pasajero
 
-        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [Required(ErrorMessage = "El Name es obligatorio.")]
         [StringLength(100)]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "El apellido es obligatorio.")]
+        [Required(ErrorMessage = "El Surname es obligatorio.")]
         [StringLength(100)]
         public string Surname { get; set; }
 

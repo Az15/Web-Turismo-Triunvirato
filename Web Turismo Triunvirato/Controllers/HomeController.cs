@@ -2,26 +2,47 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Web_Turismo_Triunvirato.Models;
 using Web_Turismo_Triunvirato.ViewModels;
+using Web_Turismo_Triunvirato.Data;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _logger; 
+        private readonly ApplicationDbContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger , ApplicationDbContext dbContext)
         {
             _logger = logger;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index() // <-- ¡IMPORTANTE! Hacer el método async Task<IActionResult>
         {
+            // Ejecuta la tarea asíncrona y espera su resultado
+            var Carousel = await _dbContext.GetCarouselItemsAsync();
+            // Verifica si la lista de Carousel es nula o está vacía
+            var Destinys = await _dbContext.GetHotDestinyItemsAsync();
 
-                    return View();
+            //Comente esta linea porque tengo que hacer unas pruebas de integridad de datos antes de continuar
 
+            //if ( (Carousel == null || !Carousel.Any()) && (Destinys == null || !Destinys.Any()) )
+            //{
+            //    // Maneja el caso donde no hay elementos en el carrusel
+            //    _logger.LogWarning("No carousel items found or Destinys Not Found.");
+            //    return View(new View_Index_Collection()); // Retorna una vista vacía o con un modelo vacío
+            //}
+
+            var collection_Index = new View_Index_Collection
+            {
+                DestinationCarrousel = Carousel,
+                PopularDestinations = Destinys
+            };
+
+
+            return View(collection_Index);
         }
-
 
         [HttpGet]
         public IActionResult Vuelos()
@@ -29,20 +50,20 @@ namespace Web_Turismo_Triunvirato.Controllers
             ViewData.Clear();
             var viewModel = new DestinationsViewModel
             {
-                PopularDestinations = new List<Destination>
+                PopularDestinations = new List<View_Index_Destination>
                     {
-                        new Destination { NombreDestio = "Bariloche", ImagenDestino = "~/img/Bariloche.jpg", Precio = 1056067, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Madrid", IsHotWeek = true },
-                        new Destination { NombreDestio = "Río de Janeiro", ImagenDestino = "~/img/RiodeJaneiro.jpeg", Precio = 217460, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/RioDeJaneiro" },
-                        new Destination { NombreDestio = "Barcelona", ImagenDestino = "~/img/Barcelona.jpeg", Precio = 932300, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Barcelona", IsHotWeek = true },
-                        new Destination { NombreDestio = "Miami", ImagenDestino = "~/img/Miami.jpeg", Precio = 675513, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Miami" },
-                        //new Destination { NombreDestio = "Roma", ImagenDestino = "~/images/roma.jpg", Precio = 1096552, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Roma" },
-                        //new Destination { NombreDestio = "San Carlos de Bariloche", ImagenDestino = "~/images/san-carlos-de-bariloche.jpg", Precio = 47425, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Bariloche", IsHotWeek = true },
-                        //new Destination { NombreDestio = "Cataratas del Iguazú", ImagenDestino = "~/images/cataratas-del-iguazu.jpg", Precio = 49738, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Iguazu" },
-                        //new Destination { NombreDestio = "Santiago de Chile", ImagenDestino = "~/images/santiago-de-chile.jpg", Precio = 192012, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Santiago" },
-                        //new Destination { NombreDestio = "Punta Cana", ImagenDestino = "~/images/punta-cana.jpg", Precio = 636185, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/PuntaCana", IsHotWeek = true },
-                        //new Destination { NombreDestio = "Aruba", ImagenDestino = "~/images/aruba.jpg", Precio = 493911, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Aruba" },
-                        //new Destination { NombreDestio = "Cancún", ImagenDestino = "~/images/cancun.jpg", Precio = 643125, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/Cancun" },
-                        //new Destination { NombreDestio = "Nueva York", ImagenDestino = "~/images/nueva-york.jpg", Precio = 743758, From = "Desde Buenos Aires", DetalleDestino = "/Destinos/NuevaYork", IsHotWeek = true }
+                        new View_Index_Destination { Title = "Bariloche", PictureDestiny = "~/img/Bariloche.jpg", Price = 1056067, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Madrid", IsHotWeek = true },
+                        new View_Index_Destination { Title = "Río de Janeiro", PictureDestiny = "~/img/RiodeJaneiro.jpeg", Price = 217460, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/RioDeJaneiro" },
+                        new View_Index_Destination { Title = "Barcelona", PictureDestiny = "~/img/Barcelona.jpeg", Price = 932300, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Barcelona", IsHotWeek = true },
+                        new View_Index_Destination { Title = "Miami", PictureDestiny = "~/img/Miami.jpeg", Price = 675513, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Miami" },
+                        new View_Index_Destination { Title = "Roma", PictureDestiny = "~/images/roma.jpg", Price = 1096552, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Roma" },
+                        new View_Index_Destination { Title = "San Carlos de Bariloche", PictureDestiny = "~/images/san-carlos-de-bariloche.jpg", Price = 47425, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Bariloche", IsHotWeek = true },
+                        new View_Index_Destination { Title = "Cataratas del Iguazú", PictureDestiny = "~/images/cataratas-del-iguazu.jpg", Price = 49738, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Iguazu" },
+                        new View_Index_Destination { Title = "Santiago de Chile", PictureDestiny = "~/images/santiago-de-chile.jpg", Price = 192012, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Santiago" },
+                        new View_Index_Destination { Title = "Punta Cana", PictureDestiny = "~/images/punta-cana.jpg", Price = 636185, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/PuntaCana", IsHotWeek = true },
+                        new View_Index_Destination { Title = "Aruba", PictureDestiny = "~/images/aruba.jpg", Price = 493911, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Aruba" },
+                        new View_Index_Destination { Title = "Cancún", PictureDestiny = "~/images/cancun.jpg", Price = 643125, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/Cancun" },
+                        new View_Index_Destination { Title = "Nueva York", PictureDestiny = "~/images/nueva-york.jpg", Price = 743758, From = "Desde Buenos Aires", DetailDestinyURL = "/Destinos/NuevaYork", IsHotWeek = true }
                     }
             };
             return View(viewModel);

@@ -61,14 +61,14 @@
                     <span class="hot-week-badge">HOT WEEK</span>
                 }
                 <div class="image-container">
-                    <img src="@Url.Content(destination.ImagenDestino)" alt="@destination.NombreDestio">
+                    <img src="@Url.Content(destination.PictureDestiny)" alt="@destination.Title">
                     <div class="image-overlay">
-                        <h3>@destination.NombreDestio</h3>
-                        <p class="price">@destination.Precio.ToString("C0")</p>
+                        <h3>@destination.Title</h3>
+                        <p class="price">@destination.Price.ToString("C0")</p>
                         <p class="from">@destination.From</p>
                     </div>
                 </div>
-                <a href="@destination.DetalleDestino" class="view-details-button">Ver Detalles</a>
+                <a href="@destination.DetailDestinyURL" class="view-details-button">Ver Detalles</a>
             </div>
         }
     </div>

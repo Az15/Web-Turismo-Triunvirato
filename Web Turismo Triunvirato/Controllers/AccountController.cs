@@ -34,8 +34,8 @@ namespace Web_Turismo_Triunvirato.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, email),
-                    new Claim("Nombre", user.Nombre ?? ""), // Guarda el nombre en las claims
-                    new Claim("Apellido", user.Apellido ?? ""), // Guarda el apellido
+                    new Claim("Name", user.Name ?? ""), // Guarda el Name en las claims
+                    new Claim("Surname", user.Surname ?? ""), // Guarda el Surname
                    // new Claim("Pais", user.Pais ?? "") // Guarda el país
                 };
 
@@ -108,21 +108,21 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CompletarPerfil(string Nombre, string Apellido, string Pais, string Contraseña)
+        public async Task<IActionResult> CompletarPerfil(string Name, string Surname, string Pais, string Contraseña)
         {
             var email = TempData["Email"]?.ToString();
             if (email == null)
                 return RedirectToAction("IngresarEmail");
 
-            var nuevoUsuario = new User { Email = email, Nombre = Nombre, Apellido = Apellido, /*Pais = Pais,*/ Password = Contraseña }; // Guarda la contraseña
+            var nuevoUsuario = new User { Email = email, Name = Name, Surname = Surname, /*Pais = Pais,*/ Password = Contraseña }; // Guarda la contraseña
             await _userService.AddAsync(nuevoUsuario);
 
             // Iniciar sesión automáticamente después del registro
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, email),
-                new Claim("Nombre", Nombre ?? ""),
-                new Claim("Apellido", Apellido ?? ""),
+                new Claim("Name", Name ?? ""),
+                new Claim("Surname", Surname ?? ""),
                 new Claim("Pais", Pais ?? "")
             };
 
@@ -165,8 +165,8 @@ namespace Web_Turismo_Triunvirato.Controllers
                 var existingUser = await _userService.GetByEmailAsync(model.Email);
                 if (existingUser != null)
                 {
-                    existingUser.Nombre = model.Nombre;
-                    existingUser.Apellido = model.Apellido;
+                    existingUser.Name = model.Name;
+                    existingUser.Surname = model.Surname;
                     //existingUser.Pais = model.Pais;
                     existingUser.Password = model.Password; // Permite cambiar la contraseña
                     await _userService.UpdateAsync(existingUser);
@@ -175,8 +175,8 @@ namespace Web_Turismo_Triunvirato.Controllers
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, model.Email),
-                        new Claim("Nombre", model.Nombre ?? ""),
-                        new Claim("Apellido", model.Apellido ?? ""),
+                        new Claim("Name", model.Name ?? ""),
+                        new Claim("Surname", model.Surname ?? ""),
                        // new Claim("Pais", model.Pais ?? "")
                     };
 

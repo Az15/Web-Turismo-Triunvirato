@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Fenix.Models // Ajusta el namespace a tu proyecto
+namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
     public class Package
     {
@@ -10,7 +10,7 @@ namespace Fenix.Models // Ajusta el namespace a tu proyecto
         // Un paquete define un destino, un alojamiento y actividades específicas.
         // Se asume que estos son objetos completos, no solo IDs.
         [Required(ErrorMessage = "El destino definido es obligatorio.")]
-        public Destination DefinedDestination { get; set; }
+        public View_Index_Destination DefinedDestination { get; set; }
 
         [Required(ErrorMessage = "El alojamiento definido es obligatorio.")]
         public Accommodation DefinedAccommodation { get; set; }
