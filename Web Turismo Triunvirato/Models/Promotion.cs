@@ -11,8 +11,8 @@ namespace Web_Turismo_Triunvirato.Models
         public ServiceType ServiceType { get; set; } // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA EXISTA!
 
         // Nuevas propiedades para la visualización en Home/Vuelos.cshtml
-        [Required(ErrorMessage = "El nombre del destino es obligatorio.")]
-        [StringLength(100, ErrorMessage = "El nombre del destino no puede exceder 100 caracteres.")]
+        [Required(ErrorMessage = "El Name del destino es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El Name del destino no puede exceder 100 caracteres.")]
         public string DestinationName { get; set; }
 
         [Required(ErrorMessage = "La ciudad/país de origen es obligatorio.")]

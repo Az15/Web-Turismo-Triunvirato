@@ -6,7 +6,7 @@
 //        [Key]
 //        public int Id { get; set; } // Identificador único de la actividad
 
-//        [Required(ErrorMessage = "El nombre de la actividad es obligatorio.")]
+//        [Required(ErrorMessage = "El Name de la actividad es obligatorio.")]
 //        [StringLength(200)]
 //        public string Name { get; set; }
 

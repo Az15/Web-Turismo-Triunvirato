@@ -1,4 +1,7 @@
 
+
+using System.ComponentModel.DataAnnotations;
+
 namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
     public class Controll_Trip

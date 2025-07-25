@@ -8,8 +8,8 @@
 
     <div class="card p-4 mt-4">
         <p><strong>Email:</strong> @User.Identity.Name</p>
-        <p><strong>Nombre:</strong> @User.Claims.FirstOrDefault(c => c.Type == "Nombre")?.Value</p>
-        <p><strong>Apellido:</strong> @User.Claims.FirstOrDefault(c => c.Type == "Apellido")?.Value</p>
+        <p><strong>Name:</strong> @User.Claims.FirstOrDefault(c => c.Type == "Name")?.Value</p>
+        <p><strong>Surname:</strong> @User.Claims.FirstOrDefault(c => c.Type == "Surname")?.Value</p>
         <p><strong>Rol:</strong> @(User.IsInRole("Admin") ? "Administrador" : "Usuario Estándar")</p>
 
         <hr />

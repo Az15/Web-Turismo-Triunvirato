@@ -18,8 +18,8 @@ namespace Web_Turismo_Triunvirato.Services
                 Id = _nextId++,
                 Email = "alan@alan.com",
                 Password = "123456",
-                Nombre = "Alan",
-                Apellido = "Walker", 
+                Name = "Alan",
+                Surname = "Walker", 
                 
             });
 
@@ -29,8 +29,8 @@ namespace Web_Turismo_Triunvirato.Services
                 Id = _nextId++,
                 Email = "admin@admin.com",
                 Password = "admin",
-                Nombre = "Test",
-                Apellido = "User"
+                Name = "Test",
+                Surname = "User"
             });
         }
 
@@ -70,7 +70,7 @@ namespace Web_Turismo_Triunvirato.Services
                 existingUser.Password = user.Password;
                 existingUser.Name = user.Name;
                 existingUser.Surname = user.Surname;
-                //existingUser.Pais = user.Pais;
+                existingUser.Country = user.Country;
             }
             return Task.CompletedTask;
         }

@@ -1,7 +1,6 @@
-//using System.Collections.Generic;
-//using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-=======
 namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
     public class Shipment

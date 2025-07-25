@@ -16,11 +16,11 @@ namespace Web_Turismo_Triunvirato.Data // Ajusta el namespace a tu proyecto
 
         // DbSets para cada una de tus tablas
         public DbSet<Accommodation> Accommodations { get; set; }
-        public DbSet<Activities> Activities { get; set; }
+        //public DbSet<Activities> Activities { get; set; }
         public DbSet<View_Index_Destination> Destinations { get; set; }
 
         public DbSet<View_Index_DestinationCarouselItem> View_DestinationCarouselItems { get; set; }
-        public DbSet<Package> Packages { get; set; }
+        //public DbSet<Package> Packages { get; set; }
         public DbSet<Passenger> Passengers { get; set; }
        
         // public DbSet<Trip> Trips { get; set; }

@@ -13,18 +13,17 @@ namespace Web_Turismo_Triunvirato.Models
         [Required]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "El Nombre es obligatorio.")]
+        [Required(ErrorMessage = "El Name es obligatorio.")]
         [StringLength(100)]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "El Apellido es obligatorio.")]
+        [Required(ErrorMessage = "El Surname es obligatorio.")]
         [StringLength(100)]
         public string Surname { get; set; }
 
         public string Country { get; set; }
 
-        //public string Rol { get; set; } 
-
+        public string Rol { get; set; } 
 
     }
 }
