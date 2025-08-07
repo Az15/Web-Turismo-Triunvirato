@@ -71,6 +71,14 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(activeFlightPromotions); // <--- Aquí se pasa IEnumerable<Promotion>
         }
 
+        public async Task<IActionResult> RutaAtlantica() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
+        {
+            // Obtener solo las promociones de tipo Vuelos que están activas y dentro del rango de fechas
+            // La fecha actual es Jueves, 24 de julio de 2025.
+
+            return View(); // <--- Aquí se pasa IEnumerable<Promotion>
+        }
+
         [HttpGet]
         public IActionResult Privacy()
         {

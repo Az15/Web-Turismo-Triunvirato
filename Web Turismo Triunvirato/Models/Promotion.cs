@@ -8,14 +8,18 @@ namespace Web_Turismo_Triunvirato.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El tipo de servicio es obligatorio.")]
-        public ServiceType ServiceType { get; set; } // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA EXISTA!
+        public ServiceType ServiceType { get; set; }
+
+        // Propiedad específica para Hoteles
+        [Range(1, 5, ErrorMessage = "El número de estrellas debe estar entre 1 y 5.")]
+        public int Stars { get; set; } = 0; // Valor predeterminado para los que no son hoteles
 
         // Nuevas propiedades para la visualización en Home/Vuelos.cshtml
-        [Required(ErrorMessage = "El Name del destino es obligatorio.")]
-        [StringLength(100, ErrorMessage = "El Name del destino no puede exceder 100 caracteres.")]
+        [Required(ErrorMessage = "El Nombre del destino es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El Nombre del destino no puede exceder 100 caracteres.")]
         public string DestinationName { get; set; }
 
-        [Required(ErrorMessage = "La ciudad/país de origen es obligatorio.")]
+        // Propiedad específica para Vuelos
         [StringLength(100, ErrorMessage = "El origen no puede exceder 100 caracteres.")]
         public string OriginName { get; set; }
 

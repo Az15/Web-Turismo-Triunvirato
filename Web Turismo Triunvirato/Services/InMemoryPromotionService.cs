@@ -6,7 +6,7 @@ using System;
 
 namespace Web_Turismo_Triunvirato.Services
 {
-    public class InMemoryPromotionService : IPromotionService 
+    public class InMemoryPromotionService : IPromotionService
     {
         private readonly List<Promotion> _promotions = new List<Promotion>();
         private int _nextId = 1;
@@ -78,7 +78,89 @@ namespace Web_Turismo_Triunvirato.Services
                 EndDate = new DateTime(2025, 10, 24), // Ejemplo: Tres meses desde hoy
                 IsActive = true
             });
-            // Agrega más promociones de prueba para otros ServiceType si quieres
+
+            _promotions.Add(new Promotion
+            {
+                Id = _nextId++,
+                ServiceType = ServiceType.Hoteles,
+                Description = "Familiar y económico cerca de la playa",
+                DestinationName = "Mar del Plata",
+                Stars = 3,
+                ImageUrl = "/img/hotel-mardel.jpg",
+                IsHotWeek = true,
+                OriginalPrice = 12000.00m,
+                OfferPrice = 9000.00m,
+                DiscountPercentage = 25.00m,
+                StartDate = new DateTime(2025, 12, 20),
+                EndDate = new DateTime(2025, 12, 30),
+                IsActive = true
+            });
+
+            // *************** Promociones de prueba para Buses ***************
+            _promotions.Add(new Promotion
+            {
+                Id = _nextId++,
+                ServiceType = ServiceType.Buses,
+                Description = "Bus a Iguazú con 15% de descuento",
+                DestinationName = "Iguazú",
+                OriginName = "Buenos Aires",
+                ImageUrl = "~/img/bus-iguazu.jpg",
+                IsHotWeek = true,
+                OriginalPrice = 55000.00m,
+                OfferPrice = 46750.00m,
+                DiscountPercentage = 15.00m,
+                StartDate = new DateTime(2025, 8, 1),
+                EndDate = new DateTime(2025, 8, 30),
+                IsActive = true
+            });
+            _promotions.Add(new Promotion
+            {
+                Id = _nextId++,
+                ServiceType = ServiceType.Buses,
+                Description = "Viaje en bus a Mendoza",
+                DestinationName = "Mendoza",
+                OriginName = "Buenos Aires",
+                ImageUrl = "~/img/bus-mendoza.jpg",
+                IsHotWeek = false,
+                OriginalPrice = 45000.00m,
+                OfferPrice = 45000.00m,
+                DiscountPercentage = 0,
+                StartDate = new DateTime(2025, 9, 1),
+                EndDate = new DateTime(2025, 9, 15),
+                IsActive = true
+            });
+
+            // *************** Promociones de prueba para Paquetes ***************
+            _promotions.Add(new Promotion
+            {
+                Id = _nextId++,
+                ServiceType = ServiceType.Paquetes,
+                Description = "Paquete todo incluido a Cancún",
+                DestinationName = "Cancún",
+                ImageUrl = "~/img/paquete-cancun.jpg",
+                IsHotWeek = true,
+                OriginalPrice = 180000.00m,
+                OfferPrice = 162000.00m,
+                DiscountPercentage = 10.00m,
+                StartDate = new DateTime(2025, 11, 1),
+                EndDate = new DateTime(2025, 11, 30),
+                IsActive = true
+            });
+            _promotions.Add(new Promotion
+            {
+                Id = _nextId++,
+                ServiceType = ServiceType.Paquetes,
+                Description = "Paquete de luna de miel en El Calafate",
+                DestinationName = "El Calafate",
+                ImageUrl = "~/img/paquete-calafate.jpg",
+                IsHotWeek = false,
+                OriginalPrice = 90000.00m,
+                OfferPrice = 90000.00m,
+                DiscountPercentage = 0,
+                StartDate = new DateTime(2025, 10, 15),
+                EndDate = new DateTime(2025, 10, 25),
+                IsActive = true
+            });
         }
 
         public Task AddPromotionAsync(Promotion promotion)

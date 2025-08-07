@@ -1,26 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
-using Web_Turismo_Triunvirato.Services; // Para IPromotionService
-using Web_Turismo_Triunvirato.Models;   // Para Promotion y ServiceType
-using System.Linq;                     // Para usar LINQ como .Where(), .OrderByDescending(), etc.
-using System;                          // Para DateTime
+using Web_Turismo_Triunvirato.Services;
+using Web_Turismo_Triunvirato.Models;
+using System.Linq;
+using System;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
-    // Asegúrate de que este controlador requiere autenticación con el rol "Admin"
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IPromotionService _promotionService;
 
-        // Constructor: Ahora inyecta IPromotionService
         public AdminController(IPromotionService promotionService)
         {
             _promotionService = promotionService;
         }
 
-        // Acción por defecto al entrar al panel de administración (la "pantalla principal")
         public IActionResult Index()
         {
             ViewData["Title"] = "Panel de Administración";
@@ -33,11 +30,11 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
-        // La vista de Vuelos ahora puede mostrar información o enlaces para la administración de promociones de vuelos
+        // Acciones para mostrar las vistas de gestión por tipo
         public IActionResult Vuelos()
         {
             ViewData["Title"] = "Administración de Vuelos";
-            return View(); // Esta vista contendrá el enlace a AltaPromocion y GestionarPromocionesVuelos
+            return View();
         }
 
         public IActionResult Hoteles()
@@ -60,39 +57,160 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES ****************
 
-        // GET: Admin/AltaPromocion (Muestra el formulario para crear una nueva promoción)
+        // GET: Admin/AltaPromocion (Vuelos)
         [HttpGet]
         public IActionResult AltaPromocion()
         {
-            ViewData["Title"] = "Alta de Promoción";
-            // Pasa una nueva instancia vacía de Promotion a la vista para el formulario
-            return View(new Promotion());
+            ViewData["Title"] = "Alta de Promoción de Vuelo";
+            return View("AltaPromocion", new Promotion { ServiceType = ServiceType.Vuelos });
         }
 
-        // POST: Admin/AltaPromocion (Procesa el envío del formulario)
+        // POST: Admin/AltaPromocion (Vuelos)
         [HttpPost]
-        [ValidateAntiForgeryToken] // Protección contra ataques CSRF
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AltaPromocion(Promotion promotion)
         {
+            promotion.ServiceType = ServiceType.Vuelos;
             if (ModelState.IsValid)
             {
-                // Calcula el DiscountPercentage antes de agregar si es necesario,
-                // aunque ya lo hacemos en InMemoryPromotionService
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
-
                 await _promotionService.AddPromotionAsync(promotion);
-                TempData["SuccessMessage"] = "¡Promoción agregada exitosamente!";
-                return RedirectToAction(nameof(ListarPromociones)); // O podrías redirigir a GestionarPromocionesVuelos si siempre es de vuelos
+                TempData["SuccessMessage"] = "¡Promoción de vuelo agregada exitosamente!";
+                return RedirectToAction(nameof(GestionarPromocionesVuelos));
             }
-            // Si el modelo no es válido, vuelve a mostrar el formulario con los errores
-            ViewData["Title"] = "Alta de Promoción"; // Vuelve a establecer el título si hay errores
-            return View(promotion);
+            ViewData["Title"] = "Alta de Promoción de Vuelo";
+            return View("AltaPromocion", promotion);
         }
 
-        // GET: Admin/ListarPromociones (Muestra todas las promociones - usada como lista general)
+        // GET: Admin/AltaPromocionHotel (Hoteles)
+        [HttpGet]
+        public IActionResult AltaPromocionHotel()
+        {
+            ViewData["Title"] = "Alta de Promoción de Hotel";
+            return View("AltaPromocion", new Promotion { ServiceType = ServiceType.Hoteles });
+        }
+
+        // POST: Admin/AltaPromocionHotel (Hoteles)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AltaPromocionHotel(Promotion promotion)
+        {
+            promotion.ServiceType = ServiceType.Hoteles;
+            if (ModelState.IsValid)
+            {
+                if (promotion.OriginalPrice > 0)
+                {
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                }
+                await _promotionService.AddPromotionAsync(promotion);
+                TempData["SuccessMessage"] = "¡Promoción de hotel agregada exitosamente!";
+                return RedirectToAction(nameof(GestionarPromocionesHoteles));
+            }
+            ViewData["Title"] = "Alta de Promoción de Hotel";
+            return View("AltaPromocion", promotion);
+        }
+
+        // GET: Admin/AltaPromocionBus (Buses)
+        [HttpGet]
+        public IActionResult AltaPromocionBus()
+        {
+            ViewData["Title"] = "Alta de Promoción de Bus";
+            return View("AltaPromocion", new Promotion { ServiceType = ServiceType.Buses });
+        }
+
+        // POST: Admin/AltaPromocionBus (Buses)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AltaPromocionBus(Promotion promotion)
+        {
+            promotion.ServiceType = ServiceType.Buses;
+            if (ModelState.IsValid)
+            {
+                if (promotion.OriginalPrice > 0)
+                {
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                }
+                await _promotionService.AddPromotionAsync(promotion);
+                TempData["SuccessMessage"] = "¡Promoción de bus agregada exitosamente!";
+                return RedirectToAction(nameof(GestionarPromocionesBuses));
+            }
+            ViewData["Title"] = "Alta de Promoción de Bus";
+            return View("AltaPromocion", promotion);
+        }
+
+        // GET: Admin/AltaPromocionPaquete (NUEVA: Paquetes)
+        [HttpGet]
+        public IActionResult AltaPromocionPaquete()
+        {
+            ViewData["Title"] = "Alta de Promoción de Paquete";
+            return View("AltaPromocion", new Promotion { ServiceType = ServiceType.Paquetes });
+        }
+
+        // POST: Admin/AltaPromocionPaquete (NUEVA: Paquetes)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AltaPromocionPaquete(Promotion promotion)
+        {
+            promotion.ServiceType = ServiceType.Paquetes;
+            if (ModelState.IsValid)
+            {
+                if (promotion.OriginalPrice > 0)
+                {
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                }
+                await _promotionService.AddPromotionAsync(promotion);
+                TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
+                return RedirectToAction(nameof(GestionarPromocionesPaquetes));
+            }
+            ViewData["Title"] = "Alta de Promoción de Paquete";
+            return View("AltaPromocion", promotion);
+        }
+
+        // GET: Admin/GestionarPromocionesVuelos
+        [HttpGet]
+        public async Task<IActionResult> GestionarPromocionesVuelos()
+        {
+            ViewData["Title"] = "Gestionar Promociones de Vuelos";
+            var flightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
+            flightPromotions = flightPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
+            return View("GestionarPromocionesVuelos", flightPromotions.OrderByDescending(p => p.Id));
+        }
+
+        // GET: Admin/GestionarPromocionesHoteles
+        [HttpGet]
+        public async Task<IActionResult> GestionarPromocionesHoteles()
+        {
+            ViewData["Title"] = "Gestionar Promociones de Hoteles";
+            var hotelPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Hoteles);
+            hotelPromotions = hotelPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
+            return View("GestionarPromocionesHoteles", hotelPromotions.OrderByDescending(p => p.Id));
+        }
+
+        // GET: Admin/GestionarPromocionesBuses
+        [HttpGet]
+        public async Task<IActionResult> GestionarPromocionesBuses()
+        {
+            ViewData["Title"] = "Gestionar Promociones de Buses";
+            var busPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Buses);
+            busPromotions = busPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
+            return View("GestionarPromocionesBuses", busPromotions.OrderByDescending(p => p.Id));
+        }
+
+        // GET: Admin/GestionarPromocionesPaquetes (NUEVA: Paquetes)
+        [HttpGet]
+        public async Task<IActionResult> GestionarPromocionesPaquetes()
+        {
+            ViewData["Title"] = "Gestionar Promociones de Paquetes";
+            var packagePromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Paquetes);
+            packagePromotions = packagePromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
+            return View("GestionarPromocionesPaquetes", packagePromotions.OrderByDescending(p => p.Id));
+        }
+
+
+        // GET: Admin/ListarPromociones (Muestra todas las promociones)
         [HttpGet]
         public async Task<IActionResult> ListarPromociones()
         {
@@ -100,22 +218,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             var promotions = await _promotionService.GetAllPromotionsAsync();
             return View(promotions);
         }
-
-        // GET: Admin/GestionarPromocionesVuelos (Muestra SOLO promociones de Vuelos para edición)
-        [HttpGet]
-        public async Task<IActionResult> GestionarPromocionesVuelos()
-        {
-            ViewData["Title"] = "Gestionar Promociones de Vuelos";
-            // Obtener solo las promociones de tipo Vuelos
-            var flightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
-
-            // Opcional: Filtrar solo las activas si solo quieres modificar las activas aquí
-            // (La fecha actual es Jueves, 24 de julio de 2025. Se asume que las fechas de las promociones de prueba son anteriores a hoy o cubren el futuro)
-            flightPromotions = flightPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
-
-            return View(flightPromotions.OrderByDescending(p => p.Id)); // Pasar la lista de promociones a la vista
-        }
-
 
         // GET: Admin/EditarPromocion/{id}
         [HttpGet]
@@ -127,7 +229,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 return NotFound();
             }
-            return View(promotion);
+            return View("AltaPromocion", promotion);
         }
 
         // POST: Admin/EditarPromocion
@@ -137,7 +239,6 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Recalcular el descuento si los precios fueron cambiados
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
@@ -145,15 +246,39 @@ namespace Web_Turismo_Triunvirato.Controllers
                 await _promotionService.UpdatePromotionAsync(promotion);
                 TempData["SuccessMessage"] = "¡Promoción actualizada exitosamente!";
 
-                // Redirige a la lista específica de vuelos después de editar si el tipo es Vuelos
+                // Redirige a la lista específica según el tipo
                 if (promotion.ServiceType == ServiceType.Vuelos)
                 {
                     return RedirectToAction(nameof(GestionarPromocionesVuelos));
                 }
-                // Si editas otro tipo de promo (ej: Hotel), redirige a la lista general
+                else if (promotion.ServiceType == ServiceType.Hoteles)
+                {
+                    return RedirectToAction(nameof(GestionarPromocionesHoteles));
+                }
+                else if (promotion.ServiceType == ServiceType.Buses)
+                {
+                    return RedirectToAction(nameof(GestionarPromocionesBuses));
+                }
+                else if (promotion.ServiceType == ServiceType.Paquetes)
+                {
+                    return RedirectToAction(nameof(GestionarPromocionesPaquetes));
+                }
                 return RedirectToAction(nameof(ListarPromociones));
             }
-            ViewData["Title"] = "Editar Promoción"; // Vuelve a establecer el título si hay errores
+            ViewData["Title"] = "Editar Promoción";
+            return View("AltaPromocion", promotion);
+        }
+
+        // GET: Admin/BajaPromocion/{id}
+        [HttpGet]
+        public async Task<IActionResult> BajaPromocion(int id)
+        {
+            ViewData["Title"] = "Baja de Promoción";
+            var promotion = await _promotionService.GetPromotionByIdAsync(id);
+            if (promotion == null)
+            {
+                return NotFound();
+            }
             return View(promotion);
         }
 
@@ -162,9 +287,32 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarPromocion(int id)
         {
+            var promotion = await _promotionService.GetPromotionByIdAsync(id);
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+
             await _promotionService.DeletePromotionAsync(id);
             TempData["SuccessMessage"] = "¡Promoción eliminada exitosamente!";
-            return RedirectToAction(nameof(ListarPromociones)); // Siempre redirige a la lista general
+
+            if (promotion.ServiceType == ServiceType.Vuelos)
+            {
+                return RedirectToAction(nameof(GestionarPromocionesVuelos));
+            }
+            else if (promotion.ServiceType == ServiceType.Hoteles)
+            {
+                return RedirectToAction(nameof(GestionarPromocionesHoteles));
+            }
+            else if (promotion.ServiceType == ServiceType.Buses)
+            {
+                return RedirectToAction(nameof(GestionarPromocionesBuses));
+            }
+            else if (promotion.ServiceType == ServiceType.Paquetes)
+            {
+                return RedirectToAction(nameof(GestionarPromocionesPaquetes));
+            }
+            return RedirectToAction(nameof(ListarPromociones));
         }
     }
 }
