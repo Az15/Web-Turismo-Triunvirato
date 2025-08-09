@@ -1,4 +1,4 @@
-﻿using Web_Turismo_Triunvirato.Data;
+﻿using Web_Turismo_Triunvirato.DataAccess;
 
 namespace Web_Turismo_Triunvirato.Models
 {

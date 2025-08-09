@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System; // Para DateTime
 
-using Web_Turismo_Triunvirato.Data;
+using Web_Turismo_Triunvirato.DataAccess;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Configuration;
-using Web_Turismo_Triunvirato.Data;
+using Web_Turismo_Triunvirato.DataAccess;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Web_Turismo_Triunvirato.Services; // Asegúrate de tener este using para IPromotionService y InMemoryPromotionService
 using Pomelo.EntityFrameworkCore.MySql;

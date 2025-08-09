@@ -1,9 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace Web_Turismo_Triunvirato.Models
 {
-    public class Promotion
+    public class Promotion : IValidatableObject
     {
         public int Id { get; set; }
 
@@ -11,7 +12,7 @@ namespace Web_Turismo_Triunvirato.Models
         public ServiceType ServiceType { get; set; }
 
         // Propiedad específica para Hoteles
-        [Range(1, 5, ErrorMessage = "El número de estrellas debe estar entre 1 y 5.")]
+        // Ya no tiene el atributo Range aquí, lo validaremos de forma condicional.
         public int Stars { get; set; } = 0; // Valor predeterminado para los que no son hoteles
 
         // Nuevas propiedades para la visualización en Home/Vuelos.cshtml
@@ -59,5 +60,26 @@ namespace Web_Turismo_Triunvirato.Models
 
         [StringLength(200, ErrorMessage = "La descripción no puede exceder 200 caracteres.")]
         public string Description { get; set; }
+
+        // Implementación de IValidatableObject para validación condicional
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // Valida la propiedad Stars solo si el tipo de servicio es Hoteles
+            if (ServiceType == ServiceType.Hoteles && (Stars < 1 || Stars > 5))
+            {
+                yield return new ValidationResult(
+                    "El número de estrellas debe estar entre 1 y 5.",
+                    new[] { nameof(Stars) });
+            }
+
+            // Aquí puedes agregar otras validaciones condicionales si las necesitas
+            // Por ejemplo, para Vuelos, si OriginName es obligatorio
+            // if (ServiceType == ServiceType.Vuelos && string.IsNullOrEmpty(OriginName))
+            // {
+            //     yield return new ValidationResult(
+            //         "El nombre de origen es obligatorio para vuelos.",
+            //         new[] { nameof(OriginName) });
+            // }
+        }
     }
 }

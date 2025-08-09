@@ -1,4 +1,4 @@
-﻿@model Web_Turismo_Triunvirato.Models.Promotion
+﻿@model Web_Turismo_Triunvirato.Models.FlightPromotion
 
 @{
     ViewData["Title"] = ViewData["Title"] ?? "Alta/Edición de Promoción";
@@ -8,15 +8,15 @@
     <h1>@ViewData["Title"]</h1>
 
     <div class="card p-4">
-        <form asp-action="@(Model.Id == 0 ? (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Hoteles ? "AltaPromocionHotel" : "AltaPromocion") : "EditarPromocion")" method="post">
+        <form asp-action="SubmitPromotionFlight">
             @Html.AntiForgeryToken()
 
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="ServiceType" />
 
             <div class="mb-3">
                 <label asp-for="ServiceType" class="form-label">Tipo de Servicio:</label>
-                <input asp-for="ServiceType" class="form-control" readonly />
+                <input value="@Model.ServiceType.ToString()" class="form-control" readonly />
+                <input type="hidden" asp-for="ServiceType" />
             </div>
 
             <div class="mb-3">
@@ -25,23 +25,20 @@
                 <span asp-validation-for="DestinationName" class="text-danger"></span>
             </div>
 
-            @* Campo condicional para Vuelos o Hoteles *@
-            @if (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Vuelos)
-            {
+        
                 <div class="mb-3">
                     <label asp-for="OriginName" class="form-label"></label>
                     <input asp-for="OriginName" class="form-control" />
                     <span asp-validation-for="OriginName" class="text-danger"></span>
                 </div>
-            }
-            else if (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Hoteles)
-            {
+            
+           
                 <div class="mb-3">
                     <label asp-for="Stars" class="form-label"></label>
                     <input asp-for="Stars" type="number" min="1" max="5" class="form-control" />
                     <span asp-validation-for="Stars" class="text-danger"></span>
                 </div>
-            }
+            
 
             <div class="mb-3">
                 <label asp-for="ImageUrl" class="form-label"></label>
@@ -88,7 +85,7 @@
             <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Guardar Promoción</button>
 
             @* El botón de volver es dinámico según el tipo de servicio *@
-            @if (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Vuelos)
+@*             @if (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Vuelos)
             {
                 <a asp-action="Vuelos" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a Vuelos</a>
             }
@@ -99,7 +96,7 @@
             else
             {
                 <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
-            }
+            } *@
         </form>
     </div>
 </div>

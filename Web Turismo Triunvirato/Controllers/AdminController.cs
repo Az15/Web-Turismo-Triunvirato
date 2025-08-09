@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using Web_Turismo_Triunvirato.Services;
 using Web_Turismo_Triunvirato.Models;
-using System.Linq;
 using System;
+using Microsoft.EntityFrameworkCore;
+using Web_Turismo_Triunvirato.DataAccess;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -13,9 +14,12 @@ namespace Web_Turismo_Triunvirato.Controllers
     {
         private readonly IPromotionService _promotionService;
 
-        public AdminController(IPromotionService promotionService)
+        private readonly ApplicationDbContext _dbContext;
+
+        public AdminController(IPromotionService promotionService, ApplicationDbContext dbContext)
         {
             _promotionService = promotionService;
+            _dbContext = dbContext;
         }
 
         public IActionResult Index()
@@ -62,28 +66,28 @@ namespace Web_Turismo_Triunvirato.Controllers
         public IActionResult AltaPromocion()
         {
             ViewData["Title"] = "Alta de Promoción de Vuelo";
-            return View("AltaPromocion", new Promotion { ServiceType = ServiceType.Vuelos });
+            return View("AltaPromocion", new FlightPromotion { ServiceType = "Vuelos" });
         }
 
         // POST: Admin/AltaPromocion (Vuelos)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AltaPromocion(Promotion promotion)
-        {
-            promotion.ServiceType = ServiceType.Vuelos;
-            if (ModelState.IsValid)
-            {
-                if (promotion.OriginalPrice > 0)
-                {
-                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
-                }
-                await _promotionService.AddPromotionAsync(promotion);
-                TempData["SuccessMessage"] = "¡Promoción de vuelo agregada exitosamente!";
-                return RedirectToAction(nameof(GestionarPromocionesVuelos));
-            }
-            ViewData["Title"] = "Alta de Promoción de Vuelo";
-            return View("AltaPromocion", promotion);
-        }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> AltaPromocion(FlightPromotion promotion)
+        //{
+        //    promotion.ServiceType = S;
+        //    if (ModelState.IsValid)
+        //    {
+        //        if (promotion.OriginalPrice > 0)
+        //        {
+        //            promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+        //        }
+        //        await _promotionService.AddPromotionAsync(promotion);
+        //        TempData["SuccessMessage"] = "¡Promoción de vuelo agregada exitosamente!";
+        //        return RedirectToAction(nameof(AdminPromotionFlights));
+        //    }
+        //    ViewData["Title"] = "Alta de Promoción de Vuelo";
+        //    return View("AltaPromocion", promotion);
+        //}
 
         // GET: Admin/AltaPromocionHotel (Hoteles)
         [HttpGet]
@@ -93,6 +97,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromocion", new Promotion { ServiceType = ServiceType.Hoteles });
         }
 
+        
         // POST: Admin/AltaPromocionHotel (Hoteles)
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -105,7 +110,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
-                await _promotionService.AddPromotionAsync(promotion);
+                await _promotionService.AddPromotionAsync(promotion); // Esta línea ahora usará el nuevo servicio
                 TempData["SuccessMessage"] = "¡Promoción de hotel agregada exitosamente!";
                 return RedirectToAction(nameof(GestionarPromocionesHoteles));
             }
@@ -171,12 +176,14 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // GET: Admin/GestionarPromocionesVuelos
         [HttpGet]
-        public async Task<IActionResult> GestionarPromocionesVuelos()
+        public async Task<IActionResult> AdminPromotionFlights()
         {
             ViewData["Title"] = "Gestionar Promociones de Vuelos";
-            var flightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
-            flightPromotions = flightPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
-            return View("GestionarPromocionesVuelos", flightPromotions.OrderByDescending(p => p.Id));
+            var flightPromotions = await _dbContext.GetActiveflightpromotionsItemsAsync();
+            return View(flightPromotions);
+            //var flightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
+            //flightPromotions = flightPromotions.Where(p => p.IsActive && p.EndDate >= DateTime.Today).ToList();
+            //return View("GestionarPromocionesVuelos", flightPromotions.OrderByDescending(p => p.Id));
         }
 
         // GET: Admin/GestionarPromocionesHoteles
@@ -210,14 +217,19 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
 
-        // GET: Admin/ListarPromociones (Muestra todas las promociones)
+        // GET: Admin/ListarPromociones (También lo redirigimos a lo mismo)
         [HttpGet]
         public async Task<IActionResult> ListarPromociones()
         {
-            ViewData["Title"] = "Listado de Promociones";
-            var promotions = await _promotionService.GetAllPromotionsAsync();
-            return View(promotions);
+            ViewData["Title"] = "Listado de Promociones de Vuelos";
+
+            // Llama a tu método del DbContext que usa la Stored Procedure
+            var flightPromotions = await _dbContext.GetActiveflightpromotionsItemsAsync();
+
+            // Devuelve la lista de promociones de vuelos a la vista
+            return View("AdminPromotionFlights", flightPromotions);
         }
+
 
         // GET: Admin/EditarPromocion/{id}
         [HttpGet]
@@ -235,38 +247,12 @@ namespace Web_Turismo_Triunvirato.Controllers
         // POST: Admin/EditarPromocion
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditarPromocion(Promotion promotion)
+        public async Task<IActionResult> SubmitPromotionFlight(FlightPromotion promotion)
         {
-            if (ModelState.IsValid)
-            {
-                if (promotion.OriginalPrice > 0)
-                {
-                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
-                }
-                await _promotionService.UpdatePromotionAsync(promotion);
-                TempData["SuccessMessage"] = "¡Promoción actualizada exitosamente!";
+           await _dbContext.AbmFlightPromotionAsync(promotion, null);
 
-                // Redirige a la lista específica según el tipo
-                if (promotion.ServiceType == ServiceType.Vuelos)
-                {
-                    return RedirectToAction(nameof(GestionarPromocionesVuelos));
-                }
-                else if (promotion.ServiceType == ServiceType.Hoteles)
-                {
-                    return RedirectToAction(nameof(GestionarPromocionesHoteles));
-                }
-                else if (promotion.ServiceType == ServiceType.Buses)
-                {
-                    return RedirectToAction(nameof(GestionarPromocionesBuses));
-                }
-                else if (promotion.ServiceType == ServiceType.Paquetes)
-                {
-                    return RedirectToAction(nameof(GestionarPromocionesPaquetes));
-                }
-                return RedirectToAction(nameof(ListarPromociones));
-            }
-            ViewData["Title"] = "Editar Promoción";
-            return View("AltaPromocion", promotion);
+            return View("index");
+
         }
 
         // GET: Admin/BajaPromocion/{id}
@@ -298,7 +284,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (promotion.ServiceType == ServiceType.Vuelos)
             {
-                return RedirectToAction(nameof(GestionarPromocionesVuelos));
+                return RedirectToAction(nameof(AdminPromotionFlights));
             }
             else if (promotion.ServiceType == ServiceType.Hoteles)
             {
