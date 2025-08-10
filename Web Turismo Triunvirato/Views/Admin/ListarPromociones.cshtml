@@ -51,7 +51,7 @@
                     <td>@Html.DisplayFor(modelItem => item.EndDate)</td>
                     <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
                     <td>
-                        <a asp-action="EditarPromocion" asp-route-id="@item.Id" class="btn btn-sm btn-info">Editar</a> |
+                        <a asp-action="EditPromotionFlight" asp-route-id="@item.Id" class="btn btn-sm btn-info">Editar</a> |
                         <form asp-action="EliminarPromocion" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea eliminar esta promoción?');">
                             <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                         </form>
