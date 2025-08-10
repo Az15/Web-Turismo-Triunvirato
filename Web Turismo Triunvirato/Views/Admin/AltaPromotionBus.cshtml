@@ -1,0 +1,109 @@
+﻿@model Web_Turismo_Triunvirato.Models.BusPromotion
+
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Bus" : "Editar Promoción de Bus";
+    var actionName = Model.Id == 0 ? "SubmitPromotionBus" : "EditPromotionBus";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">@ViewData["Title"]</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="@actionName" method="post">
+                @Html.AntiForgeryToken()
+
+                @if (Model.Id > 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+                <input type="hidden" asp-for="ServiceType" />
+                <input type="hidden" asp-for="DiscountPercentage" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DestinationName" class="form-label"></label>
+                        <input asp-for="DestinationName" class="form-control" />
+                        <span asp-validation-for="DestinationName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="OriginName" class="form-label"></label>
+                        <input asp-for="OriginName" class="form-control" />
+                        <span asp-validation-for="OriginName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BusCompanyName" class="form-label"></label>
+                        <input asp-for="BusCompanyName" class="form-control" />
+                        <span asp-validation-for="BusCompanyName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Category" class="form-label"></label>
+                        <input asp-for="Category" class="form-control" />
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageUrl" class="form-label"></label>
+                    <input asp-for="ImageUrl" class="form-control" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="OriginalPrice" class="form-label"></label>
+                        <input asp-for="OriginalPrice" class="form-control" />
+                        <span asp-validation-for="OriginalPrice" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="OfferPrice" class="form-label"></label>
+                        <input asp-for="OfferPrice" class="form-control" />
+                        <span asp-validation-for="OfferPrice" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="StartDate" class="form-label"></label>
+                        <input asp-for="StartDate" class="form-control" type="date" />
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EndDate" class="form-label"></label>
+                        <input asp-for="EndDate" class="form-control" type="date" />
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="IsActive" />
+                    <label class="form-check-label" asp-for="IsActive"></label>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="IsHotWeek" />
+                    <label class="form-check-label" asp-for="IsHotWeek"></label>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a asp-action="AdminPromotionBuses" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

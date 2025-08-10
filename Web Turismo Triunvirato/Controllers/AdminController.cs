@@ -60,7 +60,6 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE VUELOS ****************
 
-        // GET: Admin/AdminPromotionFlights
         [HttpGet]
         public async Task<IActionResult> AdminPromotionFlights()
         {
@@ -69,7 +68,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(flightPromotions);
         }
 
-        // GET: Admin/AltaPromocion (Vuelos)
         [HttpGet]
         public IActionResult AltaPromocion()
         {
@@ -77,12 +75,11 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromocionFlight", new FlightPromotion { ServiceType = "0" });
         }
 
-        // GET: Admin/EditPromotionFlight/{id}
         [HttpGet]
         public async Task<IActionResult> EditPromotionFlight(int id)
         {
             ViewData["Title"] = "Editar Promoción de Vuelo";
-            var promotion = await _dbContext.GetPromotionByIdAsync(id);
+            var promotion = await _dbContext.GetActiveflightpromotionsItemsAsync();
 
             if (promotion == null)
             {
@@ -92,7 +89,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromocionFlight", promotion);
         }
 
-        // POST: Admin/SubmitPromotionFlight (Para la creación de una nueva promoción de vuelo)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitPromotionFlight(FlightPromotion promotion)
@@ -113,7 +109,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromocionFlight", promotion);
         }
 
-        // POST: Admin/EditPromotionFlight/{id} (Guarda los cambios)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionFlight(int id, [Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
@@ -152,7 +147,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromocionFlight", promotion);
         }
 
-        // POST: Admin/DeletePromotionFlight
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionFlight(int id)
@@ -170,7 +164,6 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE HOTELES ****************
 
-        // GET: Admin/AdminPromotionHotels
         [HttpGet]
         public async Task<IActionResult> AdminPromotionHotels()
         {
@@ -179,7 +172,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(hotelPromotions);
         }
 
-        // GET: Admin/AltaPromotionHotel
         [HttpGet]
         public IActionResult AltaPromotionHotel()
         {
@@ -187,7 +179,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionHotel", new HotelPromotion { ServiceType = "1" });
         }
 
-        // GET: Admin/EditPromotionHotel/{id}
         [HttpGet]
         public async Task<IActionResult> EditPromotionHotel(int id)
         {
@@ -200,7 +191,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionHotel", promotion);
         }
 
-        // POST: Admin/SubmitPromotionHotel (Creación)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitPromotionHotel([Bind("ServiceType,Description,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,StartDate,EndDate,IsActive,Stars")] HotelPromotion promotion)
@@ -220,7 +210,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionHotel", promotion);
         }
 
-        // POST: Admin/EditPromotionHotel/{id} (Edición)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionHotel(int id, [Bind("Id,ServiceType,Description,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] HotelPromotion promotion)
@@ -259,7 +248,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionHotel", promotion);
         }
 
-        // POST: Admin/DeletePromotionHotel
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionHotel(int id)
@@ -275,6 +263,112 @@ namespace Web_Turismo_Triunvirato.Controllers
             return RedirectToAction(nameof(AdminPromotionHotels));
         }
 
-        // ... Puedes agregar más acciones para Buses, Paquetes, etc.
+        // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE BUSES ****************
+
+        // GET: Admin/AdminPromotionBuses
+        [HttpGet]
+        public async Task<IActionResult> AdminPromotionBuses()
+        {
+            ViewData["Title"] = "Gestionar Promociones de Buses";
+            var busPromotions = await _dbContext.GetActivePromotionBusesItemsAsync(); // Asumiendo que este método existe en tu DbContext
+            return View("AdminPromotionBuses", busPromotions); // Se asume que tienes una vista llamada AdminPromotionBuses.cshtml
+        }
+
+        // GET: Admin/AltaPromotionBus
+        [HttpGet]
+        public IActionResult AltaPromotionBus()
+        {
+            ViewData["Title"] = "Alta de Promoción de Bus";
+            return View("AltaPromotionBus", new BusPromotion { ServiceType = "2" }); // Se asume que tienes un modelo BusPromotion y una vista AltaPromotionBus.cshtml
+        }
+
+        // GET: Admin/EditPromotionBus/{id}
+        [HttpGet]
+        public async Task<IActionResult> EditPromotionBus(int id)
+        {
+            ViewData["Title"] = "Editar Promoción de Bus";
+            var promotion = await _dbContext.BusPromotions.FindAsync(id); // Asumiendo que BusPromotions es una propiedad en tu DbContext
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+            return View("AltaPromotionBus", promotion);
+        }
+
+        // POST: Admin/SubmitPromotionBus (Creación)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitPromotionBus([Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
+        {
+            if (ModelState.IsValid)
+            {
+                if (promotion.OriginalPrice > 0)
+                {
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                }
+                promotion.ServiceType = "2";
+                await _dbContext.AbmBusPromotionAsync(promotion, "INSERT"); // Asumiendo que AbmBusPromotionAsync existe
+                TempData["SuccessMessage"] = "¡Promoción de bus agregada exitosamente!";
+                return RedirectToAction(nameof(AdminPromotionBuses));
+            }
+            ViewData["Title"] = "Alta de Promoción de Bus";
+            return View("AltaPromotionBus", promotion);
+        }
+
+        // POST: Admin/EditPromotionBus/{id} (Edición)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPromotionBus(int id, [Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
+        {
+            if (id != promotion.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (promotion.OriginalPrice > 0)
+                    {
+                        promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                    }
+                    promotion.ServiceType = "2";
+                    await _dbContext.AbmBusPromotionAsync(promotion, "UPDATE");
+                    TempData["SuccessMessage"] = "¡Promoción de bus actualizada exitosamente!";
+                    return RedirectToAction(nameof(AdminPromotionBuses));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _dbContext.BusPromotions.AnyAsync(e => e.Id == promotion.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            ViewData["Title"] = "Editar Promoción de Bus";
+            return View("AltaPromotionBus", promotion);
+        }
+
+        // POST: Admin/DeletePromotionBus
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePromotionBus(int id)
+        {
+            var promotion = await _dbContext.BusPromotions.FindAsync(id);
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+
+            await _dbContext.AbmBusPromotionAsync(promotion, "DELETE");
+            TempData["SuccessMessage"] = "¡Promoción de bus eliminada exitosamente!";
+            return RedirectToAction(nameof(AdminPromotionBuses));
+        }
+
     }
 }
