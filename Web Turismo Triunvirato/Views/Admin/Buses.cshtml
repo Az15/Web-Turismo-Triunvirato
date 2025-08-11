@@ -2,13 +2,52 @@
     ViewData["Title"] = "Administración de Buses";
 }
 
-<div class="container-fluid">
-    <h1 class="mt-4">@ViewData["Title"]</h1>
-    <p>Desde aquí gestionarás las promociones y precios de buses.</p>
+<h2 class="mt-4">@ViewData["Title"]</h2>
+<p>Desde aquí gestionarás las promociones y precios de Buses.</p>
 
-    <div class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle"></i> En esta sección implementarás la gestión de promociones para Buses.
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AltaPromotionBus" asp-route-serviceType="Hoteles" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-plus-circle fa-4x text-success mb-3"></i>
+                    <h5 class="card-title text-dark">Alta de Promociones de Buses</h5>
+                    <p class="card-text text-muted">Agrega nuevas ofertas y precios para Buses.</p>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary mt-3">Volver al Dashboard</a>
+    @* Botón para Gestionar/Modificar Promociones de Hotel *@
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AdminPromotionBuses" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-pencil-alt fa-4x text-primary mb-3"></i>
+                    <h5 class="card-title text-dark">Modificar Promociones de Buses</h5>
+                    <p class="card-text text-muted">Edita promociones de Buses existentes.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AdminPromotionBuses" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-list fa-4x text-secondary mb-3"></i>
+                    <h5 class="card-title text-dark">Ver Todas las Promociones</h5>
+                    <p class="card-text text-muted">Lista todas las promociones </p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver al Panel de Administración</a>
 </div>

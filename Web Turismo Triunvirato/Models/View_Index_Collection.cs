@@ -8,3 +8,4 @@
         public List<View_Index_Destination> PopularDestinations { get; set; } = new List<View_Index_Destination>();
     }
 }
+

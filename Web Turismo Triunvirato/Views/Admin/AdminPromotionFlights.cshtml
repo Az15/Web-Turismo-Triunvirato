@@ -1,7 +1,7 @@
-﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.Promotion>
+﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.FlightPromotion>
 
 @{
-    ViewData["Title"] = "Gestionar Promociones de Vuelos";
+    ViewData["Title"] = "Promociones de Vuelos";
 }
 
 <div class="container mt-4">
@@ -56,7 +56,7 @@
                             }
                         </td>
                         <td>
-                            <a asp-action="EditarPromocion" asp-route-id="@item.Id" class="btn btn-sm btn-info">
+                            <a asp-action="EditPromotionflight" asp-route-id="@item.Id" class="btn btn-sm btn-info">
                                 <i class="fas fa-edit"></i> Editar
                             </a>
                             @* NO HAY BOTÓN DE ELIMINAR EN ESTA VISTA *@

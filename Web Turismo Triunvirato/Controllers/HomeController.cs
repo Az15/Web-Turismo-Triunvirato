@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System; // Para DateTime
 
-using Web_Turismo_Triunvirato.Data;
+using Web_Turismo_Triunvirato.DataAccess;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -69,6 +69,14 @@ namespace Web_Turismo_Triunvirato.Controllers
             ViewData["Title"] = "Vuelos";
             // Pasar la lista de promociones directamente a la vista
             return View(activeFlightPromotions); // <--- Aquí se pasa IEnumerable<Promotion>
+        }
+
+        public async Task<IActionResult> RutaAtlantica() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
+        {
+            // Obtener solo las promociones de tipo Vuelos que están activas y dentro del rango de fechas
+            // La fecha actual es Jueves, 24 de julio de 2025.
+
+            return View(); // <--- Aquí se pasa IEnumerable<Promotion>
         }
 
         [HttpGet]

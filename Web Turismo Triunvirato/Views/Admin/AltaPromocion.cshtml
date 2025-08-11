@@ -1,21 +1,29 @@
-﻿@model Web_Turismo_Triunvirato.Models.Promotion
+﻿@model Web_Turismo_Triunvirato.Models.FlightPromotion
 
 @{
-    ViewData["Title"] = "Alta de Nueva Promoción";
+    var action = Model.Id == 0 ? "SubmitPromotionFlight" : "EditPromotionFlight";
+    ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Vuelo" : "Editar Promoción de Vuelo";
 }
 
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
 
     <div class="card p-4">
-        <form asp-action="AltaPromocion" method="post">
+@*         <form asp-action="SubmitPromotionFlight">
             @Html.AntiForgeryToken()
 
-            <input type="hidden" asp-for="ServiceType" /> @* Campo oculto para mantener el tipo de servicio *@
+ *@
+
+        <form asp-controller="Admin" asp-action="@action" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* <input type="hidden" asp-for="Id" /> *@
+            <input type="hidden" asp-for="Id" />
 
             <div class="mb-3">
                 <label asp-for="ServiceType" class="form-label">Tipo de Servicio:</label>
-                <input asp-for="ServiceType" class="form-control" readonly /> @* Muestra el tipo, pero no permite editarlo *@
+                <input value="@Model.ServiceType.ToString()" class="form-control" readonly />
+                <input type="hidden" asp-for="ServiceType" />
             </div>
 
             <div class="mb-3">
@@ -23,11 +31,22 @@
                 <input asp-for="DestinationName" class="form-control" />
                 <span asp-validation-for="DestinationName" class="text-danger"></span>
             </div>
-            <div class="mb-3">
-                <label asp-for="OriginName" class="form-label"></label>
-                <input asp-for="OriginName" class="form-control" />
-                <span asp-validation-for="OriginName" class="text-danger"></span>
-            </div>
+
+        
+                <div class="mb-3">
+                    <label asp-for="OriginName" class="form-label"></label>
+                    <input asp-for="OriginName" class="form-control" />
+                    <span asp-validation-for="OriginName" class="text-danger"></span>
+                </div>
+            
+           
+                <div class="mb-3">
+                    <label asp-for="Stars" class="form-label"></label>
+                    <input asp-for="Stars" type="number" min="1" max="5" class="form-control" />
+                    <span asp-validation-for="Stars" class="text-danger"></span>
+                </div>
+            
+
             <div class="mb-3">
                 <label asp-for="ImageUrl" class="form-label"></label>
                 <input asp-for="ImageUrl" class="form-control" placeholder="Ej: ~/img/Bariloche.jpg" />
@@ -38,7 +57,7 @@
                 <label asp-for="IsHotWeek" class="form-check-label"></label>
             </div>
 
-            <hr /> @* Separador para los campos de precio y fechas *@
+            <hr />
 
             <div class="mb-3">
                 <label asp-for="Description" class="form-label"></label>
@@ -71,7 +90,20 @@
             </div>
 
             <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Guardar Promoción</button>
-            <a asp-action="@Model.ServiceType.ToString()" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a @Model.ServiceType</a>
+
+            @* El botón de volver es dinámico según el tipo de servicio *@
+@*             @if (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Vuelos)
+            {
+                <a asp-action="Vuelos" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a Vuelos</a>
+            }
+            else if (Model.ServiceType == Web_Turismo_Triunvirato.Models.ServiceType.Hoteles)
+            {
+                <a asp-action="Hoteles" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver a Hoteles</a>
+            }
+            else
+            {
+                <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Panel</a>
+            } *@
         </form>
     </div>
 </div>
