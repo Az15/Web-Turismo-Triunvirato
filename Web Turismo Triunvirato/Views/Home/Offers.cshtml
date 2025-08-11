@@ -1,0 +1,86 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Promociones y Ofertas";
+}
+
+<link rel="stylesheet" href="~/css/Promotions.css" />
+
+<div class="container my-5">
+    <h1 class="text-center mb-4">Promociones y Ofertas Exclusivas</h1>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="packages-tab" data-bs-toggle="tab" data-bs-target="#packages" type="button" role="tab" aria-controls="packages" aria-selected="true">Paquetes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="trips-tab" data-bs-toggle="tab" data-bs-target="#trips" type="button" role="tab" aria-controls="trips" aria-selected="false">Viajes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="lodging-tab" data-bs-toggle="tab" data-bs-target="#lodging" type="button" role="tab" aria-controls="lodging" aria-selected="false">Hospedaje</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities" type="button" role="tab" aria-controls="activities" aria-selected="false">Actividades</button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-4" id="myTabContent">
+        <div class="tab-pane fade show active" id="packages" role="tabpanel" aria-labelledby="packages-tab">
+            @if (ViewBag.Packages == null || ViewBag.Packages.Count == 0)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    <p>No se encontraron paquetes en este momento. ¡Vuelve pronto!</p>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="trips" role="tabpanel" aria-labelledby="trips-tab">
+            @if (ViewBag.Trips == null || ViewBag.Trips.Count == 0)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    <p>No se encontraron viajes en este momento. ¡Vuelve pronto!</p>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="lodging" role="tabpanel" aria-labelledby="lodging-tab">
+            @if (ViewBag.Lodging == null || ViewBag.Lodging.Count == 0)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    <p>No se encontraron opciones de hospedaje en este momento. ¡Vuelve pronto!</p>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="activities" role="tabpanel" aria-labelledby="activities-tab">
+            @if (ViewBag.Activities == null || ViewBag.Activities.Count == 0)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    <p>No se encontraron actividades en este momento. ¡Vuelve pronto!</p>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/Promotions.js"></script>

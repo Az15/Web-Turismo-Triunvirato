@@ -55,7 +55,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Vuelos() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
+        public async Task<IActionResult> Flights() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
         {
             // Obtener solo las promociones de tipo Vuelos que están activas y dentro del rango de fechas
             // La fecha actual es Jueves, 24 de julio de 2025.
@@ -69,6 +69,9 @@ namespace Web_Turismo_Triunvirato.Controllers
             ViewData["Title"] = "Vuelos";
             // Pasar la lista de promociones directamente a la vista
             return View(activeFlightPromotions); // <--- Aquí se pasa IEnumerable<Promotion>
+
+
+
         }
 
         public async Task<IActionResult> RutaAtlantica() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
@@ -109,5 +112,54 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             return View();
         }
+
+
+        [HttpGet]
+        public IActionResult Hotels()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Bus()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult TravelPackages()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Offers()
+        {
+            // Por ahora, pasamos listas vacías para que se muestre el mensaje de "no se encontraron"
+            ViewBag.Packages = new List<string>();
+            ViewBag.Trips = new List<string>();
+            ViewBag.Lodging = new List<string>();
+            ViewBag.Activities = new List<string>();
+
+            // Cuando tengas la base de datos, tu código se verá así:
+            // ViewBag.Packages = _repository.GetPromotionalPackages();
+            // ViewBag.Trips = _repository.GetPromotionalTrips();
+            // ...etc.
+
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Activities()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult TravelAssistance()
+        {
+            return View();
+        }
+
     }
 }

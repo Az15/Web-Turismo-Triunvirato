@@ -1,0 +1,46 @@
+﻿/* Estilos generales para las pestañas de Bootstrap */
+.nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+}
+
+    .nav-tabs .nav-link {
+        color: #495057;
+        border: none;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .nav-tabs .nav-link:hover {
+            border-color: #dee2e6 #dee2e6 #e9ecef;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            background-color: #fff;
+            border-color: #007bff #007bff #fff;
+            font-weight: bold;
+        }
+
+/* Estilos para las tarjetas de promoción (si decides usarlas) */
+.promotion-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+    .promotion-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .promotion-card img {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .promotion-card .card-body {
+        padding: 15px;
+    }

@@ -1,0 +1,77 @@
+﻿/* Estilos para el encabezado de la página */
+.header-activities {
+    height: 400px; /* Altura del encabezado */
+    position: relative;
+    overflow: hidden; /* Oculta cualquier parte de la imagen que se desborde */
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Estilos de la imagen de fondo */
+.header-background-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 0;
+    transform: translate(-50%, -50%); /* Centra la imagen */
+    object-fit: cover;
+    filter: brightness(0.6); /* Oscurece un poco la imagen para que el texto resalte */
+}
+
+.header-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Animaciones para el texto */
+.animate-in {
+    animation: fadeIn 1s ease-in-out;
+}
+
+.animate-in-delay {
+    animation: fadeIn 1s ease-in-out 0.5s; /* Animación con 0.5s de retraso */
+    animation-fill-mode: forwards; /* Mantiene el estado final de la animación */
+    opacity: 0; /* Lo hace invisible antes de que comience la animación */
+}
+
+/* Keyframes de la animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para las tarjetas de actividades */
+.activity-card .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .activity-card .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+.activity-card .card-img-top {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    object-fit: cover;
+    height: 250px;
+}
+
+/* Ocultar tarjetas cuando no cumplen con el filtro */
+.activity-card.hidden {
+    display: none;
+}

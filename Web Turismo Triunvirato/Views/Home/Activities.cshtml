@@ -1,0 +1,78 @@
+﻿@{
+    // Usamos el layout principal de tu aplicación
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Actividades en Vacaciones";
+}
+
+<link rel="stylesheet" href="~/css/Activities.css" />
+
+<div class="header-activities d-flex align-items-center justify-content-center">
+    <img src="~/img/actividades/test1.png" alt="Actividades en Vacaciones" class="header-background-image" />
+
+    <div class="header-content text-white text-center">
+        <h1 class="display-4 fw-bold animate-in">¡Las mejores actividades para las mejores vacaciones!</h1>
+        <p class="lead mt-3 animate-in-delay">Descubre experiencias inolvidables en tu próximo destino.</p>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 class="mb-3">Encuentra tu próxima aventura</h2>
+        </div>
+        <div class="col-md-3">
+            <select id="locationFilter" class="form-select">
+                <option value="">Filtrar por Ubicación</option>
+                <option value="cordoba">Córdoba</option>
+                <option value="mendoza">Mendoza</option>
+                <option value="bariloche">Bariloche</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" id="activitySearch" class="form-control" placeholder="Buscar actividad..." />
+                <button class="btn btn-primary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="activitiesList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col activity-card" data-location="cordoba">
+            <div class="card h-100">
+                <img src="~/img/actividades/TourSierrasCordoba2.png" class="card-img-top" alt="Actividad 1" />
+                <div class="card-body">
+                    <h5 class="card-title">Tour por las Sierras</h5>
+                    <p class="card-text">Explora los paisajes de las sierras de Córdoba.</p>
+                </div>
+            </div> 
+        </div>
+        <div class="col activity-card" data-location="mendoza">
+            <div class="card h-100">
+                <img src="~/img/actividades/CataVinoMendoza.png" class="card-img-top" alt="Actividad 2" />
+                <div class="card-body">
+                    <h5 class="card-title">Degustación de Vinos</h5>
+                    <p class="card-text">Una experiencia única en los viñedos de Mendoza.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/Activities.js"></script>
+
+        @*
+            @foreach (var activity in Model)
+{
+    <div class="col activity-card" data-location="@activity.Location.ToLower()">
+        <div class="card h-100">
+            <img src="@activity.ImageUrl" class="card-img-top" alt="@activity.Title" />
+            <div class="card-body">
+                <h5 class="card-title">@activity.Title</h5>
+                <p class="card-text">@activity.Description</p>
+            </div>
+        </div>
+    </div>
+}
+        *@

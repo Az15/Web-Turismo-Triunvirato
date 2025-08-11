@@ -1,0 +1,97 @@
+﻿/* Estilos para la sección principal (Hero Section) */
+.hero-section {
+    height: 85vh; /* Ocupa casi toda la pantalla */
+    position: relative;
+    overflow: hidden;
+    background-color: #333; /* Color de fondo si el video no carga */
+}
+
+.hero-background-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    filter: brightness(0.5); /* Oscurece el video para que el texto resalte */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.assistcard-logo-animated {
+    max-width: 300px;
+    animation: scaleUp 1s ease-in-out;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Estilos para la sección de detalles (Acordeón) */
+#travel-assistance-details {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.accordion-button {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.accordion-body ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.accordion-body li {
+    margin-bottom: 10px;
+}
+
+/* Estilos para la sección de contacto */
+#contact-section {
+    background-color: #f8f9fa; /* Color de fondo claro */
+}
+
+.card {
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}

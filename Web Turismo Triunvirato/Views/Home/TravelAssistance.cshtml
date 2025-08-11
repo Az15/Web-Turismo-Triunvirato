@@ -1,0 +1,100 @@
+﻿<link rel="stylesheet" href="~/css/TravelAssistance.css" />
+
+<div class="hero-section text-center d-flex align-items-center justify-content-center">
+
+    <div class="hero-content text-white">
+        <img src="~/img/AsistenciaViajero/assist-card.webp" alt="Assist Card Logo" class="assistcard-logo-animated mb-4" />
+        <h1 class="display-4 fw-bold">Tu Viaje, Nuestra Tranquilidad.</h1>
+        <p class="lead mt-3">Protección 24/7 en cualquier lugar del mundo.</p>
+        <button id="scrollToDetailsBtn" class="btn btn-primary btn-lg mt-4 me-2">Ver Coberturas</button>
+        <a id="contactBtn" href="https://wa.me/tunumerodetelefono?text=Hola,%20quisiera%20más%20información%20sobre%20Assist%20Card." target="_blank" class="btn btn-success btn-lg mt-4">
+            <i class="fab fa-whatsapp me-2"></i>Contáctanos
+        </a>
+    </div>
+</div>
+
+<section id="travel-assistance-details" class="container my-5">
+    <h2 class="text-center mb-4">Conoce los Beneficios de Assist Card</h2>
+    <div class="accordion" id="assistCardAccordion">
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <i class="fas fa-info-circle me-3"></i> ¿Qué es Assist Card?
+                </button>
+            </h3>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#assistCardAccordion">
+                <div class="accordion-body">
+                    <p>Los servicios de ASSIST CARD son los más diversificados que se pueden obtener actualmente en todo el mundo y han sido diseñados por nuestros expertos para ayudar a los viajeros a enfrentar situaciones de emergencia y brindarles las mejores soluciones a sus problemas. Esta característica inigualable, junto a nuestro staff de entrenados profesionales en permanente crecimiento, sin duda hacen de ASSIST CARD la mayor organización en el mundo de asistencia al viajero.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <h3 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <i class="fas fa-heartbeat me-3"></i> Coberturas y Beneficios
+                </button>
+            </h3>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#assistCardAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li><i class="fas fa-medkit me-2"></i> Asistencia médica por enfermedad o accidente.</li>
+                        <li><i class="fas fa-car-crash me-2"></i> Repatriación sanitaria y administrativa.</li>
+                        <li><i class="fas fa-suitcase-rolling me-2"></i> Cobertura de equipaje extraviado.</li>
+                        <li><i class="fas fa-handshake me-2"></i> Asistencia legal.</li>
+                        <li><i class="fas fa-phone me-2"></i> Contacto 24/7.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        </div>
+</section>
+
+<section id="contact-section" class="bg-light py-5">
+    <div class="container text-center">
+        <h2>¿Necesitas ayuda ahora?</h2>
+        <p class="lead">Comunícate con nosotros por cualquiera de estos medios:</p>
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fab fa-whatsapp fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">WhatsApp</h5>
+                        <p class="card-text">Envíanos un mensaje ahora.</p>
+                        <a href="https://wa.me/tunumerodetelefono?text=Hola,%20quisiera%20más%20información%20sobre%20Assist%20Card." target="_blank" class="btn btn-success">
+                            <i class="fab fa-whatsapp me-2"></i>Iniciar Chat
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-phone fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Llámanos</h5>
+                        <p class="card-text">Llamadas 24 horas.</p>
+                        <a href="tel:tunumerodetelefono" class="btn btn-primary">
+                            <i class="fas fa-phone me-2"></i>+54 9 11 1234-5678
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-envelope fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Envíanos un Mail</h5>
+                        <p class="card-text">Te responderemos a la brevedad.</p>
+                        <a href="mailto:reservas@turismotriunvirato.tur.ar" class="btn btn-info text-white">
+                            <i class="fas fa-envelope me-2"></i>Enviar Correo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/js/TravelAssistance.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
