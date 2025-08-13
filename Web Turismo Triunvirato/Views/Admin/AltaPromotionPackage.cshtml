@@ -1,0 +1,172 @@
+﻿@model Web_Turismo_Triunvirato.Models.PackagePromotion
+
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Paquete" : "Editar Promoción de Paquete";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="@(Model.Id == 0 ? "SubmitPromotionPackage" : "EditPromotionPackage")" asp-controller="Admin" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @if (Model.Id != 0)
+                {
+                    <input type="hidden" asp-for="Id" />
+                }
+                <input type="hidden" asp-for="ServiceType" value="3" />
+                <input type="hidden" asp-for="DiscountPercentage" />
+
+                <div class="mb-3">
+                    <label asp-for="PackageType" class="form-label"></label>
+                    <select asp-for="PackageType" class="form-control" id="packageTypeDropdown">
+                        <option value="">Seleccione un tipo de paquete</option>
+                        <option value="VueloYHotel">Vuelo y Hotel</option>
+                        <option value="BusYHotel">Bus y Hotel</option>
+                    </select>
+                    <span asp-validation-for="PackageType" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DestinationName" class="form-label"></label>
+                    <input asp-for="DestinationName" class="form-control" />
+                    <span asp-validation-for="DestinationName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="OriginName" class="form-label"></label>
+                    <input asp-for="OriginName" class="form-control" />
+                    <span asp-validation-for="OriginName" class="text-danger"></span>
+                </div>
+
+                <div id="flightHotelFields" style="display: none;">
+                    <div class="mb-3">
+                        <label asp-for="AirlineName" class="form-label"></label>
+                        <input asp-for="AirlineName" class="form-control" />
+                        <span asp-validation-for="AirlineName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div id="busHotelFields" style="display: none;">
+                    <div class="mb-3">
+                        <label asp-for="BusCompanyName" class="form-label"></label>
+                        <input asp-for="BusCompanyName" class="form-control" />
+                        <span asp-validation-for="BusCompanyName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Category" class="form-label"></label>
+                        <select asp-for="Category" class="form-control">
+                            <option value="">Seleccione una categoría</option>
+                            <option value="Cama">Cama</option>
+                            <option value="Semi-Cama">Semi-Cama</option>
+                            <option value="Ejecutivo">Ejecutivo</option>
+                        </select>
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div id="hotelFields" style="display: none;">
+                    <div class="mb-3">
+                        <label asp-for="HotelName" class="form-label"></label>
+                        <input asp-for="HotelName" class="form-control" />
+                        <span asp-validation-for="HotelName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Stars" class="form-label"></label>
+                        <input asp-for="Stars" class="form-control" type="number" min="1" max="5" />
+                        <span asp-validation-for="Stars" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ImageUrl" class="form-label"></label>
+                    <input asp-for="ImageUrl" class="form-control" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsHotWeek" class="form-check-input" />
+                    <label asp-for="IsHotWeek" class="form-check-label"></label>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="OriginalPrice" class="form-label"></label>
+                    <input asp-for="OriginalPrice" class="form-control" />
+                    <span asp-validation-for="OriginalPrice" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="OfferPrice" class="form-label"></label>
+                    <input asp-for="OfferPrice" class="form-control" />
+                    <span asp-validation-for="OfferPrice" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="StartDate" class="form-label"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EndDate" class="form-label"></label>
+                    <input asp-for="EndDate" class="form-control" type="date" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-action="AdminPromotionPackages" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const packageTypeDropdown = document.getElementById('packageTypeDropdown');
+            const flightHotelFields = document.getElementById('flightHotelFields');
+            const busHotelFields = document.getElementById('busHotelFields');
+            const hotelFields = document.getElementById('hotelFields');
+
+            function toggleFields() {
+                const selectedValue = packageTypeDropdown.value;
+
+                // Ocultar todos los campos específicos primero
+                flightHotelFields.style.display = 'none';
+                busHotelFields.style.display = 'none';
+                hotelFields.style.display = 'none';
+
+                if (selectedValue === 'VueloYHotel') {
+                    flightHotelFields.style.display = 'block';
+                    hotelFields.style.display = 'block';
+                } else if (selectedValue === 'BusYHotel') {
+                    busHotelFields.style.display = 'block';
+                    hotelFields.style.display = 'block';
+                }
+            }
+
+            // Llamar a la función al cargar la página para el caso de edición
+            toggleFields();
+
+            // Llamar a la función cada vez que cambie el valor del dropdown
+            packageTypeDropdown.addEventListener('change', toggleFields);
+        });
+    </script>
+}
