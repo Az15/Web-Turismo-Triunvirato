@@ -1,0 +1,24 @@
+﻿/* Define los estilos para el elemento que vas a animar */
+.caja-animada {
+    width: 100px;
+    height: 100px;
+    background-color: dodgerblue;
+    position: relative; /* Necesario para que la animación funcione correctamente */
+    animation-name: moverCaja; /* Nombre de la animación */
+    animation-duration: 4s; /* Duración de la animación */
+    animation-iteration-count: infinite; /* Hace que la animación se repita indefinidamente */
+    animation-direction: alternate; /* La animación se mueve hacia adelante y luego hacia atrás */
+}
+
+/* Define la animación con @keyframes */
+@keyframes moverCaja {
+    0% {
+        left: 0px;
+        background-color: dodgerblue;
+    }
+
+    100% {
+        left: 200px;
+        background-color: limegreen;
+    }
+}
