@@ -82,14 +82,14 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> EditPromotionFlight(int id)
         {
             ViewData["Title"] = "Editar Promoción de Vuelo";
-            var promotion = await _dbContext.GetActiveflightpromotionsItemsAsync();
+            var promotion = await _dbContext.FlightPromotions.FindAsync(id);
 
             if (promotion == null)
             {
                 return NotFound();
             }
 
-            return View("AltaPromocionFlight", promotion);
+            return View("AltaPromotionFlight", promotion);
         }
 
         [HttpPost]
@@ -110,7 +110,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return RedirectToAction(nameof(AdminPromotionFlights));
             }
             ViewData["Title"] = "Alta de Promoción de Vuelo";
-            return View("AltaPromocionFlight", promotion);
+            return View("AltaPromotionFlight", promotion);
         }
 
         [HttpPost]
@@ -148,7 +148,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
             ViewData["Title"] = "Editar Promoción de Vuelo";
-            return View("AltaPromocionFlight", promotion);
+            return View("AltaPromotionFlight", promotion);
         }
 
         [HttpPost]
