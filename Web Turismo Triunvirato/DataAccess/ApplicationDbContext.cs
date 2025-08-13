@@ -1,4 +1,4 @@
-﻿// DataAccess/ApplicationDbContext.cs (o el path donde lo tengas)
+﻿// DataAccess/ApplicationDbContext.cs
 using Web_Turismo_Triunvirato.Models;
 using Pomelo.EntityFrameworkCore.MySql;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using System.Linq;
 using MySqlConnector;
 using System;
 
-namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyecto
+namespace Web_Turismo_Triunvirato.DataAccess
 {
     public class ApplicationDbContext : DbContext
     {
@@ -24,21 +24,22 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
         public DbSet<Passenger> Passengers { get; set; }
         public DbSet<User> Users { get; set; }
 
-        // Nuevo: DbSet para las promociones
+        // DbSets para las promociones
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<FlightPromotion> FlightPromotions { get; set; }
         public DbSet<HotelPromotion> HotelPromotions { get; set; }
         public DbSet<BusPromotion> BusPromotions { get; set; }
+        // NUEVO: DbSet para las promociones de paquetes
+        public DbSet<PackagePromotion> PackagePromotions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Nuevo: Mapeo del modelo Promotion a la tabla view_promotionHoteles
+            // Mapeo de entidades a tablas/vistas
             modelBuilder.Entity<Promotion>().ToTable("view_promotionHoteles");
-
-            // Asegúrate de que las otras entidades están correctamente mapeadas si lo requieren
             modelBuilder.Entity<BusPromotion>().ToTable("BusPromotions");
             modelBuilder.Entity<HotelPromotion>().ToTable("HotelPromotions");
             modelBuilder.Entity<FlightPromotion>().ToTable("FlightPromotions");
+            modelBuilder.Entity<PackagePromotion>().ToTable("PackagePromotions"); // NUEVO: Mapeo de PackagePromotion
 
             base.OnModelCreating(modelBuilder);
         }
@@ -48,37 +49,44 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
         public async Task<List<View_Index_DestinationCarouselItem>> GetCarouselItemsAsync()
         {
             return await View_DestinationCarouselItems
-                                 .FromSqlRaw("CALL GetActiveCarouselItems()")
-                                 .ToListAsync();
+                                .FromSqlRaw("CALL GetActiveCarouselItems()")
+                                .ToListAsync();
         }
 
         public async Task<List<View_Index_Destination>> GetHotDestinyItemsAsync()
         {
             return await Destinations
-                                 .FromSqlRaw("CALL GetActiveHotDestiny()")
-                                 .ToListAsync();
+                                .FromSqlRaw("CALL GetActiveHotDestiny()")
+                                .ToListAsync();
         }
 
         public async Task<List<FlightPromotion>> GetActiveflightpromotionsItemsAsync()
         {
             return await FlightPromotions
-                                 .FromSqlRaw("CALL GetActivePromotionFlights()")
-                                 .ToListAsync();
+                                .FromSqlRaw("CALL GetActivePromotionFlights()")
+                                .ToListAsync();
         }
 
         public async Task<List<HotelPromotion>> GetActivePromotionHotelsItemsAsync()
         {
             return await HotelPromotions
-                                 .FromSqlRaw("CALL GetActivePromotionHotels()")
-                                 .ToListAsync();
+                                .FromSqlRaw("CALL GetActivePromotionHotels()")
+                                .ToListAsync();
         }
 
-        // CORREGIDO: Renombrado el método para seguir una convención consistente
         public async Task<List<BusPromotion>> GetActivePromotionBusesItemsAsync()
         {
             return await BusPromotions
-                                 .FromSqlRaw("CALL GetActivePromotionBuses()")
-                                 .ToListAsync();
+                                .FromSqlRaw("CALL GetActivePromotionBuses()")
+                                .ToListAsync();
+        }
+
+        // NUEVO: Método para obtener promociones de paquetes activas
+        public async Task<List<PackagePromotion>> GetActivePromotionPackagesItemsAsync()
+        {
+            return await PackagePromotions
+                                .FromSqlRaw("CALL GetActivePromotionPackages()")
+                                .ToListAsync();
         }
 
         // --- Métodos para el ABM (Stored Procedures) ---
@@ -86,13 +94,20 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
         // Método para gestionar el ABM de FlightPromotion
         public async Task AbmFlightPromotionAsync(FlightPromotion promotionFlight, string typeExecuted)
         {
+            // CORREGIDO: Conversión segura del ServiceType a un entero
+            int serviceType;
+            if (!int.TryParse(promotionFlight.ServiceType, out serviceType))
+            {
+                throw new ArgumentException("El ServiceType del vuelo debe ser un valor numérico.", nameof(promotionFlight.ServiceType));
+            }
+
             string sql = "CALL SetActivePromotionFlights(@p_id, @p_servicetype, @p_description, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
-                // CORREGIDO: Los parámetros deben ser del tipo correcto. Se usa DbNull.Value para los nulos.
                 new MySqlParameter("p_id", promotionFlight.Id > 0 ? (object)promotionFlight.Id : DBNull.Value),
-                new MySqlParameter("p_servicetype", promotionFlight.ServiceType),
+            
+                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotionFlight.Description),
                 new MySqlParameter("p_destinationname", promotionFlight.DestinationName),
                 new MySqlParameter("p_originname", promotionFlight.OriginName),
@@ -113,16 +128,23 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
         // Método para gestionar el alta, la baja y la modificación de promociones de hoteles
         public async Task AbmHotelPromotionAsync(HotelPromotion promotion, string typeExecuted)
         {
+            // CORREGIDO: Conversión segura del ServiceType a un entero
+            int serviceType;
+            if (!int.TryParse(promotion.ServiceType, out serviceType))
+            {
+                throw new ArgumentException("El ServiceType del hotel debe ser un valor numérico.", nameof(promotion.ServiceType));
+            }
+
             string sql = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
-                // CORREGIDO: Usa DbNull.Value para el ID en caso de INSERT
                 new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-                new MySqlParameter("p_servicetype", promotion.ServiceType),
+                // CORREGIDO: Se usa la variable 'serviceType' que ya es un int
+                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotion.Description),
                 new MySqlParameter("p_destinationname", promotion.DestinationName),
-                //new MySqlParameter("p_hotelname", promotion.HotelName),
+                //new MySqlParameter("p_hotelname", promotion.HotelName), // Se asume que este parámetro es necesario
                 new MySqlParameter("p_imageurl", promotion.ImageUrl),
                 new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
                 new MySqlParameter("p_originalprice", promotion.OriginalPrice),
@@ -138,16 +160,23 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
-        // NUEVO MÉTODO COMPLETO PARA BUSES
+        // Método para gestionar el ABM de BusPromotion
         public async Task AbmBusPromotionAsync(BusPromotion promotion, string typeExecuted)
         {
-            // CORREGIDO: El nombre del SP y los parámetros deben coincidir con la tabla BusPromotions
+            // CORREGIDO: Conversión segura del ServiceType a un entero
+            int serviceType;
+            if (!int.TryParse(promotion.ServiceType, out serviceType))
+            {
+                throw new ArgumentException("El ServiceType del bus debe ser un valor numérico.", nameof(promotion.ServiceType));
+            }
+
             string sql = "CALL SetActivePromotionBuses(@p_id, @p_servicetype, @p_description, @p_destinationname, @p_originname, @p_buscompanyname, @p_category, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-                new MySqlParameter("p_servicetype", promotion.ServiceType),
+                // CORREGIDO: Se usa la variable 'serviceType' que ya es un int
+                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotion.Description),
                 new MySqlParameter("p_destinationname", promotion.DestinationName),
                 new MySqlParameter("p_originname", promotion.OriginName),
@@ -167,6 +196,44 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
+        // NUEVO: Método para gestionar el ABM de PackagePromotion
+        public async Task AbmPackagePromotionAsync(PackagePromotion promotion, string typeExecuted)
+        {
+            // CORREGIDO: Conversión segura del ServiceType a un entero
+            int serviceType;
+            if (!int.TryParse(promotion.ServiceType, out serviceType))
+            {
+                throw new ArgumentException("El ServiceType del paquete debe ser un valor numérico.", nameof(promotion.ServiceType));
+            }
+
+            string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_destinationname, @p_originname, @p_buscompanyname, @p_category, @p_hotelname, @p_stars, @p_airlinename, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_typeexecuted)";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
+                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
+                new MySqlParameter("p_packagetype", promotion.PackageType),
+                new MySqlParameter("p_description", promotion.Description),
+                new MySqlParameter("p_destinationname", promotion.DestinationName),
+                new MySqlParameter("p_originname", promotion.OriginName),
+                new MySqlParameter("p_buscompanyname", promotion.BusCompanyName),
+                new MySqlParameter("p_category", promotion.Category),
+                new MySqlParameter("p_hotelname", promotion.HotelName),
+                new MySqlParameter("p_stars", promotion.Stars),
+                new MySqlParameter("p_airlinename", promotion.AirlineName),
+                new MySqlParameter("p_imageurl", promotion.ImageUrl),
+                new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
+                new MySqlParameter("p_originalprice", promotion.OriginalPrice),
+                new MySqlParameter("p_offerprice", promotion.OfferPrice),
+                new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
+                new MySqlParameter("p_startdate", promotion.StartDate),
+                new MySqlParameter("p_enddate", promotion.EndDate),
+                new MySqlParameter("p_isactive", promotion.IsActive),
+                new MySqlParameter("p_typeexecuted", typeExecuted)
+            };
+
+            await Database.ExecuteSqlRawAsync(sql, parameters);
+        }
 
         // NUEVO MÉTODO para obtener una promoción de bus por ID
         public async Task<BusPromotion> GetBusPromotionByIdAsync(int id)
@@ -178,6 +245,12 @@ namespace Web_Turismo_Triunvirato.DataAccess // Ajusta el namespace a tu proyect
         public async Task<HotelPromotion> GetHotelPromotionByIdAsync(int id)
         {
             return await HotelPromotions.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        // NUEVO: Método para obtener una promoción de paquete por ID
+        public async Task<PackagePromotion> GetPackagePromotionByIdAsync(int id)
+        {
+            return await PackagePromotions.FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }

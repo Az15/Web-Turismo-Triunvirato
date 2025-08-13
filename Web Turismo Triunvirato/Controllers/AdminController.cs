@@ -65,14 +65,17 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             ViewData["Title"] = "Gestionar Promociones de Vuelos";
             var flightPromotions = await _dbContext.GetActiveflightpromotionsItemsAsync();
-            return View(flightPromotions);
+            return View("AdminPromotionFlights", flightPromotions);
         }
 
+
+
+
         [HttpGet]
-        public IActionResult AltaPromocion()
+        public IActionResult AltaPromotionFlight()
         {
             ViewData["Title"] = "Alta de Promoción de Vuelo";
-            return View("AltaPromocionFlight", new FlightPromotion { ServiceType = "0" });
+            return View("AltaPromotionFlight", new FlightPromotion { ServiceType = "0" });
         }
 
         [HttpGet]
@@ -91,7 +94,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionFlight(FlightPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionFlight([Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
         {
             if (ModelState.IsValid)
             {
@@ -99,6 +102,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
+                promotion.ServiceType = "0";
 
                 await _dbContext.AbmFlightPromotionAsync(promotion, "INSERT");
 
