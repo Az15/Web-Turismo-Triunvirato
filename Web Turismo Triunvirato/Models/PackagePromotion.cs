@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web_Turismo_Triunvirato.Models
 {
@@ -9,19 +10,19 @@ namespace Web_Turismo_Triunvirato.Models
         public int Id { get; set; }
 
         [Required]
-        [Display(Name = "Tipo de servicio")]
-        public string ServiceType { get; set; } = "3"; // '3' para paquetes
-
-        [Required]
-        [StringLength(20)]
         [Display(Name = "Tipo de Paquete")]
         // Para diferenciar entre los paquetes: "VueloYHotel" o "BusYHotel"
         public string PackageType { get; set; }
+
+        [Required]
+        [Display(Name = "Tipo de servicio")]
+        public string ServiceType { get; set; } = "3"; // '3' para paquetes
 
         [Required(ErrorMessage = "Descripción es requerida.")]
         [StringLength(200)]
         [Display(Name = "Descripción")]
         public string Description { get; set; }
+
 
         [Required(ErrorMessage = "Destino es requerido.")]
         [StringLength(100)]
@@ -35,7 +36,7 @@ namespace Web_Turismo_Triunvirato.Models
 
         [Display(Name = "URL de Imagen")]
         [StringLength(255)]
-        public string? ImageUrl { get; set; } // Se hizo nullable para aceptar nulls si no se provee una URL
+        public string? ImageUrl { get; set; }
 
         [Display(Name = "Es Hot Week")]
         public bool IsHotWeek { get; set; } = false;
@@ -57,38 +58,25 @@ namespace Web_Turismo_Triunvirato.Models
 
         [Required(ErrorMessage = "Fecha de inicio es requerida.")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Fecha de Inicio")]
         public DateTime StartDate { get; set; } = DateTime.Today;
 
         [Required(ErrorMessage = "Fecha de fin es requerida.")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Fecha de Fin")]
         public DateTime EndDate { get; set; } = DateTime.Today.AddMonths(1);
 
-        [Display(Name = "Está Activo")]
-        public bool IsActive { get; set; } = true;
 
-        // Propiedades específicas de Vuelo y Hotel, se hacen nullable.
-        [StringLength(100)]
-        [Display(Name = "Compañía Aérea")]
-        public string? AirlineName { get; set; }
 
+        [Column("Company")]
+        [Display(Name = "Empresa")]
         [StringLength(100)]
-        [Display(Name = "Nombre del Hotel")]
+        public string? CompanyName { get; set; }
+
+        // Nuevo campo para Nombre Hotel
+        [Display(Name = "Nombre Hotel")]
+        [StringLength(100)]
         public string? HotelName { get; set; }
-
-        [Display(Name = "Cantidad de Estrellas")]
-        public int Stars { get; set; }
-
-        // Propiedades específicas de Bus y Hotel, se hacen nullable.
-        [StringLength(100)]
-        [Display(Name = "Compañía de Bus")]
-        public string? BusCompanyName { get; set; }
-
-        [StringLength(50)]
-        [Display(Name = "Categoría de Bus")]
-        public string? Category { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }

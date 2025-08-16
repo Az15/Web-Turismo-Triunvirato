@@ -28,6 +28,8 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
+
+
         public IActionResult Perfil()
         {
             ViewData["Title"] = "Perfil del Administrador";
@@ -52,11 +54,14 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
-        public IActionResult Paquetes()
+        public IActionResult packages()
         {
             ViewData["Title"] = "Administración de Paquetes";
             return View();
         }
+
+        [HttpGet]
+
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE VUELOS ****************
 
@@ -302,7 +307,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         // POST: Admin/SubmitPromotionBus (Creación)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionBus([Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionBus([Bind("Id,ServiceType,PackageType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,AirlineName,HotelName,Stars,BusCompanyName,Category")] BusPromotion promotion)
         {
             if (ModelState.IsValid)
             {
@@ -372,6 +377,135 @@ namespace Web_Turismo_Triunvirato.Controllers
             await _dbContext.AbmBusPromotionAsync(promotion, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de bus eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionBuses));
+        }
+
+
+        // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE PAQUETES ****************
+
+        public async Task<IActionResult> AdminPromotionPackages()
+        {
+            var promotions = await _dbContext.GetActivePromotionPackagesItemsAsync();
+            ViewData["Title"] = "Gestión de Promociones de Paquetes";
+            return View(promotions);
+        }
+
+        // Método GET para mostrar la vista de creación de una nueva promoción de paquete
+        public IActionResult AltaPromotionPackage()
+        {
+            ViewData["Title"] = "Alta de Promoción de Paquete";
+            // CORREGIDO: Pasa un nuevo modelo vacío a la vista para evitar la excepción
+            return View(new PackagePromotion());
+        }
+
+        // Método GET para mostrar la vista de edición de una promoción de paquete
+        public async Task<IActionResult> EditPromotionPackage(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var promotion = await _dbContext.GetPackagePromotionByIdAsync(id.Value);
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+            ViewData["Title"] = "Editar Promoción de Paquete";
+            return View("AltaPromotionPackage", promotion);
+        }
+
+        // Método POST para la creación de una promoción de paquete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
+        public async Task<IActionResult> SubmitPromotionPackage([Bind("Id,ServiceType,PackageType,Description,CompanyName," +
+            "DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate," +
+            "IsActive,HotelName")] PackagePromotion promotion)
+        {
+            if (ModelState.IsValid)
+            {
+                // Se calcula el descuento si los precios son válidos.
+                if (promotion.OriginalPrice > 0)
+                {
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                }
+
+                // El tipo de servicio para los paquetes es "3".
+                promotion.ServiceType = "3";
+
+                // Se llama al método ABM del DbContext para insertar el nuevo paquete.
+                await _dbContext.AbmPackagePromotionAsync(promotion, "INSERT");
+
+                TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
+                return RedirectToAction(nameof(AdminPromotionPackages));
+            }
+
+            // Si el modelo no es válido, se regresa a la vista para mostrar los errores.
+            ViewData["Title"] = "Alta de Promoción de Paquete";
+            return View("AltaPromotionPackage", promotion);
+        }
+
+        // Método POST para la edición de una promoción de paquete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
+        public async Task<IActionResult> EditPromotionPackage(int id, [Bind("Id,ServiceType,PackageType,Description,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,HotelName")] PackagePromotion promotion)
+        {
+            if (id != promotion.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Se recalcula el porcentaje de descuento en caso de que los precios se hayan modificado.
+                    if (promotion.OriginalPrice > 0)
+                    {
+                        promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                    }
+
+                    // El tipo de servicio para los paquetes es "3".
+                    promotion.ServiceType = "3";
+
+                    // Se llama al método ABM del DbContext para actualizar el paquete.
+                    await _dbContext.AbmPackagePromotionAsync(promotion, "UPDATE");
+                    TempData["SuccessMessage"] = "¡Promoción de paquete actualizada exitosamente!";
+                    return RedirectToAction(nameof(AdminPromotionPackages));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _dbContext.PackagePromotions.AnyAsync(e => e.Id == promotion.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            ViewData["Title"] = "Editar Promoción de Paquete";
+            return View("AltaPromotionPackage", promotion);
+        }
+
+        // Método POST para la eliminación de una promoción de paquete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePromotionPackage(int id)
+        {
+            var promotion = await _dbContext.PackagePromotions.FindAsync(id);
+            if (promotion == null)
+            {
+                return NotFound();
+            }
+
+            // Se llama al método ABM del DbContext para eliminar el paquete.
+            await _dbContext.AbmPackagePromotionAsync(promotion, "DELETE");
+            TempData["SuccessMessage"] = "¡Promoción de paquete eliminada exitosamente!";
+            return RedirectToAction(nameof(AdminPromotionPackages));
         }
 
     }

@@ -1,7 +1,8 @@
 ﻿@model Web_Turismo_Triunvirato.Models.PackagePromotion
 
 @{
-    ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Paquete" : "Editar Promoción de Paquete";
+    var action = Model.Id == 0 ? "SubmitPromotionPackage" : "EditPromotionPackage";
+    ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Paquetes" : "Editar Promoción de Paquete";
 }
 
 <div class="container mt-4">
@@ -18,6 +19,8 @@
                 }
                 <input type="hidden" asp-for="ServiceType" value="3" />
                 <input type="hidden" asp-for="DiscountPercentage" />
+           @*      <input type="hidden" asp-for="Stars" />
+                <input type="hidden" asp-for="Category" /> *@
 
                 <div class="mb-3">
                     <label asp-for="PackageType" class="form-label"></label>
@@ -27,6 +30,18 @@
                         <option value="BusYHotel">Bus y Hotel</option>
                     </select>
                     <span asp-validation-for="PackageType" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CompanyName" class="form-label"></label>
+                    <input asp-for="CompanyName" class="form-control" id="companyNameInput" />
+                    <span asp-validation-for="CompanyName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="HotelName" class="form-label"></label>
+                    <input asp-for="HotelName" class="form-control" />
+                    <span asp-validation-for="HotelName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
@@ -45,45 +60,6 @@
                     <label asp-for="OriginName" class="form-label"></label>
                     <input asp-for="OriginName" class="form-control" />
                     <span asp-validation-for="OriginName" class="text-danger"></span>
-                </div>
-
-                <div id="flightHotelFields" style="display: none;">
-                    <div class="mb-3">
-                        <label asp-for="AirlineName" class="form-label"></label>
-                        <input asp-for="AirlineName" class="form-control" />
-                        <span asp-validation-for="AirlineName" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div id="busHotelFields" style="display: none;">
-                    <div class="mb-3">
-                        <label asp-for="BusCompanyName" class="form-label"></label>
-                        <input asp-for="BusCompanyName" class="form-control" />
-                        <span asp-validation-for="BusCompanyName" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="Category" class="form-label"></label>
-                        <select asp-for="Category" class="form-control">
-                            <option value="">Seleccione una categoría</option>
-                            <option value="Cama">Cama</option>
-                            <option value="Semi-Cama">Semi-Cama</option>
-                            <option value="Ejecutivo">Ejecutivo</option>
-                        </select>
-                        <span asp-validation-for="Category" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div id="hotelFields" style="display: none;">
-                    <div class="mb-3">
-                        <label asp-for="HotelName" class="form-label"></label>
-                        <input asp-for="HotelName" class="form-control" />
-                        <span asp-validation-for="HotelName" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3">
-                        <label asp-for="Stars" class="form-label"></label>
-                        <input asp-for="Stars" class="form-control" type="number" min="1" max="5" />
-                        <span asp-validation-for="Stars" class="text-danger"></span>
-                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -141,31 +117,24 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const packageTypeDropdown = document.getElementById('packageTypeDropdown');
-            const flightHotelFields = document.getElementById('flightHotelFields');
-            const busHotelFields = document.getElementById('busHotelFields');
-            const hotelFields = document.getElementById('hotelFields');
+            const companyNameInput = document.getElementById('companyNameInput');
 
             function toggleFields() {
                 const selectedValue = packageTypeDropdown.value;
 
-                // Ocultar todos los campos específicos primero
-                flightHotelFields.style.display = 'none';
-                busHotelFields.style.display = 'none';
-                hotelFields.style.display = 'none';
-
                 if (selectedValue === 'VueloYHotel') {
-                    flightHotelFields.style.display = 'block';
-                    hotelFields.style.display = 'block';
+                    companyNameInput.placeholder = 'Nombre de Aerolínea';
                 } else if (selectedValue === 'BusYHotel') {
-                    busHotelFields.style.display = 'block';
-                    hotelFields.style.display = 'block';
+                    companyNameInput.placeholder = 'Nombre de Empresa de Bus';
+                } else {
+                    companyNameInput.placeholder = '';
                 }
             }
 
-            // Llamar a la función al cargar la página para el caso de edición
+            // Llamar a la función al cargar la página para inicializar los campos
             toggleFields();
 
-            // Llamar a la función cada vez que cambie el valor del dropdown
+            // Agregar un evento para que la función se ejecute cada vez que cambie el valor del dropdown
             packageTypeDropdown.addEventListener('change', toggleFields);
         });
     </script>
