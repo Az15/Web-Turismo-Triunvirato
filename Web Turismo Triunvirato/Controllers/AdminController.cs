@@ -60,8 +60,20 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
-        [HttpGet]
+        public IActionResult Encomiendas()
+        {
+            ViewData["Title"] = "Administración de Encomiendas";
+            return View();
+        }
 
+
+
+
+        //public async Task<IActionResult> Encomiendas()
+        //{
+        //    var companies = await _dbContext.EncomiendaCompanies.ToListAsync();
+        //    return View(companies);
+        //}
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE VUELOS ****************
 
@@ -393,7 +405,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         public IActionResult AltaPromotionPackage()
         {
             ViewData["Title"] = "Alta de Promoción de Paquete";
-            // CORREGIDO: Pasa un nuevo modelo vacío a la vista para evitar la excepción
+            // Pasa un nuevo modelo vacío a la vista para evitar la excepción
             return View(new PackagePromotion());
         }
 
@@ -419,8 +431,8 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
         public async Task<IActionResult> SubmitPromotionPackage([Bind("Id,ServiceType,PackageType,Description,CompanyName," +
-            "DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate," +
-            "IsActive,HotelName")] PackagePromotion promotion)
+                                                                        "DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate," +
+                                                                        "IsActive,HotelName")] PackagePromotion promotion)
         {
             if (ModelState.IsValid)
             {
@@ -507,6 +519,106 @@ namespace Web_Turismo_Triunvirato.Controllers
             TempData["SuccessMessage"] = "¡Promoción de paquete eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionPackages));
         }
+    
+
+    // NUEVAS ACCIONES PARA LA GESTIÓN DE ENCOMIENDAS
+
+    [HttpGet]
+    public async Task<IActionResult> AdminEncomiendas()
+    {
+        ViewData["Title"] = "Administrar Empresas de Encomiendas";
+        var encomiendaCompanies = await _dbContext.EncomiendaCompanies.ToListAsync();
+        return View("AdminEncomiendas", encomiendaCompanies);
+    }
+
+    [HttpGet]
+    public IActionResult AltaEncomienda()
+    {
+        ViewData["Title"] = "Alta de Empresa de Encomiendas";
+        return View("AltaEncomienda", new EncomiendaCompany());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AltaEncomienda([Bind("Name,ImageUrl,Phone,Email,Address")] EncomiendaCompany company)
+    {
+        if (ModelState.IsValid)
+        {
+            _dbContext.Add(company);
+            await _dbContext.SaveChangesAsync();
+            TempData["SuccessMessage"] = "¡Empresa de encomiendas agregada exitosamente!";
+            return RedirectToAction(nameof(AdminEncomiendas));
+        }
+        ViewData["Title"] = "Alta de Empresa de Encomiendas";
+        return View("AltaEncomienda", company);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> EditEncomienda(int id)
+    {
+        ViewData["Title"] = "Editar Empresa de Encomiendas";
+        var company = await _dbContext.EncomiendaCompanies.FindAsync(id);
+        if (company == null)
+        {
+            return NotFound();
+        }
+        return View("AltaEncomienda", company);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditEncomienda(int id, [Bind("Id,Name,ImageUrl,Phone,Email,Address")] EncomiendaCompany company)
+    {
+        if (id != company.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                _dbContext.Update(company);
+                await _dbContext.SaveChangesAsync();
+                TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                return RedirectToAction(nameof(AdminEncomiendas));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _dbContext.EncomiendaCompanies.AnyAsync(e => e.Id == company.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+        ViewData["Title"] = "Editar Empresa de Encomiendas";
+        return View("AltaEncomienda", company);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteEncomienda(int id)
+    {
+        var company = await _dbContext.EncomiendaCompanies.FindAsync(id);
+        if (company == null)
+        {
+            return NotFound();
+        }
+
+        _dbContext.EncomiendaCompanies.Remove(company);
+        await _dbContext.SaveChangesAsync();
+        TempData["SuccessMessage"] = "¡Empresa de encomiendas eliminada exitosamente!";
+        return RedirectToAction(nameof(AdminEncomiendas));
+    }
+
+
+
 
     }
+
+
 }

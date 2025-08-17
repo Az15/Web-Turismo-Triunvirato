@@ -32,7 +32,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public DbSet<BusPromotion> BusPromotions { get; set; }
         // NUEVO: DbSet para las promociones de paquetes
         public DbSet<PackagePromotion> PackagePromotions { get; set; }
-
+        public DbSet<EncomiendaCompany> EncomiendaCompanies { get; set; } 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Mapeo de entidades a tablas/vistas
@@ -233,6 +233,20 @@ namespace Web_Turismo_Triunvirato.DataAccess
             };
 
             await Database.ExecuteSqlRawAsync(sql, parameters);
+        }
+
+
+        public async Task AbmEncomiendaCompanyAsync(EncomiendaCompany company, string type)
+        {
+            await Database.ExecuteSqlRawAsync(
+                "CALL SetEncomiendaCompany(@p_id, @p_companyname, @p_companyurl, @p_imageurl, @p_createdat, @p_typeexecuted)",
+                new MySqlParameter("@p_id", company.Id),
+                new MySqlParameter("@p_companyname", company.CompanyName),
+                new MySqlParameter("@p_companyurl", company.CompanyUrl),
+                new MySqlParameter("@p_imageurl", company.ImageUrl),
+                new MySqlParameter("@p_createdat", company.CreatedAt),
+                new MySqlParameter("@p_typeexecuted", type)
+            );
         }
 
         // NUEVO MÉTODO para obtener una promoción de bus por ID
