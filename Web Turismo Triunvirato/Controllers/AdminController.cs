@@ -7,19 +7,25 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Web_Turismo_Triunvirato.DataAccess;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IPromotionService _promotionService;
         private readonly ApplicationDbContext _dbContext;
+        
 
-        public AdminController(IPromotionService promotionService, ApplicationDbContext dbContext)
+        public AdminController(IPromotionService promotionService, ApplicationDbContext dbContext, IWebHostEnvironment webHostEnvironment)
         {
             _promotionService = promotionService;
             _dbContext = dbContext;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -538,22 +544,62 @@ namespace Web_Turismo_Triunvirato.Controllers
         return View("AltaEncomienda", new EncomiendaCompany());
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> AltaEncomienda([Bind("Name,ImageUrl,Phone,Email,Address")] EncomiendaCompany company)
-    {
-        if (ModelState.IsValid)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // Se añade IFormFile para recibir el archivo subido
+        public async Task<IActionResult> AltaEncomienda([Bind("Id,CompanyName,CompanyUrl")] EncomiendaCompany encomienda, IFormFile ImageFile)
         {
-            _dbContext.Add(company);
-            await _dbContext.SaveChangesAsync();
-            TempData["SuccessMessage"] = "¡Empresa de encomiendas agregada exitosamente!";
-            return RedirectToAction(nameof(AdminEncomiendas));
-        }
-        ViewData["Title"] = "Alta de Empresa de Encomiendas";
-        return View("AltaEncomienda", company);
-    }
+            if (ModelState.IsValid)
+            {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    // La carpeta donde se guardarán las imágenes. Asegúrate de que exista.
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/encomiendas");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
 
-    [HttpGet]
+                    // Genera un nombre de archivo único para evitar colisiones
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Guarda el archivo en el servidor
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(fileStream);
+                    }
+
+                    // Actualiza la propiedad ImageUrl del modelo con la ruta relativa
+                    encomienda.ImageUrl = "/images/encomiendas/" + uniqueFileName;
+                }
+
+                _dbContext.Add(encomienda);
+                await _dbContext.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Empresa de encomienda creada exitosamente!";
+                return RedirectToAction(nameof(AdminEncomiendas));
+            }
+
+            return View(encomienda);
+        }
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> AltaEncomienda([Bind("Name,ImageUrl,Phone,Email,Address")] EncomiendaCompany company)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _dbContext.Add(company);
+        //        await _dbContext.SaveChangesAsync();
+        //        TempData["SuccessMessage"] = "¡Empresa de encomiendas agregada exitosamente!";
+        //        return RedirectToAction(nameof(AdminEncomiendas));
+        //    }
+        //    ViewData["Title"] = "Alta de Empresa de Encomiendas";
+        //    return View("AltaEncomienda", company);
+        //}
+
+        [HttpGet]
     public async Task<IActionResult> EditEncomienda(int id)
     {
         ViewData["Title"] = "Editar Empresa de Encomiendas";

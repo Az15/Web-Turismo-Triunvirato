@@ -1,83 +1,59 @@
 ﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.EncomiendaCompany>
 
 @{
-    ViewData["Title"] = "Administrar Empresas de Encomiendas";
+    ViewData["Title"] = "Gestión de Empresas de Encomiendas";
 }
 
-<h2 class="mt-4">@ViewData["Title"]</h2>
-<p>
-    <a asp-action="AltaEncomienda" class="btn btn-primary">Crear Nueva Empresa</a>
-</p>
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
+    <p>
+        <a asp-action="AltaEncomienda" class="btn btn-success">Crear Nueva Empresa</a>
+    </p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table table-striped table-bordered">
+        <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.CompanyName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.ImageUrl)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CompanyUrl)
-                </th>
+                <th>Nombre</th>
+                <th>Imagen</th>
+                <th>URL de la Empresa</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @if (Model != null && Model.Any())
-            {
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CompanyName)
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(item.ImageUrl))
-                            {
-                                <img src="@item.ImageUrl" alt="Imagen de @item.CompanyName" style="max-height: 50px; border-radius: 5px;" />
-                            }
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CompanyUrl)
-                        </td>
-                        <td>
-                            <a asp-action="EditEncomienda" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a> |
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.Id">Eliminar</button>
-
-                            <!-- Modal de Confirmación de Eliminación -->
-                            <div class="modal fade" id="deleteModal-@item.Id" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            ¿Estás seguro de que quieres eliminar la empresa de encomiendas "@item.CompanyName"?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <form asp-action="DeleteEncomienda" method="post" style="display:inline;">
-                                                <input type="hidden" name="id" value="@item.Id" />
-                                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            }
-            else
+            @foreach (var item in Model)
             {
                 <tr>
-                    <td colspan="4" class="text-center">No se encontraron empresas de encomiendas.</td>
+                    <td>@item.CompanyName</td>
+                    <td>
+                        <!-- Se usa la etiqueta <img> para mostrar la imagen en lugar del texto de la URL -->
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.CompanyName" style="max-width: 100px; height: auto;" />
+                        }
+                    </td>
+                    <td><a href="@item.CompanyUrl" target="_blank">@item.CompanyUrl</a></td>
+                    <td>
+                        <a asp-action="EditEncomienda" asp-route-id="@item.Id" class="btn btn-sm btn-info">Editar</a>
+                        <form asp-controller="Admin" asp-action="DeleteEncomienda" method="post" style="display:inline-block;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar esta empresa?');">Eliminar</button>
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Volver al Panel</a>
+    </div>
 </div>

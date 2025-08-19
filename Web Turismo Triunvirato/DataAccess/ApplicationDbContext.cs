@@ -244,7 +244,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 new MySqlParameter("@p_companyname", company.CompanyName),
                 new MySqlParameter("@p_companyurl", company.CompanyUrl),
                 new MySqlParameter("@p_imageurl", company.ImageUrl),
-                new MySqlParameter("@p_createdat", company.CreatedAt),
+                //new MySqlParameter("@p_createdat", company.CreatedAt),
                 new MySqlParameter("@p_typeexecuted", type)
             );
         }

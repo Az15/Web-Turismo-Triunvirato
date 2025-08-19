@@ -22,13 +22,14 @@
                 {
                     <div class="empresa-seguimiento">
                         <a href="@company.CompanyUrl" target="_blank">
-                            @if (company.ImageUrl.StartsWith("fa"))
+                            @if (!string.IsNullOrEmpty(company.ImageUrl))
                             {
-                                <i class="@company.ImageUrl" style="font-size: 4em; color: #007bff;"></i>
+                                <img src="@company.ImageUrl" alt="@company.CompanyName" />
                             }
                             else
                             {
                                 <span style="font-size: 4em;">@company.ImageUrl</span>
+
                             }
                         </a>
                     </div>
