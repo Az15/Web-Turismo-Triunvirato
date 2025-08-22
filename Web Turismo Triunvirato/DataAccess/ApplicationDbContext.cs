@@ -8,6 +8,7 @@ using System.Linq;
 using MySqlConnector;
 using System;
 using System.Data;
+using System.Diagnostics;
 
 namespace Web_Turismo_Triunvirato.DataAccess
 {
@@ -32,7 +33,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public DbSet<BusPromotion> BusPromotions { get; set; }
         // NUEVO: DbSet para las promociones de paquetes
         public DbSet<PackagePromotion> PackagePromotions { get; set; }
-        public DbSet<EncomiendaCompany> EncomiendaCompanies { get; set; } 
+        public DbSet<EncomiendaCompany> EncomiendaCompanies { get; set; }
+        public DbSet<ActivitiesPromotion> Activities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Mapeo de entidades a tablas/vistas
@@ -247,6 +249,25 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 //new MySqlParameter("@p_createdat", company.CreatedAt),
                 new MySqlParameter("@p_typeexecuted", type)
             );
+        }
+
+
+        public async Task AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
+        {
+            // Cambiamos el nombre del SP
+            string sql = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_location, @p_imageurl, @p_typeexecuted)";
+
+            var parameters = new MySqlParameter[]
+            {
+        new MySqlParameter("p_id", activity.Id > 0 ? (object)activity.Id : DBNull.Value),
+        new MySqlParameter("p_title", activity.Title),
+        new MySqlParameter("p_description", activity.Description),
+        new MySqlParameter("p_location", activity.Location),
+        new MySqlParameter("p_imageurl", activity.ImageUrl),
+        new MySqlParameter("p_typeexecuted", typeExecuted)
+            };
+
+            await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
         // NUEVO MÉTODO para obtener una promoción de bus por ID

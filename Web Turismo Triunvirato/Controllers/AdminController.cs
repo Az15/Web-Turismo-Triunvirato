@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using System.Diagnostics;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -20,7 +21,6 @@ namespace Web_Turismo_Triunvirato.Controllers
         private readonly IPromotionService _promotionService;
         private readonly ApplicationDbContext _dbContext;
         
-
         public AdminController(IPromotionService promotionService, ApplicationDbContext dbContext, IWebHostEnvironment webHostEnvironment)
         {
             _promotionService = promotionService;
@@ -33,8 +33,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             ViewData["Title"] = "Panel de Administración";
             return View();
         }
-
-
 
         public IActionResult Perfil()
         {
@@ -72,14 +70,13 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
+        public IActionResult Activities()
+        {
+            ViewData["Title"] = "Panel de Administración";
+            return View();
+        }
 
 
-
-        //public async Task<IActionResult> Encomiendas()
-        //{
-        //    var companies = await _dbContext.EncomiendaCompanies.ToListAsync();
-        //    return View(companies);
-        //}
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE VUELOS ****************
 
@@ -527,7 +524,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
     
 
-    // NUEVAS ACCIONES PARA LA GESTIÓN DE ENCOMIENDAS
+    ///////////// NUEVAS ACCIONES PARA LA GESTIÓN DE ENCOMIENDAS  ////////////////////////////////////////////
 
     [HttpGet]
     public async Task<IActionResult> AdminEncomiendas()
@@ -582,22 +579,6 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             return View(encomienda);
         }
-
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> AltaEncomienda([Bind("Name,ImageUrl,Phone,Email,Address")] EncomiendaCompany company)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _dbContext.Add(company);
-        //        await _dbContext.SaveChangesAsync();
-        //        TempData["SuccessMessage"] = "¡Empresa de encomiendas agregada exitosamente!";
-        //        return RedirectToAction(nameof(AdminEncomiendas));
-        //    }
-        //    ViewData["Title"] = "Alta de Empresa de Encomiendas";
-        //    return View("AltaEncomienda", company);
-        //}
 
         [HttpGet]
     public async Task<IActionResult> EditEncomienda(int id)
@@ -661,10 +642,166 @@ namespace Web_Turismo_Triunvirato.Controllers
         return RedirectToAction(nameof(AdminEncomiendas));
     }
 
+        /////////////////////////////////////// ACTIVIDADES ////////////////////////////////////////////////////////////
+
+        [HttpGet]
+        public async Task<IActionResult> AdminActivities()
+        {
+            ViewData["Title"] = "Administrar Actividades";
+            var activitiesAdmin = await _dbContext.Activities.ToListAsync();
+            return View("AdminActivities", activitiesAdmin);
+        }
+
+        [HttpGet]
+        public IActionResult AltaActividad()
+        {
+            ViewData["Title"] = "Alta de Actividades";
+            return View("AltaActividad", new ActivitiesPromotion());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AltaActividad([Bind("Id,Title,Description,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
+        {
+            if (ModelState.IsValid)
+            {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/Actividades");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(fileStream);
+                    }
+
+                    Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
+                }
+
+                _dbContext.Add(Actividad);
+
+                await _dbContext.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Empresa de encomienda creada exitosamente!";
+                return RedirectToAction(nameof(AdminActivities));
+            }
+
+            return View(Actividad);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditActividad(int id)
+        {
+            ViewData["Title"] = "Editar Actividades";
+            var Actividad = await _dbContext.Activities.FindAsync(id);
+            if (Actividad == null)
+            {
+                return NotFound();
+            }
+            return View("AltaActividad", Actividad);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // Se modifica el método de edición para aceptar el IFormFile.
+        public async Task<IActionResult> EditActividad(int id, [Bind("Id,Title,Description,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
+        {
+            if (id != Actividad.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Si se subió una nueva imagen, se guarda y se actualiza la URL.
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        // Lógica para guardar la nueva imagen (similar a AltaActividad).
+                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/Actividades");
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(fileStream);
+                        }
+
+                        // Se borra la imagen anterior si existía para no dejar archivos huérfanos.
+                        if (!string.IsNullOrEmpty(Actividad.ImageUrl))
+                        {
+                            string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, Actividad.ImageUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(oldFilePath))
+                            {
+                                System.IO.File.Delete(oldFilePath);
+                            }
+                        }
+
+                        // Se actualiza la URL de la imagen del modelo.
+                        Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
+                    }
+
+                    // Si no se subió una nueva imagen, se mantiene la URL existente.
+                    // Esto se maneja automáticamente ya que el campo ImageUrl se incluye en el bind y el campo hidden.
+                    _dbContext.Update(Actividad);
+                    await _dbContext.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                    return RedirectToAction(nameof(AdminActivities));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _dbContext.Activities.AnyAsync(e => e.Id == Actividad.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            ViewData["Title"] = "Editar Actividad";
+            return View("AltaActividad", Actividad);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteActividad(int id)
+        {
+            var Actividad = await _dbContext.Activities.FindAsync(id);
+            if (Actividad == null)
+            {
+                return NotFound();
+            }
+
+            // También se borra la imagen del servidor al eliminar el registro.
+            if (!string.IsNullOrEmpty(Actividad.ImageUrl))
+            {
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, Actividad.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
+            _dbContext.Activities.Remove(Actividad);
+            await _dbContext.SaveChangesAsync();
+            TempData["SuccessMessage"] = "¡Actividad eliminada exitosamente!";
+            return RedirectToAction(nameof(AdminActivities));
+        }
 
 
-
+        ////fin/////
     }
-
-
 }
