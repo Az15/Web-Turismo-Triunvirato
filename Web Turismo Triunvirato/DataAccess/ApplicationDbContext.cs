@@ -49,6 +49,26 @@ namespace Web_Turismo_Triunvirato.DataAccess
 
         // --- Métodos para obtener datos (Stored Procedures) ---
 
+        public async Task<List<FlightPromotion>> GetViewFlightpromotionsItemsAsync()
+        {
+            return await FlightPromotions
+                                 .FromSqlRaw("CALL GetViewFlights()")
+                                 .ToListAsync();
+        }
+        public async Task<List<HotelPromotion>> GetViewHotelspromotionsItemsAsync()
+        {
+            return await HotelPromotions
+                                 .FromSqlRaw("CALL GetViewHotels()")
+                                 .ToListAsync();
+        }
+
+        public async Task<List<BusPromotion>> GetViewBusspromotionsItemsAsync()
+        {
+            return await BusPromotions
+                                 .FromSqlRaw("CALL GetViewBuses()")
+                                 .ToListAsync();
+        }
+
         public async Task<List<View_Index_DestinationCarouselItem>> GetCarouselItemsAsync()
         {
             return await View_DestinationCarouselItems
