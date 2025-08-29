@@ -1,49 +1,82 @@
-﻿/*.
-
-    .user-menu .dropdown-item button:hover {
-        background-color: #f8f9fa;*/ /* Color de fondo al pasar el ratón */
-    /*}*/
-
-/* wwwroot/css/Login.css */
-
-/* Estilos existentes para el contenedor de login, formulario, etc. */
-
-/* wwwroot/css/Login.css */
-
-/* Estilos existentes */
-
-.login-options button {
-    margin-right: 5px; /* Espacio entre los botones */
-    padding: 8px 15px; /* Ajustar el relleno */
-    border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer;
-    font-size: 0.9em; /* Tamaño de la fuente */
-    transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
+﻿/* Estilos para el contenedor principal del login */
+.login-container {
+    max-width: 400px; /* Define el ancho máximo del contenedor */
+    margin: 40px auto; /* Centra el contenedor horizontalmente */
+    padding: 30px;
+    background-color: #f8f9fa; /* Un color de fondo para la tarjeta de login */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+    text-align: center; /* Centra el texto y otros elementos */
 }
 
-    .login-options button:hover {
-        /* Estilo general para todos los botones al pasar el mouse (si aplica) */
+/* Estilos para los campos de formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Los inputs de formulario ocupan el 100% del contenedor */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-sizing: border-box; /* Asegura que padding y borde no afecten el ancho total */
+}
+
+/* Estilos para los botones del formulario */
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
     }
 
-/* Estilos para los botones de Gmail y Email (si los usaras con esas clases) */
-/*.login-options .gmail-button { ... }
-.login-options .gmail-button:hover { ... }
-.login-options .email-button { ... }
-.login-options .email-button:hover { ... }*/
+/* Estilos para las opciones de login (Crear cuenta, etc.) */
+.login-options {
+    margin-top: 20px;
+}
 
-/* Estilo para los botones que usan la clase de Bootstrap 'btn-secondary' */
+    /* Contenedor para los botones dentro de login-options */
+    .login-options .g_id_signin,
+    .login-options a,
+    .login-options button {
+        display: block; /* Asegura que cada botón ocupe su propia línea */
+        width: 100%; /* Ocupa el 100% del contenedor padre */
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+/* Estilos de los botones secundarios */
 .btn-secondary {
-    background-color: #6c757d; /* El color gris predeterminado de Bootstrap para btn-secondary */
+    background-color: #6c757d;
     color: #fff;
     border-color: #6c757d;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    display: inline-block; /* Evita que el enlace de email ocupe todo el ancho */
+    width: auto;
 }
 
     .btn-secondary:hover {
-        background-color: #5a6268; /* Un tono de gris ligeramente más oscuro al pasar el mouse */
+        background-color: #5a6268;
         border-color: #545b62;
     }
 
-
-  /***/
-
+/* Estilos para el botón de Google, lo centramos y ajustamos */
+.g_id_signin {
+    margin-left: auto;
+    margin-right: auto;
+    /* Las propiedades de data-width en el HTML también ayudan aquí */
+}

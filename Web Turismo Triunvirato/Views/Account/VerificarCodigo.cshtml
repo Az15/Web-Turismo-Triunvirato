@@ -1,16 +1,38 @@
-﻿@{
-    ViewData["Title"] = "Verificar Código";
+﻿@*
+    Código de la vista de ASP.NET Core MVC (simulado)
+    Guarda este contenido en tu archivo .cshtml correspondiente.
+*@
+@{
+    ViewData["Title"] = "Completar Perfil";
+    // Reutilizamos el mismo CSS, ya que la estructura es similar.
+    <link rel="stylesheet" href="~/css/VerificarCodigo.css" />
 }
 
-<h2>Crear Cuenta - Paso 2</h2>
-<form method="post" asp-action="VerificarCodigo">
-    <label>Ingrese el código:</label>
-    <input type="text" name="CodigoIngresado" required class="form-control" />
-    <br>
-    <button type="submit" class="btn btn-primary">Verificar</button>
-</form>
+<div class="main-container">
+    <div class="form-card">
+        <h2 class="form-title">Crear Cuenta - Paso 3</h2>
 
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-danger">@ViewBag.Error</div>
-}
+        <form method="post" asp-action="CompletarPerfil">
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre:</label>
+                <input id="name" type="text" name="Name" required class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label for="surname" class="form-label">Apellido:</label>
+                <input id="surname" type="text" name="Surname" required class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label for="pais" class="form-label">País:</label>
+                <input id="pais" type="text" name="Pais" required class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña:</label>
+                <input id="password" type="password" name="Contraseña" required class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 mt-3">
+                Guardar
+            </button>
+        </form>
+    </div>
+</div>
