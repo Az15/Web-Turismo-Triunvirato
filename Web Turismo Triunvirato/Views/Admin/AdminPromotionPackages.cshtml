@@ -1,0 +1,90 @@
+﻿@using Web_Turismo_Triunvirato.Models
+@model IEnumerable<PackagePromotion>
+
+@{
+    ViewData["Title"] = "Gestionar Promociones de Paquetes";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <p>
+        <a asp-action="AltaPromotionPackage" class="btn btn-success">Crear Nueva Promoción de Paquete</a>
+    </p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+    }
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Tipo de Paquete</th>
+                <th>Descripción</th>
+                <th>Destino</th>
+                <th>Origen</th>
+                <th>Company</th>
+                <th>Hotel</th>
+                <th>Precio Original</th>
+                <th>Precio Oferta</th>
+                <th>Descuento</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>@item.PackageType</td>
+                        <td>@item.Description</td>
+                        <td>@item.DestinationName</td>
+                        <td>@item.OriginName</td>
+                        <td>
+                        @if (!string.IsNullOrEmpty(item.CompanyName))
+                        {
+                                    <span>@item.CompanyName</span>
+                        }
+                        else
+                        {
+                                    <span>-</span>
+                        }
+                        </td>
+                        <td>
+                        @if (!string.IsNullOrEmpty(item.HotelName))
+                        {
+                                    <span>@item.HotelName</span>
+                        }
+                        else
+                        {
+                                    <span>-</span>
+                        }
+                        </td>
+                        <td>@item.OriginalPrice.ToString("C")</td>
+                        <td>@item.OfferPrice.ToString("C")</td>
+                        <td>@item.DiscountPercentage.ToString("F2")%</td>
+                        <td>@item.StartDate.ToString("d")</td>
+                        <td>@item.EndDate.ToString("d")</td>
+                        <td>@(item.IsActive ? "Sí" : "No")</td>
+                        <td>
+                            <a asp-action="EditPromotionPackage" asp-route-id="@item.Id" class="btn btn-sm btn-info">Editar</a>
+                            <form asp-controller="Admin" asp-action="DeletePromotionPackage" method="post" style="display:inline-block;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                            @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar esta promoción?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Volver al Panel</a>
+    </div>
+</div>

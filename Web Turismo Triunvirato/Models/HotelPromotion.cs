@@ -15,7 +15,7 @@ namespace Web_Turismo_Triunvirato.Models
         [StringLength(100)]
         [Display(Name = "Tipo de servicio")]
 
-        public string ServiceType = "Hotel";
+        public string ServiceType = "1";
 
         [Required(ErrorMessage = "Destination name is required.")]
         [StringLength(100)]

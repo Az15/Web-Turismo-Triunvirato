@@ -56,10 +56,12 @@
                             }
                         </td>
                         <td>
-                            <a asp-action="EditPromotionflight" asp-route-id="@item.Id" class="btn btn-sm btn-info">
-                                <i class="fas fa-edit"></i> Editar
-                            </a>
-                            @* NO HAY BOTÓN DE ELIMINAR EN ESTA VISTA *@
+                            <a asp-action="EditPromotionFlight" asp-route-id="@item.Id" class="btn btn-sm btn-info">Editar</a>
+                            <form asp-controller="Admin" asp-action="DeletePromotionFlight" method="post" style="display:inline-block;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar esta promoción?');">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                 }

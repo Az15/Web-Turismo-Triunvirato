@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Administración de Encomiendas";
+}
+
+<h2 class="mt-4">@ViewData["Title"]</h2>
+<p>Desde aquí gestionarás las empresas de encomiendas.</p>
+
+<div class="row mt-4">
+    @* Botón para Alta de Encomiendas *@
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AltaEncomienda" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-plus-circle fa-4x text-success mb-3"></i>
+                    <h5 class="card-title text-dark">Alta de las Empresas de Encomiendas</h5>
+                    <p class="card-text text-muted">Agrega nuevas empresas para el servicio de encomiendas.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @* Botón para Administrar Encomiendas *@
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AdminEncomiendas" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-pencil-alt fa-4x text-primary mb-3"></i>
+                    <h5 class="card-title text-dark">Administrar Empresas de Encomiendas</h5>
+                    <p class="card-text text-muted">Edita y elimina empresas de encomiendas existentes.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver al Panel de Administración</a>
+</div>
+
+@section Scripts {
+    <!-- Font Awesome para los íconos, si no lo tienes ya en el layout -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

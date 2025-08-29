@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.EncomiendaCompany>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -6,34 +8,39 @@
     <title>Requisitos Importantes</title>
     <link rel="stylesheet" href="~/css/sendBoxPage.css" />
     <link rel="stylesheet" href="~/css/SendBoxPageFollow.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-
 
 <body>
 
     <div class="seguimiento-container">
         <h2 class="seguimiento-title">Seguimiento de Encomiendas</h2>
         <div class="empresas-seguimiento">
-@*             <div class="empresa-seguimiento">
-                <a href="https://www.viacargo.com.ar/" target="_blank">
-                    <img src="/img/encomiendas/ViaCargo.png" alt="Via Cargo">
-                </a>
-            </div> *@
-            <div class="empresa-seguimiento">
-                <a href="https://www.buspack.com.ar/" target="_blank">
-                    <img src="/img/encomiendas/BuscaPack.png" alt="Buspack Express">
-                </a>
-            </div>
-            <div class="empresa-seguimiento">
-                <a href="https://mdcargasoficial.com/" target="_blank">
-                    <img src="/img/encomiendas/MDCargas.png" alt="MD Cargas">
-                </a>
-            </div>
-            <div class="empresa-seguimiento">
-                <a href="https://cruceroexpress.com.ar/seguimientos/SeguimientoEncomiendas.html" target="_blank">
-                    <img src="/img/encomiendas/CruceroExpress.png" alt="Crucero Express">
-                </a>
-            </div>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var company in Model)
+                {
+                    <div class="empresa-seguimiento">
+                        <a href="@company.CompanyUrl" target="_blank">
+                            @if (!string.IsNullOrEmpty(company.ImageUrl))
+                            {
+                                <img src="@company.ImageUrl" alt="@company.CompanyName" />
+                            }
+                            else
+                            {
+                                <span style="font-size: 4em;">@company.ImageUrl</span>
+
+                            }
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center text-muted">
+                    <p>No hay empresas de encomiendas registradas.</p>
+                </div>
+            }
         </div>
     </div>
 
@@ -67,7 +74,6 @@
 
         <p class="nota">Una vez firmada la guía de entrega no se aceptan reclamos posteriores.</p>
     </div>
-
 
     <script src="~/js/sendBoxPage.js"></script>
 </body>

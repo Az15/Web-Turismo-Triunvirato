@@ -1,5 +1,6 @@
-﻿@{
-    // Usamos el layout principal de tu aplicación
+﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.ActivitiesPromotion>
+
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewBag.Title = "Actividades en Vacaciones";
 }
@@ -8,7 +9,6 @@
 
 <div class="header-activities d-flex align-items-center justify-content-center">
     <img src="~/img/actividades/test1.png" alt="Actividades en Vacaciones" class="header-background-image" />
-
     <div class="header-content text-white text-center">
         <h1 class="display-4 fw-bold animate-in">¡Las mejores actividades para las mejores vacaciones!</h1>
         <p class="lead mt-3 animate-in-delay">Descubre experiencias inolvidables en tu próximo destino.</p>
@@ -23,9 +23,14 @@
         <div class="col-md-3">
             <select id="locationFilter" class="form-select">
                 <option value="">Filtrar por Ubicación</option>
-                <option value="cordoba">Córdoba</option>
-                <option value="mendoza">Mendoza</option>
-                <option value="bariloche">Bariloche</option>
+                <!-- Generar opciones de ubicación dinámicamente con una comprobación de nulidad -->
+                @if (Model != null)
+                {
+                    @foreach (var location in Model.Select(a => a.Location).Distinct())
+                    {
+                        <option value="@location.ToLower()">@location</option>
+                    }
+                }
             </select>
         </div>
         <div class="col-md-3">
@@ -41,7 +46,6 @@
 
     <div id="activitiesList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
-
         <a href="https://wa.me/+541122296405?text=Hola,%20te%20hablo%20de%20la%20web,%20me%20interesaria%20tener%20mas%20informaci%C3%B3n%20de%20Tour%20por%20las%20Sierras%20Cordobeza%20que%20vi%20en%20la%20web" target="_blank" class="col activity-card" data-location="cordoba">
             <div class="card h-100">
                 <img src="~/img/actividades/TourSierrasCordoba2.png" class="card-img-top" alt="Actividad 1" />
@@ -51,7 +55,6 @@
                 </div>
             </div>
         </a>
-
         <a href="https://wa.me/+541122296405?text=Hola,%20te%20hablo%20de%20la%20web,%20me%20interesaria%20tener%20mas%20informaci%C3%B3n%20de%20Degustaci%C3%B3n%20de%20Vinos%20en%20Mendoza%20que%20vi%20en%20la%20web" target="_blank" class="col activity-card" data-location="mendoza">
             <div class="card h-100">
                 <img src="~/img/actividades/CataVinoMendoza.png" class="card-img-top" alt="Actividad 2" />
@@ -62,23 +65,7 @@
             </div>
         </a>
 
-
     </div>
 </div>
 
 <script src="~/js/Activities.js"></script>
-
-        @*
-            @foreach (var activity in Model)
-{
-    <div class="col activity-card" data-location="@activity.Location.ToLower()">
-        <div class="card h-100">
-            <img src="@activity.ImageUrl" class="card-img-top" alt="@activity.Title" />
-            <div class="card-body">
-                <h5 class="card-title">@activity.Title</h5>
-                <p class="card-text">@activity.Description</p>
-            </div>
-        </div>
-    </div>
-}
-        *@
