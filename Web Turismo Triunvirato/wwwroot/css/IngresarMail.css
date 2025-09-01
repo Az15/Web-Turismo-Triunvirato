@@ -1,0 +1,121 @@
+﻿/*
+ * Archivo: ingresarMail.css
+ * Descripción: Contiene los estilos para la página de ingreso de correo electrónico.
+ */
+
+/* * Estilo para el body: 
+ * Ocupa toda la pantalla, con un color de fondo claro.
+ * Usa flexbox para centrar el contenido principal vertical y horizontalmente.
+ * Aplica un padding general y una fuente sans-serif.
+ */
+body {
+    background-color: #f3f4f6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/*
+ * Estilo para el contenedor principal del formulario:
+ * Simula una tarjeta con fondo blanco, bordes redondeados y sombra.
+ * El ancho máximo está limitado a 28rem (448px) para que no se extienda por toda la pantalla.
+ * Esto asegura que el formulario se vea bien en cualquier dispositivo.
+ */
+.form-container {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    width: 100%;
+    max-width: 28rem;
+}
+
+/*
+ * Estilo para el título principal del formulario.
+ */
+.form-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+/*
+ * Estilo para el formulario.
+ * Usa flexbox para organizar los elementos en una columna.
+ */
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/*
+ * Estilo para cada grupo de label e input.
+ * El label se muestra como un bloque para ocupar su propia línea.
+ */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+    .form-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    /*
+ * Estilo para el campo de entrada (input).
+ * Ajusta el ancho, padding, bordes, sombra y foco.
+ */
+    .form-group input {
+        margin-top: 0.25rem;
+        display: block;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        background-color: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+    }
+
+        /* * Estilo para el estado de foco del input, mejorando la usabilidad.
+ */
+        .form-group input:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+        }
+
+/*
+ * Estilo para el botón de enviar.
+ * Diseño con fondo de color, texto blanco y efectos de hover.
+ */
+.form-submit-button {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #ffffff;
+    background-color: #4f46e5;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+    cursor: pointer;
+}
+
+    .form-submit-button:hover {
+        background-color: #4338ca;
+    }

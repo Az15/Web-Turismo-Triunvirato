@@ -1,5 +1,4 @@
-﻿
-<div class="login-container">
+﻿<div class="login-container">
     <h2>Bienvenido</h2>
     <form asp-controller="Account" asp-action="Authenticate" method="post">
         <div class="form-group">
@@ -12,21 +11,52 @@
         </div>
         <br>
         <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-
     </form>
+
     <div class="login-options">
         <p>¿No tienes cuenta?</p>
-        <button class="btn btn-secondary btn-sm">Crear cuenta con Gmail</button>
-        <br>
 
+        <!-- Contenedor para el botón de Google (lo genera Google Identity Services) -->
+        <!-- NOTA: El data-client_id debe ser tu ID de cliente de Google -->
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+
+        <!-- Este div hace que la biblioteca de Google renderice el botón aquí -->
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-size="large"
+             data-theme="outline"
+             data-text="continue_with"
+             data-logo_alignment="left">
+        </div>
+
+        <!-- Botón para crear cuenta con email -->
+        <br>
         <a asp-controller="Account" asp-action="IngresarEmail" class="btn btn-secondary btn-sm">Crear cuenta con Email</a>
         <br>
-
     </div>
 </div>
 
+<!-- Enlace a tu CSS de login -->
 <link rel="stylesheet" href="~/css/Login.css" />
 
+<!-- Script de Google Identity Services, necesario para el login con Google -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- Tu script de login.js, que ahora debe incluir la función handleCredentialResponse -->
 <script src="~/js/login.js"></script>
 
+<script>
+    // Esta función se activará después de que el usuario inicie sesión con Google
+    function handleCredentialResponse(response) {
+        // La credencial de Google se encuentra en response.credential
+        const idToken = response.credential;
+        console.log("ID Token:", idToken);
 
+        alert('¡Inicio de sesión con Google exitoso!);
+    }
+</script>

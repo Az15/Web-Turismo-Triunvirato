@@ -1,0 +1,59 @@
+﻿/*
+    Archivo de estilos CSS para la vista de Verificar Código.
+    Guarda este archivo como wwwroot/css/VerificarCodigo.css.
+*/
+
+/*
+    Contenedor principal para centrar el formulario.
+    Utiliza Flexbox para una alineación perfecta horizontal y vertical.
+*/
+.main-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px); /* Ajusta la altura para centrar el contenido */
+}
+
+/*
+    Estilo para la tarjeta del formulario, con sombra y esquinas redondeadas.
+    Similar al diseño del formulario anterior para mantener la consistencia.
+*/
+.form-card {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Limita el ancho máximo para una mejor legibilidad */
+}
+
+/*
+    Estilo para el título del formulario.
+*/
+.form-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/*
+    Estilo para los labels del formulario.
+*/
+.form-label {
+    font-weight: 500;
+}
+
+/*
+    Estilo para el botón de verificar.
+*/
+.btn-primary {
+    /* Aquí puedes agregar cualquier estilo adicional al botón si lo necesitas */
+}
+
+/*
+    Ajustes responsivos si son necesarios.
+*/
+@media (max-width: 768px) {
+    .form-card {
+        padding: 1.5rem; /* Reduce el padding en pantallas más pequeñas */
+    }
+}
