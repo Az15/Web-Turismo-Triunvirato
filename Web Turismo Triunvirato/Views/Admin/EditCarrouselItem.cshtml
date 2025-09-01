@@ -1,0 +1,62 @@
+﻿@model Web_Turismo_Triunvirato.Models.View_Index_DestinationCarouselItem
+
+@{
+    ViewData["Title"] = "Editar Elemento de Carrusel";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Editar Elemento de Carrusel</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditCarrouselItem" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="ImageUrl" />
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="form-label">Título</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ImageUrl" class="form-label">Imagen Actual</label>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Url.Content(Model.ImageUrl)" alt="Imagen de Carrusel" class="img-thumbnail d-block mb-2" style="max-height: 200px;" />
+                            }
+                            <label class="form-label">Subir Nueva Imagen (Opcional)</label>
+                            <input type="file" class="form-control" name="imageFile" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="AltText" class="form-label">Texto Alternativo</label>
+                            <input asp-for="AltText" class="form-control" />
+                            <span asp-validation-for="AltText" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="LinkUrl" class="form-label">URL del Enlace</label>
+                            <input asp-for="LinkUrl" class="form-control" />
+                            <span asp-validation-for="LinkUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsActive" class="form-check-label">Está Activo</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
+                            <a asp-action="AdminCarrouselItem" class="btn btn-secondary mt-2">Volver a la Lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

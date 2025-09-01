@@ -1,0 +1,68 @@
+﻿@model Web_Turismo_Triunvirato.Models.View_Index_Destination
+
+@{
+    ViewData["Title"] = "Editar Promoción de Destino";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Editar Promoción de Destino</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditDestination" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="PictureDestiny" />
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="form-label">Título</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PictureDestiny" class="form-label">Imagen Actual</label>
+                            @if (!string.IsNullOrEmpty(Model.PictureDestiny))
+                            {
+                                <img src="@Url.Content(Model.PictureDestiny)" alt="Imagen de Destino" class="img-thumbnail d-block mb-2" style="max-height: 200px;" />
+                            }
+                            <label class="form-label">Subir Nueva Imagen (Opcional)</label>
+                            <input type="file" class="form-control" name="imageFile" />
+                            <span asp-validation-for="PictureDestiny" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Price" class="form-label">Precio</label>
+                            <input asp-for="Price" type="number" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="From" class="form-label">Origen</label>
+                            <input asp-for="From" class="form-control" />
+                            <span asp-validation-for="From" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TripType" class="form-label">Tipo de Viaje</label>
+                            <input asp-for="TripType" class="form-control" />
+                            <span asp-validation-for="TripType" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="IsHotWeek" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsHotWeek" class="form-check-label">Es Hot Week</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Guardar Cambios</button>
+                            <a asp-action="AdminDestination" class="btn btn-secondary mt-2">Volver a la Lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
