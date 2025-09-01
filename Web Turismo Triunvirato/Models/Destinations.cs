@@ -1,6 +1,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 {
@@ -8,6 +9,8 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
     {
         [Key]
         public int Id { get; set; } // Identificador único del destino
+
+        public int Whatsapp_Id { get; set; } // El ID que agregaste
 
         [Required(ErrorMessage = "El origen es obligatorio.")]
         [StringLength(200)]
@@ -34,6 +37,10 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
 
         [StringLength(1000)]
         public string Description { get; set; } // Descripción general del destino o viaje
+
+
+        [NotMapped]
+        public string RenderedWhatsappMessage { get; set; }
     }
 }
 

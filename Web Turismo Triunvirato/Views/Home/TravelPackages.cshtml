@@ -1,4 +1,4 @@
-@model IEnumerable<Web_Turismo_Triunvirato.Models.Promotion>  
+@model IEnumerable<Web_Turismo_Triunvirato.Models.PackagePromotion>  
 
 @{
     ViewData["Title"] = "¡Promociones!";
@@ -26,29 +26,7 @@
             <label for="origin">Origen</label>
             <input type="text" id="origin" placeholder="Ingresa ciudad, país o región">
         </div>
-        @*
-        <div class="input-group">
-            <label for="destination">Destino</label>
-            <input type="text" id="destination" placeholder="¿Adónde vas?">
-        </div>
-        <div class="input-group">
-            <label for="departure-date">Fecha de Ida</label>
-            <input type="date" id="departure-date">
-        </div>
-        <div class="input-group">
-            <label for="return-date">Fecha de Vuelta</label>
-            <input type="date" id="return-date">
-        </div>
-        <div class="input-group">
-            <label for="passengers">Pasajeros, Clase</label>
-            <select id="passengers">
-                <option value="1">1 pasajero, Económica</option>
-                <option value="2">2 pasajeros, Económica</option>
-            </select>
-        </div>
 
-
-      *@
         <button class="search-button">Buscar</button>
     </div>
     <div class="more-options">
@@ -59,12 +37,11 @@
 </div>
 
 <section class="destinations-section">
-    <h2>¡Promociones mas buscadas!</h2> @* Título actualizado *@
+    <h2>¡Promociones mas buscadas!</h2>
     <div class="destinations-grid">
         @if (Model != null && Model.Any())
         {
-
-            @foreach (var promotion in Model) @* Iteramos sobre las promociones *@
+            @foreach (var promotion in Model)
             {
                 <div class="destination-card">
                     @if (promotion.IsHotWeek)
@@ -73,33 +50,26 @@
                     }
                     else if (promotion.DiscountPercentage > 0)
                     {
-                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span> 
+                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span>
                     }
                     <div class="image-container">
-                       
                         <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
                         <div class="image-overlay">
-                            <h3>@promotion.DestinationName</h3> 
-                            <p class="price">@promotion.OfferPrice.ToString("C0")</p> 
-                            <p class="from">Desde @promotion.OriginName</p> 
+                            <h3>@promotion.DestinationName</h3>
+                            <p class="price">@promotion.OfferPrice.ToString("C0")</p>
+                            <p class="from">Desde @promotion.OriginName</p>
+                            <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
+                                <i class="fab fa-whatsapp"></i> Consultar
+                            </a>
                         </div>
-
                     </div>
-              
-                    @* <a href="#" class="btn btn-success ver-detalles-button">Ver Detalles</a> *@
                 </div>
             }
         }
         else
         {
             <p class="col-12 alert alert-info text-center">No hay destinos populares de ¡Promociones! disponibles en este momento.</p>
-
         }
     </div>
 </section>
 
-@* Si aún usas el viewModel DestinationsViewModel en algún otro lugar de la vista
-   y quieres mantenerlo por alguna razón, podrías adaptarlo.
-   Pero lo ideal es que la vista reciba directamente el modelo que va a renderizar.
-   En este caso, IEnumerable<Promotion> es lo más directo.
-*@

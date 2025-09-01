@@ -28,12 +28,16 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index() // <-- ¡IMPORTANTE! Hacer el método async Task<IActionResult>
+        public async Task<IActionResult> Index()
         {
 
-            // Ejecuta la tarea asíncrona y espera su resultado
+            if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
             var Carousel = await _dbContext.GetCarouselItemsAsync();
-            // Verifica si la lista de Carousel es nula o está vacía
+
             var Destinys = await _dbContext.GetHotDestinyItemsAsync();
 
             var collection_Index = new View_Index_Collection
@@ -46,26 +50,39 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Flights() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
+        public async Task<IActionResult> Flights()
         {
-            // Obtener solo las promociones de tipo Vuelos que están activas y dentro del rango de fechas
-            // La fecha actual es Jueves, 24 de julio de 2025.
 
-            //var activeFlightPromotions = await _promotionService.GetPromotionsByTypeAsync(ServiceType.Vuelos);
-            var activeFlightPromotions = await _dbContext.GetViewFlightpromotionsItemsAsync();
+            var flightPromotions = await _dbContext.GetViewFlightpromotionsItemsAsync();
+
+            int whatsappMessageId = flightPromotions.FirstOrDefault()?.Whatsapp_Id ?? 1;
+
+            var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
+
+            foreach (var promotion in flightPromotions)
+            {
+
+                var dataObject = new
+                {
+                    origin = promotion.OriginName,
+                    destination = promotion.DestinationName,
+                    price = promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                };
+
+                promotion.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
+            }
 
             ViewData["Title"] = "Vuelos";
-            // Pasar la lista de promociones directamente a la vista
-            return View(activeFlightPromotions); // <--- Aquí se pasa IEnumerable<Promotion>
+
+            return View(flightPromotions);
+
         }
 
         [HttpGet]
-        public async Task<IActionResult> RutaAtlantica() // <--- ESTA ACCIÓN ES LA QUE DEBE ESTAR ACTUALIZADA
+        public async Task<IActionResult> RutaAtlantica() 
         {
-            // Obtener solo las promociones de tipo Vuelos que están activas y dentro del rango de fechas
-            // La fecha actual es Jueves, 24 de julio de 2025.
 
-            return View(); // <--- Aquí se pasa IEnumerable<Promotion>
+            return View(); 
         }
 
         [HttpGet]
@@ -109,23 +126,84 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public async Task<IActionResult> Hotels()
         {
-            var ModelHotelsItems = await _dbContext.GetViewHotelspromotionsItemsAsync();
+            var hotelPromotions = await _dbContext.GetViewHotelspromotionsItemsAsync();
 
-            return View(ModelHotelsItems);
+            int whatsappMessageId = hotelPromotions.FirstOrDefault()?.Whatsapp_Id ?? 1;
+
+            var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
+
+            foreach (var promotion in hotelPromotions)
+            {
+                // Crear un objeto anónimo con las propiedades a reemplazar
+                var dataObject = new
+                {
+                    HotelName = promotion.Description,
+                    DestinationName = promotion.DestinationName,
+                    OfferPrice = promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")),
+                };
+
+                // Renderizar el mensaje y asignarlo a la propiedad del modelo
+                promotion.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
+            }
+
+            // Devolver la vista con la lista de promociones modificada
+            return View(hotelPromotions);
         }
 
         [HttpGet]
         public async Task<IActionResult> Bus()
         {
-            var ModelBusesItems = await _dbContext.GetViewBusspromotionsItemsAsync();
+            var busPromotions = await _dbContext.GetViewBusspromotionsItemsAsync();
 
-            return View(ModelBusesItems);
+            // Obtener el Whatsapp_Id de la primera promoción
+            var firstBusPromotion = busPromotions.FirstOrDefault();
+
+            // Verificar que exista al menos una promoción y obtener el ID
+            int whatsappMessageId = firstBusPromotion?.Whatsapp_Id ?? 1; // Usar null-coalescing para un valor por defecto
+
+            // Obtener la plantilla de mensaje de WhatsApp una sola vez.
+            var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
+
+            // Iterar y renderizar el mensaje para cada promoción
+            foreach (var promotion in busPromotions)
+            {
+                var dataObject = new
+                {
+                    originName = promotion.OriginName,
+                    destinationName = promotion.DestinationName,
+                    offerPrice = promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                };
+
+                promotion.RenderedWhatsappMessage = Web_Turismo_Triunvirato.Models.WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
+            }
+
+            return View(busPromotions);
         }
 
         [HttpGet]
-        public IActionResult TravelPackages()
+        public async Task<IActionResult> TravelPackages()
         {
-            return View();
+            var packagePromotions = await _dbContext.GetActivePromotionPackagesItemsAsync();
+
+            int whatsappMessageId = packagePromotions.FirstOrDefault()?.Whatsapp_Id ?? 1;
+
+            var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
+
+            foreach (var promotion in packagePromotions)
+            {
+                var dataObject = new
+                {
+                    Description = promotion.Description,
+                    DestinationName = promotion.DestinationName,
+                    OfferPrice = promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")),
+                    PackageType = promotion.PackageType
+                };
+
+                // Renderizar el mensaje y asignarlo a la propiedad del modelo
+                promotion.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
+            }
+
+            return View(packagePromotions);
         }
 
         [HttpGet]
@@ -146,10 +224,28 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public IActionResult Activities()
+        public async Task<IActionResult> Activities()
         {
-            return View();
-        }
+
+                    var activeActivities = await _dbContext.GetActiveActivitiesAsync();
+
+                    int whatsappMessageId = activeActivities.FirstOrDefault()?.Whatsapp_Id ?? 1;
+
+                    var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
+
+                    foreach (var activity in activeActivities)
+                    {
+                        var dataObject = new
+                        {
+                            Title = activity.Title,
+                            Location = activity.Location,
+                            Description = activity.Description
+                        };
+                        activity.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
+                    }
+
+                    return View(activeActivities);
+                }
 
         [HttpGet]
         public IActionResult TravelAssistance()

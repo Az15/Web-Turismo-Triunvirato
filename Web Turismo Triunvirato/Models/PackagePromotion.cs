@@ -9,6 +9,8 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
+        public int Whatsapp_Id { get; set; } // El ID que agregaste
+
         [Required]
         [Display(Name = "Tipo de Paquete")]
         // Para diferenciar entre los paquetes: "VueloYHotel" o "BusYHotel"
@@ -78,5 +80,9 @@ namespace Web_Turismo_Triunvirato.Models
         [StringLength(100)]
         public string? HotelName { get; set; }
         public bool IsActive { get; set; } = true;
+
+
+        [NotMapped]
+        public string RenderedWhatsappMessage { get; set; }
     }
 }

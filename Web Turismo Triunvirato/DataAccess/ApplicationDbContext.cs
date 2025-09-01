@@ -27,6 +27,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public DbSet<User> Users { get; set; }
 
         // DbSets para las promociones
+
+        public DbSet<WhatsappMessage> WhatsappMessages { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<FlightPromotion> FlightPromotions { get; set; }
         public DbSet<HotelPromotion> HotelPromotions { get; set; }
@@ -306,6 +308,109 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public async Task<PackagePromotion> GetPackagePromotionByIdAsync(int id)
         {
             return await PackagePromotions.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task CreateWhatsappMessageAsync(string title, string messageTemplate, bool isActive)
+        {
+            await Database.ExecuteSqlInterpolatedAsync(
+                $"CALL create_whatsapp_message({title}, {messageTemplate}, {isActive})"
+            );
+        }
+        /// <summary>
+        /// Obtiene todos los mensajes de WhatsApp activos e inactivos.
+        /// </summary>
+        public async Task<List<WhatsappMessage>> GetAllWhatsappMessagesAsync()
+        {
+            // Usa FromSqlRaw para ejecutar el SP y mapear el resultado a la entidad.
+            return await WhatsappMessages
+                .FromSqlRaw("CALL get_all_whatsapp_messages()")
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Obtiene los mensajes de WhatsApp que están marcados como activos.
+        /// </summary>
+        public async Task<List<WhatsappMessage>> GetActiveWhatsappMessagesAsync()
+        {
+            // Llama al SP que filtra por mensajes activos.
+            return await WhatsappMessages
+                .FromSqlRaw("CALL get_active_whatsapp_messages()")
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Obtiene un mensaje de WhatsApp específico por su ID.
+        /// </summary>
+
+        public async Task<WhatsappMessage> GetWhatsappMessageByIdAsync(int id)
+        {
+            // Usa FromSqlInterpolated para la llamada al SP
+            // y SingleOrDefault() para obtener el primer resultado o null.
+            // Esto evita que Entity Framework agregue LIMIT 1.
+            return await Task.Run(() => WhatsappMessages
+                .FromSqlInterpolated($"CALL get_whatsapp_message_by_id({id})")
+                .AsEnumerable() // Convierte a IEnumerable para que la operación se realice en memoria
+                .SingleOrDefault());
+        }
+        public async Task UpdateWhatsappMessageAsync(WhatsappMessage message)
+        {
+            // Usa ExecuteSqlInterpolatedAsync para el comando y pasa el modelo directamente
+            await Database.ExecuteSqlInterpolatedAsync(
+                $"CALL update_whatsapp_message({message.Id}, {message.Title}, {message.Message_Template}, {message.Is_Active})"
+            );
+        }
+
+        public async Task<List<ActivitiesPromotion>> GetActiveActivitiesAsync()
+        {
+            // Usa FromSqlRaw para ejecutar el SP y mapear el resultado a la entidad.
+            return await Activities
+                .FromSqlRaw("CALL get_active_activities()")
+                .ToListAsync();
+        }
+
+
+        /// <summary>
+        /// Crea un nuevo usuario en la base de datos.
+        /// </summary>
+        public async Task CreateUserAsync(User user)
+        {
+            await Database.ExecuteSqlInterpolatedAsync($"CALL create_user({user.Email}, {user.Password}, {user.Name}, {user.Surname}, {user.Country}, {user.Rol})");
+        }
+
+        /// <summary>
+        /// Intenta logear un usuario por email y contraseña.
+        /// </summary>
+        /// <returns>El objeto User si el login es exitoso, de lo contrario, null.</returns>
+        public async Task<User> LoginUserAsync(string email, string password)
+        {
+            // Solución: Convierte el resultado a una lista y usa FirstOrDefault()
+            return (await Users
+                .FromSqlInterpolated($"CALL login_user({email}, {password})")
+                .ToListAsync())
+                .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Lista todos los usuarios de la base de datos.
+        /// </summary>
+        /// <returns>Una lista de objetos User.</returns>
+        public async Task<List<User>> ListUsersAsync()
+        {
+            return await Users
+                .FromSqlRaw("CALL list_users()")
+                .ToListAsync();
+        }
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            // Solución: Convierte el resultado a una lista y usa FirstOrDefault()
+            return (await Users
+                .FromSqlInterpolated($"CALL get_user_by_email({email})")
+                .ToListAsync())
+                .FirstOrDefault();
+        }
+        public async Task UpdateUserAsync(User user)
+        {
+            await Database.ExecuteSqlInterpolatedAsync($"CALL update_user({user.Id}, {user.Name}, {user.Surname}, {user.Country}, {user.Password})");
         }
     }
 }

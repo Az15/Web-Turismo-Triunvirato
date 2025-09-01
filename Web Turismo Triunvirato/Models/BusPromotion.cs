@@ -2,6 +2,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web_Turismo_Triunvirato.Models
 {
@@ -9,6 +10,8 @@ namespace Web_Turismo_Triunvirato.Models
     {
         [Key]
         public int Id { get; set; }
+
+        public int Whatsapp_Id { get; set; } // El ID que agregaste
 
         [Required]
         [Display(Name = "Tipo de servicio")]
@@ -75,5 +78,9 @@ namespace Web_Turismo_Triunvirato.Models
         [StringLength(50)]
         [Display(Name = "Categoría")]
         public string Category { get; set; }
+
+
+        [NotMapped]
+        public string RenderedWhatsappMessage { get; set; }
     }
 }

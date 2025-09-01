@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Administración de Pagina Principal";
+}
+
+<h2 class="mt-4">@ViewData["Title"]</h2>
+<p>Desde aquí gestionarás el carrousell y tambien las promos mas vendidas.</p>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="CreateCarrouselItem" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-plus-circle fa-4x text-success mb-3"></i>
+                    <h5 class="card-title text-dark">Crea nueva imagen de carrousel</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AdminCarrouselItem" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-list fa-4x text-secondary mb-3"></i>
+                    <h5 class="card-title text-dark">Edita o desactiva imagenes de carrousel.</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="CreateDestination" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-plus-circle fa-4x text-success mb-3"></i>
+                    <h5 class="card-title text-dark">Crea nueva promocion para pagina principal.</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AdminDestination" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-list fa-4x text-secondary mb-3"></i>
+                    <h5 class="card-title text-dark">Edita o desactiva promocion para pagina principal.</h5>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver al Panel de Administración</a>
+</div>

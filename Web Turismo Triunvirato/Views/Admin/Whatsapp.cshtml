@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Administración de Mensajes de WhatsApp";
+}
+
+<h2 class="mt-4">@ViewData["Title"]</h2>
+<p>Desde aquí gestionarás los mensajes predefinidos para WhatsApp.</p>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="CreateWhatsappMessage" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fa-brands fa-whatsapp fa-4x text-success mb-3"></i>
+                    <h5 class="card-title text-dark">Crear Mensaje de WhatsApp</h5>
+                    <p class="card-text text-muted">Crea nuevas plantillas de mensajes.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <a asp-controller="Admin" asp-action="AdminWhatsappMessages" class="text-decoration-none d-block w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-pencil-alt fa-4x text-primary mb-3"></i>
+                    <h5 class="card-title text-dark">Gestionar Mensajes</h5>
+                    <p class="card-text text-muted">Edita o desactiva mensajes existentes.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver al Panel de Administración</a>
+</div>

@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Crear Mensaje de WhatsApp";
+}
+
+<h2 class="mt-4">@ViewData["Title"]</h2>
+<p>Complete los siguientes campos para crear una nueva plantilla de mensaje.</p>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="CreateWhatsappMessage" method="post">
+            <div class="form-group">
+                <label for="Title">Título del Mensaje:</label>
+                <input type="text" class="form-control" id="Title" name="Title" required>
+                <small class="form-text text-muted">Ejemplo: "Mensaje de confirmación de reserva".</small>
+            </div>
+            <div class="form-group mt-3">
+                <label for="MessageTemplate">Plantilla del Mensaje:</label>
+                <textarea class="form-control" id="Message_Template" name="Message_Template" rows="5" required></textarea>
+                <small class="form-text text-muted">Use  @@variable para los datos a reemplazar (ej: Hola @@cliente, tu vuelo a @@destino).</small>
+            </div>
+            <div class="form-check mt-3">
+                <input type="checkbox" class="form-check-input" id="Is_Active" name="Is_Active" value="true" checked>
+                <label class="form-check-label" for="Is_Active">Mensaje Activo</label>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-whatsapp"><i class="fas fa-save me-2"></i>Guardar Mensaje</button>
+                <a asp-action="Whatsapp" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

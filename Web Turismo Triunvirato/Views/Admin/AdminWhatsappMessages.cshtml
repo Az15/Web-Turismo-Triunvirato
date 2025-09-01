@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.WhatsappMessage>
+
+@{
+    ViewData["Title"] = "Gestión de Mensajes de WhatsApp";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <p>
+        <a asp-action="CreateWhatsappMessage" class="btn btn-whatsapp">Crear Nuevo Mensaje</a>
+    </p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    @* <th>ID</th> *@
+                    <th>Título</th>
+                    <th>Plantilla del Mensaje</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        @* <td>@item.Id</td> *@
+                        <td>@item.Title</td>
+                        <td><pre>@item.Message_Template</pre></td>
+                        <td>
+                            @if (item.Is_Active)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactivo</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="EditWhatsappMessage" asp-route-id="@item.Id" class="btn btn-sm btn-info">Editar</a>
+                            <form asp-controller="Admin" asp-action="ToggleWhatsappMessageStatus" method="post" style="display:inline-block;">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                @Html.AntiForgeryToken()
+                                @if (item.Is_Active)
+                                {
+                                    <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('¿Estás seguro de que quieres desactivar este mensaje?');">Desactivar</button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('¿Estás seguro de que quieres activar este mensaje?');">Activar</button>
+                                }
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Volver al Panel</a>
+    </div>
+</div>
+
+<style>
+    .table-responsive pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+</style>

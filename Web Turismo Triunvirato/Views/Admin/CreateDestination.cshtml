@@ -1,0 +1,51 @@
+﻿@model Web_Turismo_Triunvirato.Models.View_Index_Destination
+
+@{
+    ViewData["Title"] = "Crear Promoción Principal";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Crear Nueva Promoción</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateDestination" method="post" enctype="multipart/form-data">
+                        <div class="form-group mb-3">
+                            <label asp-for="Title" class="form-label">Título</label>
+                            <input asp-for="Title" class="form-control" required />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="PictureDestiny" class="form-label">Subir Imagen</label>
+                            <input type="file" class="form-control" name="imageFile" required />
+                            <span asp-validation-for="PictureDestiny" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Price" class="form-label">Precio</label>
+                            <input asp-for="Price" type="number" class="form-control" required />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="From" class="form-label">Origen</label>
+                            <input asp-for="From" class="form-control" required />
+                            <span asp-validation-for="From" class="text-danger"></span>
+                        </div>
+                        <input type="hidden" asp-for="TripType" value="IDA Y VUELTA" />
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="IsHotWeek" class="form-check-input" type="checkbox" role="switch" />
+                            <label asp-for="IsHotWeek" class="form-check-label">Es Hot Week</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Crear Promoción</button>
+                            <a asp-action="AdminDestination" class="btn btn-secondary mt-2">Volver a la Lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

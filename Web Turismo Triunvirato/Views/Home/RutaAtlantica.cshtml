@@ -1,44 +1,27 @@
-﻿@* @{
-    ViewData["Title"] = "Error de Conexión";
+﻿@{
+    ViewData["Title"] = "Buscar Micros";
 }
-
-<div class="d-flex align-items-center justify-content-center vh-100 bg-light">
-    <div class="text-center">
-        <h1 class="display-1 fw-bold text-danger">¡Error!</h1>
-        <p class="fs-3">
-            <span class="text-danger">Oops!</span> No se pudo conectar con el origen de datos.
-        </p>
-        <p class="lead">
-            Por favor, inténtalo de nuevo más tarde o contacta al administrador del sistema.
-        </p>
-        <a asp-action="Index" asp-controller="Home" class="btn btn-primary mt-4">
-            Volver a la página de inicio
-        </a>
-    </div>
-</div> *@
-
-@{
-    ViewData["Title"] = "Ruta Atlantica";
-}
-
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <link rel="stylesheet" href="~/css/RutaAtlantica.css" />
+    <link rel="stylesheet" href="~/css/BusAnimation.css" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruta Atlantica</title>
-
-    
+    <title>Compra de boletos</title>
 </head>
 
-
 <body>
+    <div class="header-container">
+        <img src="~/img/RutaAtlantica/Bus_Header.gif" alt="Bus Header" class="bus-header-image" />
+        <div class="overlay-text">
+            <h1 class="animated-heading">Busca tu próximo destino</h1>
+            <p class="signature-text">Turismo Triunvirato</p>
+        </div>
+    </div>
+
     <script src="https://rutatlantica.com.ar/js/ruta-widget.js" data-sellerid="d95be34d-bb0f-45c8-b7ac-b80178814006" data-theme="default"></script>
 
 </body>
-
-
-
 </html>

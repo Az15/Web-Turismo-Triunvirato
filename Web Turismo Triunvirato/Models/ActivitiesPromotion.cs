@@ -12,6 +12,10 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
+        public int Whatsapp_Id { get; set; } // El ID que agregaste
+
+        public bool Is_Active { get; set; } // Campo para indicar si la promoción está activa
+
         // Título de la actividad. Este campo es obligatorio.
         [Required(ErrorMessage = "El título es obligatorio.")]
         public string Title { get; set; }
@@ -28,5 +32,9 @@ namespace Web_Turismo_Triunvirato.Models
         // para que la validación no falle cuando se crea una nueva actividad
         // sin una URL inicial.
         public string? ImageUrl { get; set; }
+
+
+        [NotMapped]
+        public string RenderedWhatsappMessage { get; set; }
     }
 }

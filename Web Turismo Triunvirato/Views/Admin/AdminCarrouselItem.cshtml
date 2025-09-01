@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.View_Index_DestinationCarouselItem>
+
+@{
+    ViewData["Title"] = "Administrar Carrusel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Administrar Imágenes de Carrusel</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped table-hover">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th>ID</th>
+                    <th>Imagen</th>
+                    <th>Título</th>
+                    <th>Enlace</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>
+                            <img src="@Url.Content(item.ImageUrl)" alt="@item.AltText" style="width: 100px; height: auto;" />
+                        </td>
+                        <td>@item.Title</td>
+                        <td>@item.LinkUrl</td>
+                        <td>
+                            <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
+                                @(item.IsActive ? "Activo" : "Inactivo")
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="EditCarrouselItem" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <form asp-action="ToggleCarrouselItemStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-danger" : "btn-success")">
+                                    <i class="fas fa-power-off"></i> @(item.IsActive ? "Desactivar" : "Activar")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">No hay imágenes de carrusel para mostrar.</div>
+    }
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Volver al Panel de Administración</a>
+    </div>
+</div>

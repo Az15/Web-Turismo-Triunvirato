@@ -1,0 +1,72 @@
+﻿/* Container for the image and text */
+.header-container {
+    position: relative;
+    width: 100%;
+    /* Ajusta la altura a un valor fijo para controlar el tamaño */
+    height: 400px;
+    overflow: hidden;
+    /* Centra la imagen y el texto horizontalmente */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinea los elementos en la parte inferior */
+}
+
+/* The AI-generated image */
+.bus-header-image {
+    position: absolute; /* Permite que la imagen se posicione en el fondo */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el área sin distorsión */
+    z-index: -1; /* Envía la imagen detrás del texto */
+}
+
+/* Container for the animated text */
+.overlay-text {
+    position: relative; /* Cambiado a relativo para que se posicione dentro del contenedor */
+    text-align: center;
+    color: white;
+    padding-bottom: 20px; /* Añade un poco de espacio en la parte inferior */
+}
+
+/* Keyframes for the slide-in animation */
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* The animated heading */
+.animated-heading {
+    animation: slideInFromRight 1.5s ease-out forwards;
+    font-size: 2.5em; /* Tamaño de fuente más pequeño para un mejor ajuste */
+}
+
+/* The signature text */
+.signature-text {
+    color: #007bff; /* Color azul de Bootstrap */
+    font-size: 1.2em; /* Tamaño de fuente más pequeño */
+    font-weight: bold;
+    margin-top: 5px;
+    animation: fadeIn 2s ease-in-out forwards;
+    animation-delay: 1s; /* Agrega un pequeño retraso después de la animación del encabezado */
+    opacity: 0;
+}
+
+/* Keyframes for a simple fade-in effect */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

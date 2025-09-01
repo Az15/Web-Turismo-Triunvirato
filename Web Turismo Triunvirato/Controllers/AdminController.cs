@@ -801,7 +801,411 @@ namespace Web_Turismo_Triunvirato.Controllers
             return RedirectToAction(nameof(AdminActivities));
         }
 
+        [HttpGet]
+        public IActionResult Whatsapp()
+        {
+            return View();
+        }
 
+        [HttpGet]
+        public IActionResult CreateWhatsappMessage()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateWhatsappMessage(WhatsappMessage model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Llama al método del DbContext con el modelo directamente
+                    // La propiedad 'Id' no es necesaria para la inserción, ya que es auto-incremental.
+                    await _dbContext.CreateWhatsappMessageAsync(
+                        model.Title,
+                        model.Message_Template,
+                        model.Is_Active
+                    );
+
+                    return RedirectToAction("AdminWhatsappMessages");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Ocurrió un error al guardar el mensaje: " + ex.Message);
+                    return View(model);
+                }
+            }
+
+            return View(model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> AdminWhatsappMessages()
+        {
+            try
+            {
+                // Llama al método del DbContext para obtener la lista de mensajes
+                var messages = await _dbContext.GetAllWhatsappMessagesAsync();
+                return View(messages);
+            }
+            catch (Exception ex)
+            {
+                // Manejar errores si la llamada al SP falla
+                // Considera usar un logger en un proyecto real
+                TempData["ErrorMessage"] = "Ocurrió un error al cargar los mensajes: " + ex.Message;
+                // Retorna una lista vacía para evitar errores en la vista
+                return View(new List<WhatsappMessage>());
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditWhatsappMessage(int id)
+        {
+            var message = await _dbContext.GetWhatsappMessageByIdAsync(id);
+            if (message == null)
+            {
+                return NotFound();
+            }
+            return View(message);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditWhatsappMessage(WhatsappMessage model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Usamos el mismo método de "upsert" que creamos
+                    await _dbContext.UpdateWhatsappMessageAsync(model);
+
+                    TempData["SuccessMessage"] = "Mensaje de WhatsApp actualizado exitosamente.";
+                    return RedirectToAction("AdminWhatsappMessages");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Ocurrió un error al actualizar el mensaje: " + ex.Message);
+                    return View(model);
+                }
+            }
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleWhatsappMessageStatus(int id)
+        {
+            try
+            {
+                // 1. Obtener el mensaje de la base de datos usando el ID.
+                var message = await _dbContext.GetWhatsappMessageByIdAsync(id);
+
+                if (message == null)
+                {
+                    TempData["ErrorMessage"] = "Mensaje no encontrado.";
+                    return RedirectToAction("AdminWhatsappMessages");
+                }
+
+                // 2. Cambiar el estado del mensaje.
+                message.Is_Active = !message.Is_Active;
+
+                // 3. Actualizar el registro en la base de datos usando el SP de actualización.
+                await _dbContext.UpdateWhatsappMessageAsync(message);
+
+                TempData["SuccessMessage"] = "Estado del mensaje actualizado exitosamente.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el estado: " + ex.Message;
+            }
+
+            // 4. Redirigir de vuelta a la lista de mensajes.
+            return RedirectToAction("AdminWhatsappMessages");
+        }
         ////fin/////
+        ///
+
+        [HttpGet]
+        public IActionResult PaginaPrincipal()
+        {
+            return View();
+        }
+
+        // Acción para mostrar el formulario de creación
+        [HttpGet]
+        public IActionResult CreateCarrouselItem()
+        {
+            return View();
+        }
+
+        // Acción para procesar el formulario de creación
+        [HttpPost]
+        public async Task<IActionResult> CreateCarrouselItem(View_Index_DestinationCarouselItem model, IFormFile imageFile)
+        {
+            if (ModelState.IsValid && imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/");
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                model.ImageUrl = "/img/" + uniqueFileName;
+                _dbContext.View_DestinationCarouselItems.Add(model);
+                await _dbContext.SaveChangesAsync();
+
+                return RedirectToAction("AdminCarrouselItem");
+            }
+            return View(model);
+        }
+
+        // Acción para mostrar la lista de elementos del carrusel
+        [HttpGet]
+        public async Task<IActionResult> AdminCarrouselItem()
+        {
+            var items = await _dbContext.View_DestinationCarouselItems.ToListAsync();
+            return View(items);
+        }
+
+        // Acción para mostrar el formulario de creación de destinos
+        [HttpGet]
+        public IActionResult CreateDestination()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateDestination(View_Index_Destination model, IFormFile imageFile)
+        {
+            // Verificar si se subió un archivo de imagen.
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                ModelState.AddModelError("PictureDestiny", "La imagen de destino es obligatoria.");
+            }
+
+            // Si hay errores de validación, regresar a la vista.
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Lógica para guardar la imagen
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/");
+
+            // Asegúrate de que la carpeta de destino exista
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(stream);
+            }
+
+            // Asignar los valores del modelo
+            model.PictureDestiny = "/img/" + uniqueFileName;
+            model.DetailDestinyURL = "/destinations/" + model.Title; // O la lógica que uses para generar esta URL
+
+            // Guardar los cambios en la base de datos.
+            _dbContext.Destinations.Add(model);
+            await _dbContext.SaveChangesAsync();
+
+            // Redireccionar al usuario.
+            return RedirectToAction("AdminDestination");
+        }
+
+        // Acción para mostrar la lista de destinos/promociones
+        [HttpGet]
+        public async Task<IActionResult> AdminDestination()
+        {
+            var items = await _dbContext.Destinations.ToListAsync();
+            return View(items);
+        }
+
+
+        // GET: Muestra el formulario de edición con los datos cargados del carrusel
+        [HttpGet]
+        public async Task<IActionResult> EditCarrouselItem(int id)
+        {
+            var item = await _dbContext.View_DestinationCarouselItems.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return View(item);
+        }
+
+        // POST: Procesa los cambios del formulario de edición del carrusel
+        [HttpPost]
+        public async Task<IActionResult> EditCarrouselItem(View_Index_DestinationCarouselItem model, IFormFile imageFile)
+        {
+            // Carga el elemento existente del DbContext
+            var existingItem = await _dbContext.View_DestinationCarouselItems.FindAsync(model.Id);
+            if (existingItem == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Si se subió una nueva imagen, la guardamos y actualizamos la URL
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/carousel");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Opcional: Elimina la imagen antigua
+                    if (!string.IsNullOrEmpty(existingItem.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, existingItem.ImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+                    existingItem.ImageUrl = "/images/carousel/" + uniqueFileName;
+                }
+
+                // Actualiza los demás campos
+                existingItem.Title = model.Title;
+                existingItem.AltText = model.AltText;
+                existingItem.LinkUrl = model.LinkUrl;
+                existingItem.IsActive = model.IsActive;
+
+                _dbContext.Entry(existingItem).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+
+                return RedirectToAction("AdminCarrouselItem");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleCarrouselItemStatus(int id)
+        {
+            var item = await _dbContext.View_DestinationCarouselItems.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            item.IsActive = !item.IsActive; // Invierte el estado
+            _dbContext.Entry(item).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction("AdminCarrouselItem");
+        }
+
+        public async Task<IActionResult> EditDestination(int id)
+                {
+                    var promotion = await _dbContext.Destinations.FindAsync(id);
+                    if (promotion == null)
+                    {
+                        return NotFound();
+                    }
+                    return View(promotion);
+                }
+
+        // POST: Procesa los cambios del formulario de edición de destino
+        [HttpPost]
+        public async Task<IActionResult> EditDestination(View_Index_Destination model, IFormFile imageFile)
+        {
+            var existingPromotion = await _dbContext.Destinations.FindAsync(model.Id);
+            if (existingPromotion == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                // Si se subió una nueva imagen, la guardamos y actualizamos la URL
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/destinations");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Opcional: Elimina la imagen antigua
+                    if (!string.IsNullOrEmpty(existingPromotion.PictureDestiny))
+                    {
+                        var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, existingPromotion.PictureDestiny.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+                    existingPromotion.PictureDestiny = "/images/destinations/" + uniqueFileName;
+                }
+
+                // Actualiza los demás campos
+                existingPromotion.Title = model.Title;
+                existingPromotion.Price = model.Price;
+                existingPromotion.From = model.From;
+                existingPromotion.TripType = model.TripType;
+                existingPromotion.IsHotWeek = model.IsHotWeek;
+
+                _dbContext.Entry(existingPromotion).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+
+                return RedirectToAction("AdminDestination");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleDestinationStatus(int id)
+        {
+            var item = await _dbContext.Destinations.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            // Nota: El modelo View_Index_Destination no tiene la propiedad IsActive, 
+            // pero tu modelo original sí la tiene. Si la usas en la tabla, la puedes agregar aquí.
+            // item.IsActive = !item.IsActive; // Descomentar si la propiedad existe.
+
+            item.IsHotWeek = !item.IsHotWeek; // Usaremos esta propiedad como ejemplo para activar/desactivar
+            _dbContext.Entry(item).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction("AdminDestination");
+        }
     }
 }

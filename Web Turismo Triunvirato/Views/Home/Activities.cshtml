@@ -23,7 +23,6 @@
         <div class="col-md-3">
             <select id="locationFilter" class="form-select">
                 <option value="">Filtrar por Ubicación</option>
-                <!-- Generar opciones de ubicación dinámicamente con una comprobación de nulidad -->
                 @if (Model != null)
                 {
                     @foreach (var location in Model.Select(a => a.Location).Distinct())
@@ -42,30 +41,28 @@
             </div>
         </div>
     </div>
-
-
     <div id="activitiesList" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-
-        <a href="https://wa.me/+541122296405?text=Hola,%20te%20hablo%20de%20la%20web,%20me%20interesaria%20tener%20mas%20informaci%C3%B3n%20de%20Tour%20por%20las%20Sierras%20Cordobeza%20que%20vi%20en%20la%20web" target="_blank" class="col activity-card" data-location="cordoba">
-            <div class="card h-100">
-                <img src="~/img/actividades/TourSierrasCordoba2.png" class="card-img-top" alt="Actividad 1" />
-                <div class="card-body">
-                    <h5 class="card-title">Tour por las Sierras</h5>
-                    <p class="card-text">Explora los paisajes de las sierras de Córdoba.</p>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var activity in Model)
+            {
+                <div class="col activity-card" data-location="@activity.Location.ToLower()">
+                    <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(activity.RenderedWhatsappMessage)}")" target="_blank">
+                        <div class="card h-100">
+                            <img src="@Url.Content(activity.ImageUrl)" class="card-img-top" alt="@activity.Title" />
+                            <div class="card-body">
+                                <h5 class="card-title">@activity.Title</h5>
+                                <p class="card-text">@activity.Description</p>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </div>
-        </a>
-        <a href="https://wa.me/+541122296405?text=Hola,%20te%20hablo%20de%20la%20web,%20me%20interesaria%20tener%20mas%20informaci%C3%B3n%20de%20Degustaci%C3%B3n%20de%20Vinos%20en%20Mendoza%20que%20vi%20en%20la%20web" target="_blank" class="col activity-card" data-location="mendoza">
-            <div class="card h-100">
-                <img src="~/img/actividades/CataVinoMendoza.png" class="card-img-top" alt="Actividad 2" />
-                <div class="card-body">
-                    <h5 class="card-title">Degustación de Vinos</h5>
-                    <p class="card-text">Una experiencia única en los viñedos de Mendoza.</p>
-                </div>
-            </div>
-        </a>
-
+            }
+        }
+        else
+        {
+            <p class="col-12 alert alert-info text-center">No hay actividades disponibles en este momento.</p>
+        }
     </div>
 </div>
-
 <script src="~/js/Activities.js"></script>
