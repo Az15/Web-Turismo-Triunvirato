@@ -53,11 +53,19 @@
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="ImageUrl" class="form-label"></label>
-                    <input asp-for="ImageUrl" class="form-control" />
+                <div class="form-group mb-3">
+                    <label asp-for="ImageUrl" class="form-label">Seleccionar Imagen</label>
+                    <input asp-for="ImageUrl" type="file" class="form-control" accept="image/*" />
                     <span asp-validation-for="ImageUrl" class="text-danger"></span>
                 </div>
+
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mb-3">
+                        <img src="@Model.ImageUrl" alt="Imagen actual" class="img-thumbnail" style="max-height: 200px;" />
+                    </div>
+                }
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
