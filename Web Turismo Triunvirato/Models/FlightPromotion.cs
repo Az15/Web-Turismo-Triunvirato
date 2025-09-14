@@ -73,6 +73,8 @@ namespace Web_Turismo_Triunvirato.Models
 
 
         [NotMapped]
-        public string RenderedWhatsappMessage { get; set; }
+        public string? RenderedWhatsappMessage { get; set; } 
+
+
     }
 }
