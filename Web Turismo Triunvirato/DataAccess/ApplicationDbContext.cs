@@ -167,7 +167,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 // CORREGIDO: Se usa la variable 'serviceType' que ya es un int
                 new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotion.Description),
-                new MySqlParameter("p_destinationname", promotion.DestinationName),
+                new MySqlParameter("p_description", promotion.Description),
+                new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
                 new MySqlParameter("p_imageurl", promotion.ImageUrl),
                 new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
                 new MySqlParameter("p_originalprice", promotion.OriginalPrice),

@@ -1,16 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
-using Web_Turismo_Triunvirato.Services;
-using Web_Turismo_Triunvirato.Models;
-using System;
-using Microsoft.EntityFrameworkCore;
-using Web_Turismo_Triunvirato.DataAccess;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Web_Turismo_Triunvirato.DataAccess;
+using Web_Turismo_Triunvirato.Models;
+using Web_Turismo_Triunvirato.Services;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -97,7 +98,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             ViewData["Title"] = "Alta de Promoción de Vuelo";
             return View("AltaPromotionFlight", new FlightPromotion { ServiceType = "0" });
         }
-
         [HttpGet]
         public async Task<IActionResult> EditPromotionFlight(int id)
         {
@@ -109,8 +109,25 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return NotFound();
             }
 
+            // Obtener la lista de mensajes de WhatsApp activos
+            var whatsappMessages = await _dbContext.WhatsappMessages
+                .Where(m => m.Is_Active)
+                .OrderBy(m => m.Title)
+                .ToListAsync();
+
+            // Crear una lista de SelectListItem para el dropdown
+            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+
+            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
+            ViewBag.WhatsappMessages = whatsappList;
+
             return View("AltaPromotionFlight", promotion);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -133,17 +150,19 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionFlight", promotion);
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionFlight(int id, [Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
+        public async Task<IActionResult> EditPromotionFlight(int id, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
         {
             if (id != promotion.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     if (promotion.OriginalPrice > 0)
@@ -166,7 +185,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         throw;
                     }
                 }
-            }
+            //}
             ViewData["Title"] = "Editar Promoción de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
