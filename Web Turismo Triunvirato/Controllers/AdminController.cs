@@ -1,16 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
-using Web_Turismo_Triunvirato.Services;
-using Web_Turismo_Triunvirato.Models;
-using System;
-using Microsoft.EntityFrameworkCore;
-using Web_Turismo_Triunvirato.DataAccess;
-using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Web_Turismo_Triunvirato.DataAccess;
+using Web_Turismo_Triunvirato.Models;
+using Web_Turismo_Triunvirato.Services;
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -30,7 +31,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         public IActionResult Index()
         {
-            ViewData["Title"] = "Panel de Administración";
+            ViewData["Title"] = "Panel de AdministraciÃ³n";
             return View();
         }
 
@@ -42,43 +43,43 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         public IActionResult Vuelos()
         {
-            ViewData["Title"] = "Administración de Vuelos";
+            ViewData["Title"] = "AdministraciÃ³n de Vuelos";
             return View();
         }
 
         public IActionResult Hoteles()
         {
-            ViewData["Title"] = "Administración de Hoteles";
+            ViewData["Title"] = "AdministraciÃ³n de Hoteles";
             return View();
         }
 
         public IActionResult Buses()
         {
-            ViewData["Title"] = "Administración de Buses";
+            ViewData["Title"] = "AdministraciÃ³n de Buses";
             return View();
         }
 
         public IActionResult packages()
         {
-            ViewData["Title"] = "Administración de Paquetes";
+            ViewData["Title"] = "AdministraciÃ³n de Paquetes";
             return View();
         }
 
         public IActionResult Encomiendas()
         {
-            ViewData["Title"] = "Administración de Encomiendas";
+            ViewData["Title"] = "AdministraciÃ³n de Encomiendas";
             return View();
         }
 
         public IActionResult Activities()
         {
-            ViewData["Title"] = "Panel de Administración";
+            ViewData["Title"] = "Panel de AdministraciÃ³n";
             return View();
         }
 
 
 
-        // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE VUELOS ****************
+        // **************** ACCIONES PARA ADMINISTRACIÃ“N DE PROMOCIONES DE VUELOS ****************
 
         [HttpGet]
         public async Task<IActionResult> AdminPromotionFlights()
@@ -94,14 +95,13 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public IActionResult AltaPromotionFlight()
         {
-            ViewData["Title"] = "Alta de Promoción de Vuelo";
+            ViewData["Title"] = "Alta de PromociÃ³n de Vuelo";
             return View("AltaPromotionFlight", new FlightPromotion { ServiceType = "0" });
         }
-
         [HttpGet]
         public async Task<IActionResult> EditPromotionFlight(int id)
         {
-            ViewData["Title"] = "Editar Promoción de Vuelo";
+            ViewData["Title"] = "Editar PromociÃ³n de Vuelo";
             var promotion = await _dbContext.FlightPromotions.FindAsync(id);
 
             if (promotion == null)
@@ -109,8 +109,25 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return NotFound();
             }
 
+            // Obtener la lista de mensajes de WhatsApp activos
+            var whatsappMessages = await _dbContext.WhatsappMessages
+                .Where(m => m.Is_Active)
+                .OrderBy(m => m.Title)
+                .ToListAsync();
+
+            // Crear una lista de SelectListItem para el dropdown
+            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+
+            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
+            ViewBag.WhatsappMessages = whatsappList;
+
             return View("AltaPromotionFlight", promotion);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -126,24 +143,26 @@ namespace Web_Turismo_Triunvirato.Controllers
 
                 await _dbContext.AbmFlightPromotionAsync(promotion, "INSERT");
 
-                TempData["SuccessMessage"] = "¡Promoción de vuelo creada exitosamente!";
+                TempData["SuccessMessage"] = "Â¡PromociÃ³n de vuelo creada exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionFlights));
             }
-            ViewData["Title"] = "Alta de Promoción de Vuelo";
+            ViewData["Title"] = "Alta de PromociÃ³n de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionFlight(int id, [Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
+        public async Task<IActionResult> EditPromotionFlight(int id, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
         {
             if (id != promotion.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 try
                 {
                     if (promotion.OriginalPrice > 0)
@@ -152,7 +171,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                     promotion.ServiceType = "0";
                     await _dbContext.AbmFlightPromotionAsync(promotion, "UPDATE");
-                    TempData["SuccessMessage"] = "¡Promoción de vuelo actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "Â¡PromociÃ³n de vuelo actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminPromotionFlights));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -166,8 +185,8 @@ namespace Web_Turismo_Triunvirato.Controllers
                         throw;
                     }
                 }
-            }
-            ViewData["Title"] = "Editar Promoción de Vuelo";
+            //}
+            ViewData["Title"] = "Editar PromociÃ³n de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
 
@@ -182,11 +201,11 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             await _dbContext.AbmFlightPromotionAsync(promotion, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de vuelo eliminada exitosamente!";
+            TempData["SuccessMessage"] = "Â¡PromociÃ³n de vuelo eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionFlights));
         }
 
-        // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE HOTELES ****************
+        // **************** ACCIONES PARA ADMINISTRACIÃ“N DE PROMOCIONES DE HOTELES ****************
 
         [HttpGet]
         public async Task<IActionResult> AdminPromotionHotels()
@@ -199,14 +218,14 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public IActionResult AltaPromotionHotel()
         {
-            ViewData["Title"] = "Alta de Promoción de Hotel";
+            ViewData["Title"] = "Alta de PromociÃ³n de Hotel";
             return View("AltaPromotionHotel", new HotelPromotion { ServiceType = "1" });
         }
 
         [HttpGet]
         public async Task<IActionResult> EditPromotionHotel(int id)
         {
-            ViewData["Title"] = "Editar Promoción de Hotel";
+            ViewData["Title"] = "Editar PromociÃ³n de Hotel";
             var promotion = await _dbContext.HotelPromotions.FindAsync(id);
             if (promotion == null)
             {
@@ -227,10 +246,10 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
                 promotion.ServiceType = "1";
                 await _dbContext.AbmHotelPromotionAsync(promotion, "INSERT");
-                TempData["SuccessMessage"] = "¡Promoción de hotel agregada exitosamente!";
+                TempData["SuccessMessage"] = "Â¡PromociÃ³n de hotel agregada exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionHotels));
             }
-            ViewData["Title"] = "Alta de Promoción de Hotel";
+            ViewData["Title"] = "Alta de PromociÃ³n de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
@@ -253,7 +272,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                     promotion.ServiceType = "1";
                     await _dbContext.AbmHotelPromotionAsync(promotion, "UPDATE");
-                    TempData["SuccessMessage"] = "¡Promoción de hotel actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "Â¡PromociÃ³n de hotel actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminPromotionHotels));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -268,7 +287,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                 }
             }
-            ViewData["Title"] = "Editar Promoción de Hotel";
+            ViewData["Title"] = "Editar PromociÃ³n de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
@@ -283,18 +302,18 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             await _dbContext.AbmHotelPromotionAsync(promotion, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de hotel eliminada exitosamente!";
+            TempData["SuccessMessage"] = "Â¡PromociÃ³n de hotel eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionHotels));
         }
 
-        // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE BUSES ****************
+        // **************** ACCIONES PARA ADMINISTRACIÃ“N DE PROMOCIONES DE BUSES ****************
 
         // GET: Admin/AdminPromotionBuses
         [HttpGet]
         public async Task<IActionResult> AdminPromotionBuses()
         {
             ViewData["Title"] = "Gestionar Promociones de Buses";
-            var busPromotions = await _dbContext.GetActivePromotionBusesItemsAsync(); // Asumiendo que este método existe en tu DbContext
+            var busPromotions = await _dbContext.GetActivePromotionBusesItemsAsync(); // Asumiendo que este mÃ©todo existe en tu DbContext
             return View("AdminPromotionBuses", busPromotions); // Se asume que tienes una vista llamada AdminPromotionBuses.cshtml
         }
 
@@ -302,7 +321,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public IActionResult AltaPromotionBus()
         {
-            ViewData["Title"] = "Alta de Promoción de Bus";
+            ViewData["Title"] = "Alta de PromociÃ³n de Bus";
             return View("AltaPromotionBus", new BusPromotion { ServiceType = "2" }); // Se asume que tienes un modelo BusPromotion y una vista AltaPromotionBus.cshtml
         }
 
@@ -310,7 +329,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public async Task<IActionResult> EditPromotionBus(int id)
         {
-            ViewData["Title"] = "Editar Promoción de Bus";
+            ViewData["Title"] = "Editar PromociÃ³n de Bus";
             var promotion = await _dbContext.BusPromotions.FindAsync(id); // Asumiendo que BusPromotions es una propiedad en tu DbContext
             if (promotion == null)
             {
@@ -319,7 +338,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionBus", promotion);
         }
 
-        // POST: Admin/SubmitPromotionBus (Creación)
+        // POST: Admin/SubmitPromotionBus (CreaciÃ³n)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitPromotionBus([Bind("Id,ServiceType,PackageType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,AirlineName,HotelName,Stars,BusCompanyName,Category")] BusPromotion promotion)
@@ -332,14 +351,14 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
                 promotion.ServiceType = "2";
                 await _dbContext.AbmBusPromotionAsync(promotion, "INSERT"); // Asumiendo que AbmBusPromotionAsync existe
-                TempData["SuccessMessage"] = "¡Promoción de bus agregada exitosamente!";
+                TempData["SuccessMessage"] = "Â¡PromociÃ³n de bus agregada exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionBuses));
             }
-            ViewData["Title"] = "Alta de Promoción de Bus";
+            ViewData["Title"] = "Alta de PromociÃ³n de Bus";
             return View("AltaPromotionBus", promotion);
         }
 
-        // POST: Admin/EditPromotionBus/{id} (Edición)
+        // POST: Admin/EditPromotionBus/{id} (EdiciÃ³n)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionBus(int id, [Bind("Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
@@ -359,7 +378,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                     promotion.ServiceType = "2";
                     await _dbContext.AbmBusPromotionAsync(promotion, "UPDATE");
-                    TempData["SuccessMessage"] = "¡Promoción de bus actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "Â¡PromociÃ³n de bus actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminPromotionBuses));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -374,7 +393,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                 }
             }
-            ViewData["Title"] = "Editar Promoción de Bus";
+            ViewData["Title"] = "Editar PromociÃ³n de Bus";
             return View("AltaPromotionBus", promotion);
         }
 
@@ -390,29 +409,29 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             await _dbContext.AbmBusPromotionAsync(promotion, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de bus eliminada exitosamente!";
+            TempData["SuccessMessage"] = "Â¡PromociÃ³n de bus eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionBuses));
         }
 
 
-        // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE PAQUETES ****************
+        // **************** ACCIONES PARA ADMINISTRACIÃ“N DE PROMOCIONES DE PAQUETES ****************
 
         public async Task<IActionResult> AdminPromotionPackages()
         {
             var promotions = await _dbContext.GetActivePromotionPackagesItemsAsync();
-            ViewData["Title"] = "Gestión de Promociones de Paquetes";
+            ViewData["Title"] = "GestiÃ³n de Promociones de Paquetes";
             return View(promotions);
         }
 
-        // Método GET para mostrar la vista de creación de una nueva promoción de paquete
+        // MÃ©todo GET para mostrar la vista de creaciÃ³n de una nueva promociÃ³n de paquete
         public IActionResult AltaPromotionPackage()
         {
-            ViewData["Title"] = "Alta de Promoción de Paquete";
-            // Pasa un nuevo modelo vacío a la vista para evitar la excepción
+            ViewData["Title"] = "Alta de PromociÃ³n de Paquete";
+            // Pasa un nuevo modelo vacÃ­o a la vista para evitar la excepciÃ³n
             return View(new PackagePromotion());
         }
 
-        // Método GET para mostrar la vista de edición de una promoción de paquete
+        // MÃ©todo GET para mostrar la vista de ediciÃ³n de una promociÃ³n de paquete
         public async Task<IActionResult> EditPromotionPackage(int? id)
         {
             if (id == null)
@@ -425,21 +444,21 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 return NotFound();
             }
-            ViewData["Title"] = "Editar Promoción de Paquete";
+            ViewData["Title"] = "Editar PromociÃ³n de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
 
-        // Método POST para la creación de una promoción de paquete
+        // MÃ©todo POST para la creaciÃ³n de una promociÃ³n de paquete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
+        // Se ajusta el Bind para incluir solo los campos que se envÃ­an desde la vista.
         public async Task<IActionResult> SubmitPromotionPackage([Bind("Id,ServiceType,PackageType,Description,CompanyName," +
                                                                         "DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate," +
                                                                         "IsActive,HotelName")] PackagePromotion promotion)
         {
             if (ModelState.IsValid)
             {
-                // Se calcula el descuento si los precios son válidos.
+                // Se calcula el descuento si los precios son vÃ¡lidos.
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
@@ -448,22 +467,22 @@ namespace Web_Turismo_Triunvirato.Controllers
                 // El tipo de servicio para los paquetes es "3".
                 promotion.ServiceType = "3";
 
-                // Se llama al método ABM del DbContext para insertar el nuevo paquete.
+                // Se llama al mÃ©todo ABM del DbContext para insertar el nuevo paquete.
                 await _dbContext.AbmPackagePromotionAsync(promotion, "INSERT");
 
-                TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
+                TempData["SuccessMessage"] = "Â¡PromociÃ³n de paquete agregada exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionPackages));
             }
 
-            // Si el modelo no es válido, se regresa a la vista para mostrar los errores.
-            ViewData["Title"] = "Alta de Promoción de Paquete";
+            // Si el modelo no es vÃ¡lido, se regresa a la vista para mostrar los errores.
+            ViewData["Title"] = "Alta de PromociÃ³n de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
 
-        // Método POST para la edición de una promoción de paquete
+        // MÃ©todo POST para la ediciÃ³n de una promociÃ³n de paquete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
+        // Se ajusta el Bind para incluir solo los campos que se envÃ­an desde la vista.
         public async Task<IActionResult> EditPromotionPackage(int id, [Bind("Id,ServiceType,PackageType,Description,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,HotelName")] PackagePromotion promotion)
         {
             if (id != promotion.Id)
@@ -484,9 +503,9 @@ namespace Web_Turismo_Triunvirato.Controllers
                     // El tipo de servicio para los paquetes es "3".
                     promotion.ServiceType = "3";
 
-                    // Se llama al método ABM del DbContext para actualizar el paquete.
+                    // Se llama al mÃ©todo ABM del DbContext para actualizar el paquete.
                     await _dbContext.AbmPackagePromotionAsync(promotion, "UPDATE");
-                    TempData["SuccessMessage"] = "¡Promoción de paquete actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "Â¡PromociÃ³n de paquete actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminPromotionPackages));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -502,11 +521,11 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            ViewData["Title"] = "Editar Promoción de Paquete";
+            ViewData["Title"] = "Editar PromociÃ³n de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
 
-        // Método POST para la eliminación de una promoción de paquete
+        // MÃ©todo POST para la eliminaciÃ³n de una promociÃ³n de paquete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionPackage(int id)
@@ -517,14 +536,14 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return NotFound();
             }
 
-            // Se llama al método ABM del DbContext para eliminar el paquete.
+            // Se llama al mÃ©todo ABM del DbContext para eliminar el paquete.
             await _dbContext.AbmPackagePromotionAsync(promotion, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de paquete eliminada exitosamente!";
+            TempData["SuccessMessage"] = "Â¡PromociÃ³n de paquete eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionPackages));
         }
     
 
-    ///////////// NUEVAS ACCIONES PARA LA GESTIÓN DE ENCOMIENDAS  ////////////////////////////////////////////
+    ///////////// NUEVAS ACCIONES PARA LA GESTIÃ“N DE ENCOMIENDAS  ////////////////////////////////////////////
 
     [HttpGet]
     public async Task<IActionResult> AdminEncomiendas()
@@ -543,21 +562,21 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Se añade IFormFile para recibir el archivo subido
+        // Se aÃ±ade IFormFile para recibir el archivo subido
         public async Task<IActionResult> AltaEncomienda([Bind("Id,CompanyName,CompanyUrl")] EncomiendaCompany encomienda, IFormFile ImageFile)
         {
             if (ModelState.IsValid)
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    // La carpeta donde se guardarán las imágenes. Asegúrate de que exista.
+                    // La carpeta donde se guardarÃ¡n las imÃ¡genes. AsegÃºrate de que exista.
                     string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/encomiendas");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
                     }
 
-                    // Genera un nombre de archivo único para evitar colisiones
+                    // Genera un nombre de archivo Ãºnico para evitar colisiones
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -607,7 +626,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 _dbContext.Update(company);
                 await _dbContext.SaveChangesAsync();
-                TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                TempData["SuccessMessage"] = "Â¡Empresa de encomiendas actualizada exitosamente!";
                 return RedirectToAction(nameof(AdminEncomiendas));
             }
             catch (DbUpdateConcurrencyException)
@@ -638,7 +657,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         _dbContext.EncomiendaCompanies.Remove(company);
         await _dbContext.SaveChangesAsync();
-        TempData["SuccessMessage"] = "¡Empresa de encomiendas eliminada exitosamente!";
+        TempData["SuccessMessage"] = "Â¡Empresa de encomiendas eliminada exitosamente!";
         return RedirectToAction(nameof(AdminEncomiendas));
     }
 
@@ -708,7 +727,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Se modifica el método de edición para aceptar el IFormFile.
+        // Se modifica el mÃ©todo de ediciÃ³n para aceptar el IFormFile.
         public async Task<IActionResult> EditActividad(int id, [Bind("Id,Title,Description,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
         {
             if (id != Actividad.Id)
@@ -720,10 +739,10 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 try
                 {
-                    // Si se subió una nueva imagen, se guarda y se actualiza la URL.
+                    // Si se subiÃ³ una nueva imagen, se guarda y se actualiza la URL.
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
-                        // Lógica para guardar la nueva imagen (similar a AltaActividad).
+                        // LÃ³gica para guardar la nueva imagen (similar a AltaActividad).
                         string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/Actividades");
                         if (!Directory.Exists(uploadsFolder))
                         {
@@ -738,7 +757,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                             await ImageFile.CopyToAsync(fileStream);
                         }
 
-                        // Se borra la imagen anterior si existía para no dejar archivos huérfanos.
+                        // Se borra la imagen anterior si existÃ­a para no dejar archivos huÃ©rfanos.
                         if (!string.IsNullOrEmpty(Actividad.ImageUrl))
                         {
                             string oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, Actividad.ImageUrl.TrimStart('/'));
@@ -752,11 +771,11 @@ namespace Web_Turismo_Triunvirato.Controllers
                         Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
                     }
 
-                    // Si no se subió una nueva imagen, se mantiene la URL existente.
-                    // Esto se maneja automáticamente ya que el campo ImageUrl se incluye en el bind y el campo hidden.
+                    // Si no se subiÃ³ una nueva imagen, se mantiene la URL existente.
+                    // Esto se maneja automÃ¡ticamente ya que el campo ImageUrl se incluye en el bind y el campo hidden.
                     _dbContext.Update(Actividad);
                     await _dbContext.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "Â¡Empresa de encomiendas actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminActivities));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -785,7 +804,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return NotFound();
             }
 
-            // También se borra la imagen del servidor al eliminar el registro.
+            // TambiÃ©n se borra la imagen del servidor al eliminar el registro.
             if (!string.IsNullOrEmpty(Actividad.ImageUrl))
             {
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, Actividad.ImageUrl.TrimStart('/'));
@@ -797,7 +816,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             _dbContext.Activities.Remove(Actividad);
             await _dbContext.SaveChangesAsync();
-            TempData["SuccessMessage"] = "¡Actividad eliminada exitosamente!";
+            TempData["SuccessMessage"] = "Â¡Actividad eliminada exitosamente!";
             return RedirectToAction(nameof(AdminActivities));
         }
 
@@ -821,8 +840,8 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 try
                 {
-                    // Llama al método del DbContext con el modelo directamente
-                    // La propiedad 'Id' no es necesaria para la inserción, ya que es auto-incremental.
+                    // Llama al mÃ©todo del DbContext con el modelo directamente
+                    // La propiedad 'Id' no es necesaria para la inserciÃ³n, ya que es auto-incremental.
                     await _dbContext.CreateWhatsappMessageAsync(
                         model.Title,
                         model.Message_Template,
@@ -833,7 +852,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Ocurrió un error al guardar el mensaje: " + ex.Message);
+                    ModelState.AddModelError("", "OcurriÃ³ un error al guardar el mensaje: " + ex.Message);
                     return View(model);
                 }
             }
@@ -847,7 +866,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             try
             {
-                // Llama al método del DbContext para obtener la lista de mensajes
+                // Llama al mÃ©todo del DbContext para obtener la lista de mensajes
                 var messages = await _dbContext.GetAllWhatsappMessagesAsync();
                 return View(messages);
             }
@@ -855,8 +874,8 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 // Manejar errores si la llamada al SP falla
                 // Considera usar un logger en un proyecto real
-                TempData["ErrorMessage"] = "Ocurrió un error al cargar los mensajes: " + ex.Message;
-                // Retorna una lista vacía para evitar errores en la vista
+                TempData["ErrorMessage"] = "OcurriÃ³ un error al cargar los mensajes: " + ex.Message;
+                // Retorna una lista vacÃ­a para evitar errores en la vista
                 return View(new List<WhatsappMessage>());
             }
         }
@@ -880,7 +899,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 try
                 {
-                    // Usamos el mismo método de "upsert" que creamos
+                    // Usamos el mismo mÃ©todo de "upsert" que creamos
                     await _dbContext.UpdateWhatsappMessageAsync(model);
 
                     TempData["SuccessMessage"] = "Mensaje de WhatsApp actualizado exitosamente.";
@@ -888,7 +907,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Ocurrió un error al actualizar el mensaje: " + ex.Message);
+                    ModelState.AddModelError("", "OcurriÃ³ un error al actualizar el mensaje: " + ex.Message);
                     return View(model);
                 }
             }
@@ -913,14 +932,14 @@ namespace Web_Turismo_Triunvirato.Controllers
                 // 2. Cambiar el estado del mensaje.
                 message.Is_Active = !message.Is_Active;
 
-                // 3. Actualizar el registro en la base de datos usando el SP de actualización.
+                // 3. Actualizar el registro en la base de datos usando el SP de actualizaciÃ³n.
                 await _dbContext.UpdateWhatsappMessageAsync(message);
 
                 TempData["SuccessMessage"] = "Estado del mensaje actualizado exitosamente.";
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el estado: " + ex.Message;
+                TempData["ErrorMessage"] = "OcurriÃ³ un error al actualizar el estado: " + ex.Message;
             }
 
             // 4. Redirigir de vuelta a la lista de mensajes.
@@ -935,14 +954,14 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
-        // Acción para mostrar el formulario de creación
+        // AcciÃ³n para mostrar el formulario de creaciÃ³n
         [HttpGet]
         public IActionResult CreateCarrouselItem()
         {
             return View();
         }
 
-        // Acción para procesar el formulario de creación
+        // AcciÃ³n para procesar el formulario de creaciÃ³n
         [HttpPost]
         public async Task<IActionResult> CreateCarrouselItem(View_Index_DestinationCarouselItem model, IFormFile imageFile)
         {
@@ -966,7 +985,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(model);
         }
 
-        // Acción para mostrar la lista de elementos del carrusel
+        // AcciÃ³n para mostrar la lista de elementos del carrusel
         [HttpGet]
         public async Task<IActionResult> AdminCarrouselItem()
         {
@@ -974,7 +993,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(items);
         }
 
-        // Acción para mostrar el formulario de creación de destinos
+        // AcciÃ³n para mostrar el formulario de creaciÃ³n de destinos
         [HttpGet]
         public IActionResult CreateDestination()
         {
@@ -984,22 +1003,22 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDestination(View_Index_Destination model, IFormFile imageFile)
         {
-            // Verificar si se subió un archivo de imagen.
+            // Verificar si se subiÃ³ un archivo de imagen.
             if (imageFile == null || imageFile.Length == 0)
             {
                 ModelState.AddModelError("PictureDestiny", "La imagen de destino es obligatoria.");
             }
 
-            // Si hay errores de validación, regresar a la vista.
+            // Si hay errores de validaciÃ³n, regresar a la vista.
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            // Lógica para guardar la imagen
+            // LÃ³gica para guardar la imagen
             var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/");
 
-            // Asegúrate de que la carpeta de destino exista
+            // AsegÃºrate de que la carpeta de destino exista
             if (!Directory.Exists(uploadsFolder))
             {
                 Directory.CreateDirectory(uploadsFolder);
@@ -1015,7 +1034,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             // Asignar los valores del modelo
             model.PictureDestiny = "/img/" + uniqueFileName;
-            model.DetailDestinyURL = "/destinations/" + model.Title; // O la lógica que uses para generar esta URL
+            model.DetailDestinyURL = "/destinations/" + model.Title; // O la lÃ³gica que uses para generar esta URL
 
             // Guardar los cambios en la base de datos.
             _dbContext.Destinations.Add(model);
@@ -1025,7 +1044,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return RedirectToAction("AdminDestination");
         }
 
-        // Acción para mostrar la lista de destinos/promociones
+        // AcciÃ³n para mostrar la lista de destinos/promociones
         [HttpGet]
         public async Task<IActionResult> AdminDestination()
         {
@@ -1034,7 +1053,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
 
-        // GET: Muestra el formulario de edición con los datos cargados del carrusel
+        // GET: Muestra el formulario de ediciÃ³n con los datos cargados del carrusel
         [HttpGet]
         public async Task<IActionResult> EditCarrouselItem(int id)
         {
@@ -1046,7 +1065,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(item);
         }
 
-        // POST: Procesa los cambios del formulario de edición del carrusel
+        // POST: Procesa los cambios del formulario de ediciÃ³n del carrusel
         [HttpPost]
         public async Task<IActionResult> EditCarrouselItem(View_Index_DestinationCarouselItem model, IFormFile imageFile)
         {
@@ -1059,7 +1078,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (ModelState.IsValid)
             {
-                // Si se subió una nueva imagen, la guardamos y actualizamos la URL
+                // Si se subiÃ³ una nueva imagen, la guardamos y actualizamos la URL
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/carousel");
@@ -1088,7 +1107,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     existingItem.ImageUrl = "/images/carousel/" + uniqueFileName;
                 }
 
-                // Actualiza los demás campos
+                // Actualiza los demÃ¡s campos
                 existingItem.Title = model.Title;
                 existingItem.AltText = model.AltText;
                 existingItem.LinkUrl = model.LinkUrl;
@@ -1130,7 +1149,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     return View(promotion);
                 }
 
-        // POST: Procesa los cambios del formulario de edición de destino
+        // POST: Procesa los cambios del formulario de ediciÃ³n de destino
         [HttpPost]
         public async Task<IActionResult> EditDestination(View_Index_Destination model, IFormFile imageFile)
         {
@@ -1142,7 +1161,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (ModelState.IsValid)
             {
-                // Si se subió una nueva imagen, la guardamos y actualizamos la URL
+                // Si se subiÃ³ una nueva imagen, la guardamos y actualizamos la URL
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/destinations");
@@ -1171,7 +1190,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     existingPromotion.PictureDestiny = "/images/destinations/" + uniqueFileName;
                 }
 
-                // Actualiza los demás campos
+                // Actualiza los demÃ¡s campos
                 existingPromotion.Title = model.Title;
                 existingPromotion.Price = model.Price;
                 existingPromotion.From = model.From;
@@ -1198,7 +1217,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             // Nota: El modelo View_Index_Destination no tiene la propiedad IsActive, 
-            // pero tu modelo original sí la tiene. Si la usas en la tabla, la puedes agregar aquí.
+            // pero tu modelo original sÃ­ la tiene. Si la usas en la tabla, la puedes agregar aquÃ­.
             // item.IsActive = !item.IsActive; // Descomentar si la propiedad existe.
 
             item.IsHotWeek = !item.IsHotWeek; // Usaremos esta propiedad como ejemplo para activar/desactivar

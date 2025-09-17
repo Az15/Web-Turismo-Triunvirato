@@ -37,7 +37,13 @@
             <input asp-for="Description" class="form-control" />
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
-
+            <div class="mb-3">
+                <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
+                <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
+                    <option value="">-- Seleccione un mensaje --</option>
+                </select>
+                <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
+            </div>
         <div class="form-group mb-3">
             <label asp-for="DestinationName" class="form-label"></label>
             <input asp-for="DestinationName" class="form-control" />
@@ -49,7 +55,6 @@
             <input asp-for="OriginName" class="form-control" />
             <span asp-validation-for="OriginName" class="text-danger"></span>
         </div>
-
         <div class="form-group mb-3">
             <label asp-for="OriginalPrice" class="form-label"></label>
             <input asp-for="OriginalPrice" class="form-control" />

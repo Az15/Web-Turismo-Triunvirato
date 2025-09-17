@@ -71,7 +71,9 @@ namespace Web_Turismo_Triunvirato.Models
         public int? Stars { get; set; } = 0;
 
         [NotMapped]
-        [BindNever] // <-- Agrega este atributo
-        public string RenderedWhatsappMessage { get; set; }
+        [BindNever] 
+        public string? RenderedWhatsappMessage { get; set; } 
+
+
     }
 }

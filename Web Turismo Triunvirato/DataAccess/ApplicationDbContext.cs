@@ -126,7 +126,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 throw new ArgumentException("El ServiceType del vuelo debe ser un valor numérico.", nameof(promotionFlight.ServiceType));
             }
 
-            string sql = "CALL SetActivePromotionFlights(@p_id, @p_Whatsapp_Id,@p_servicetype, @p_description, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
+
+            string sql = "CALL SetActivePromotionFlights(@p_id, @p_servicetype, @p_description,@p_whatsapp_id, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
@@ -134,6 +135,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 new MySqlParameter("p_Whatsapp_Id", promotionFlight.Whatsapp_Id),
                 new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotionFlight.Description),
+                new MySqlParameter("p_whatsapp_id", promotionFlight.Whatsapp_Id),
                 new MySqlParameter("p_destinationname", promotionFlight.DestinationName),
                 new MySqlParameter("p_originname", promotionFlight.OriginName),
                 new MySqlParameter("p_imageurl", promotionFlight.ImageUrl),
@@ -168,7 +170,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 // CORREGIDO: Se usa la variable 'serviceType' que ya es un int
                 new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotion.Description),
-                new MySqlParameter("p_destinationname", promotion.DestinationName),
+                new MySqlParameter("p_description", promotion.Description),
+                new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
                 new MySqlParameter("p_imageurl", promotion.ImageUrl),
                 new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
                 new MySqlParameter("p_originalprice", promotion.OriginalPrice),
