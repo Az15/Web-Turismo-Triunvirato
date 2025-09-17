@@ -1,8 +1,7 @@
-﻿
-
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding; // Necesitas agregar esta referencia
 
 namespace Web_Turismo_Triunvirato.Models
 {
@@ -11,7 +10,7 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
-        public int Whatsapp_Id { get; set; } // El ID que agregaste
+        public int Whatsapp_Id { get; set; }
 
         [Required(ErrorMessage = "Tipo de servicio.")]
         [StringLength(100)]
@@ -50,13 +49,13 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Discount Percentage")]
         public decimal DiscountPercentage { get; set; }
 
-        [Required(ErrorMessage = "Start date is required.")]
+        [Required(ErrorMessage = "Fecha de Inicio es Requerida.")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; } = DateTime.Today;
 
-        [Required(ErrorMessage = "End date is required.")]
+        [Required(ErrorMessage = "Fecha de Finalación es requerida.")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [Display(Name = "End Date")]
@@ -71,8 +70,8 @@ namespace Web_Turismo_Triunvirato.Models
 
         public int? Stars { get; set; } = 0;
 
-
         [NotMapped]
+        [BindNever] 
         public string? RenderedWhatsappMessage { get; set; } 
 
 
