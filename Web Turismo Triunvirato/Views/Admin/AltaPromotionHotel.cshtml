@@ -9,11 +9,15 @@
     <h1>@ViewData["Title"]</h1>
 
     <div class="card p-4">
-        <form asp-controller="Admin" asp-action="@action" method="post">
+        <form asp-controller="Admin" asp-action="@action" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="Id" />
-            @* <input type="hidden" asp-for="ServiceType" /> *@
+
+            @if (Model.Id != 0)
+            {
+                <input type="hidden" asp-for="ImageUrl" />
+            }
 
             <div class="mb-3">
                 <label asp-for="ServiceType" class="form-label">Tipo de Servicio:</label>
@@ -22,29 +26,30 @@
             </div>
 
             <div class="mb-3">
+                <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
+                <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
+                    <option value="">-- Seleccione un mensaje --</option>
+                </select>
+                <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
                 <label asp-for="DestinationName" class="form-label"></label>
                 <input asp-for="DestinationName" class="form-control" />
                 <span asp-validation-for="DestinationName" class="text-danger"></span>
             </div>
 
-@*             <div class="mb-3">
-                <label asp-for="HotelName" class="form-label"></label>
-                <input asp-for="HotelName" class="form-control" />
-                <span asp-validation-for="HotelName" class="text-danger"></span>
-            </div> *@
-
             <div class="mb-3">
                 <label asp-for="Stars" class="form-label"></label>
-                <input asp-for="Stars" type="number" min="1" max="5" class="form-control" />
+                <input asp-for="Stars" type="number" class="form-control" />
                 <span asp-validation-for="Stars" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="ImageUrl" class="form-label">Seleccionar Imagen</label>
-                <input asp-for="ImageUrl" type="file" class="form-control" accept="image/*" />
+                <label for="ImageFile" class="form-label">Seleccionar Imagen</label>
+                <input type="file" id="ImageFile" name="ImageFile" class="form-control" accept="image/*" />
                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
-
 
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
@@ -96,8 +101,8 @@
     </div>
 </div>
 
-@section Scripts {
+@* @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+} *@

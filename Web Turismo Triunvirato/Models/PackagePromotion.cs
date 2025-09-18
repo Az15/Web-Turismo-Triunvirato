@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -81,7 +82,7 @@ namespace Web_Turismo_Triunvirato.Models
         public string? HotelName { get; set; }
         public bool IsActive { get; set; } = true;
 
-
+        [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }
     }

@@ -9,7 +9,6 @@
 
 <div class="row">
     <div class="col-md-6">
-        <!-- Se corrige el asp-action para que apunte a los métodos "AltaActividad" o "EditActividad" del controlador -->
         <form asp-action="@(Model.Id == 0 ? "AltaActividad" : "EditActividad")" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @if (Model.Id != 0)
@@ -33,6 +32,15 @@
                 <input asp-for="Location" class="form-control" />
                 <span asp-validation-for="Location" class="text-danger"></span>
             </div>
+
+            <div class="mb-3">
+                <label for="WhatsappId" class="form-label">Mensaje de Whatsapp</label>
+                <select id="WhatsappId" name="WhatsappId" class="form-select" asp-items="ViewBag.WhatsappMessages">
+                    <option value="">-- Seleccionar un mensaje --</option>
+                </select>
+                <span class="text-danger"></span>
+            </div>
+
             <div class="mb-3">
                 <label for="ImageFile" class="form-label">Subir Imagen</label>
                 <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" @(Model.Id == 0 ? "required" : "") />

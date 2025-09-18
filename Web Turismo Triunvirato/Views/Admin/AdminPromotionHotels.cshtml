@@ -35,7 +35,7 @@
     <table class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th>Tipo de Servicio</th>
+                @* <th>Tipo de Servicio</th> *@
                 <th>Descripción</th>
                 <th>Destino</th>
                 @if (promotionType == typeof(FlightPromotion))
@@ -44,7 +44,6 @@
                 }
                 else if (promotionType == typeof(HotelPromotion))
                 {
-                    <th>Nombre del Hotel</th>
                     <th>Estrellas</th>
                 }
                 <th>Precio Original</th>
@@ -60,7 +59,7 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.ServiceType</td>
+                    @* <td>@item.ServiceType</td> *@
                     <td>@item.Description</td>
                     <td>@item.DestinationName</td>
                     @if (item is FlightPromotion)
@@ -72,8 +71,8 @@
                         @* <td>@item.HotelName</td> *@
                         <td>@item.Stars</td>
                     }
-                    <td>@item.OriginalPrice.ToString("C")</td>
-                    <td>@item.OfferPrice.ToString("C")</td>
+                    <td>@item.OriginalPrice.ToString("C", new System.Globalization.CultureInfo("es-AR"))</td>
+                    <td>@item.OfferPrice.ToString("C", new System.Globalization.CultureInfo("es-AR"))</td>
                     <td>@item.DiscountPercentage%</td>
                     <td>@item.StartDate.ToString("d")</td>
                     <td>@item.EndDate.ToString("d")</td>

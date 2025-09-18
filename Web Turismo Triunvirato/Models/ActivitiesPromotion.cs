@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,7 +34,7 @@ namespace Web_Turismo_Triunvirato.Models
         // sin una URL inicial.
         public string? ImageUrl { get; set; }
 
-
+        [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }
     }

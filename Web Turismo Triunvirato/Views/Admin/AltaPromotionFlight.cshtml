@@ -14,36 +14,21 @@
             <input type="hidden" asp-for="Id" />
         }
 
-     
-
         @* Campo oculto para la URL de la imagen existente, si no se sube una nueva *@
         <input type="hidden" asp-for="ImageUrl" />
-
-        @* Campos de tu formulario existentes *@
-        <div class="form-group mb-3">
-            <label asp-for="Whatsapp_Id" class="form-label"></label>
-            <input asp-for="Whatsapp_Id" class="form-control" />
-            <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="ServiceType" class="form-label"></label>
-            <input asp-for="ServiceType" class="form-control" />
-            <span asp-validation-for="ServiceType" class="text-danger"></span>
-        </div>
 
         <div class="form-group mb-3">
             <label asp-for="Description" class="form-label"></label>
             <input asp-for="Description" class="form-control" />
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
-            <div class="mb-3">
-                <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
-                <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
-                    <option value="">-- Seleccione un mensaje --</option>
-                </select>
-                <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
-            </div>
+        <div class="mb-3">
+            <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
+            <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
+                <option value="">-- Seleccione un mensaje --</option>
+            </select>
+            <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
+        </div>
         <div class="form-group mb-3">
             <label asp-for="DestinationName" class="form-label"></label>
             <input asp-for="DestinationName" class="form-control" />
@@ -90,21 +75,18 @@
             <label asp-for="IsHotWeek" class="form-check-label"></label>
         </div>
 
-     
         <div class="form-group mb-3">
-            <label asp-for="ImageUrl" class="form-label">Seleccionar Imagen</label>
-            <input asp-for="ImageUrl" type="file" class="form-control" accept="image/*" />
+            <label for="ImageFile" class="form-label">Seleccionar Imagen</label>
+            <input type="file" id="ImageFile" name="ImageFile" class="form-control" accept="image/*" />
             <span asp-validation-for="ImageUrl" class="text-danger"></span>
         </div>
 
- 
         @if (!string.IsNullOrEmpty(Model.ImageUrl))
         {
             <div class="mb-3">
                 <img src="@Model.ImageUrl" alt="Imagen actual" class="img-thumbnail" style="max-height: 200px;" />
             </div>
         }
-
 
         <div class="form-check mb-3">
             <input asp-for="IsActive" class="form-check-input" />

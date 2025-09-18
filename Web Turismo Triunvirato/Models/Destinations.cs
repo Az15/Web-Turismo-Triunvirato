@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -38,7 +39,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [StringLength(1000)]
         public string Description { get; set; } // Descripción general del destino o viaje
 
-
+        [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }
     }

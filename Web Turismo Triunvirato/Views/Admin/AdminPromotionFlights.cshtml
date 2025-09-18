@@ -26,11 +26,11 @@
                     <th>Origen</th>
                     <th>Precio Original</th>
                     <th>Precio Oferta</th>
-                    <th>% Descuento</th>
+                    <th>Descuento Total</th>
                     <th>Inicio</th>
                     <th>Fin</th>
-                    <th>Activa</th>
-                    <th>Acciones</th>
+                    <th>Estado</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -40,8 +40,8 @@
                         <td>@Html.DisplayFor(modelItem => item.Description)</td>
                         <td>@Html.DisplayFor(modelItem => item.DestinationName)</td>
                         <td>@Html.DisplayFor(modelItem => item.OriginName)</td>
-                        <td>@item.OriginalPrice.ToString("C0")</td> @* Formato de moneda *@
-                        <td>@item.OfferPrice.ToString("C0")</td> @* Formato de moneda *@
+                        <td>@item.OriginalPrice.ToString("C", new System.Globalization.CultureInfo("es-AR"))</td> @* Formato de moneda *@
+                        <td>@item.OfferPrice.ToString("C", new System.Globalization.CultureInfo("es-AR"))</td> @* Formato de moneda *@
                         <td>@item.DiscountPercentage.ToString("F2")%</td> @* 2 decimales y signo de porcentaje *@
                         <td>@item.StartDate.ToShortDateString()</td>
                         <td>@item.EndDate.ToShortDateString()</td>
