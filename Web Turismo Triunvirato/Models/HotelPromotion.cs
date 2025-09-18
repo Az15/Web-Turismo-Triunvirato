@@ -1,6 +1,7 @@
 ﻿// Models/FlightPromotion.cs
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -77,7 +78,8 @@ namespace Web_Turismo_Triunvirato.Models
         [Range(1,5, ErrorMessage ="Es necesario dar una calificación entre 1 y 5")]
         [Required(ErrorMessage ="La calificacion tiene que ser mayor a uno")]
         public int Stars = 0;
-
+       
+        [ValidateNever]
         [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }

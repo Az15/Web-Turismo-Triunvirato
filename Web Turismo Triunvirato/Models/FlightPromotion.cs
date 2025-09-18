@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding; // Necesitas agregar esta referencia
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding; // Necesitas agregar esta referencia
 
 namespace Web_Turismo_Triunvirato.Models
 {
@@ -75,8 +76,10 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Calificación")]
         public int? Stars { get; set; } = 0;
 
+
         [NotMapped]
-        [BindNever] 
+        [BindNever]
+        [ValidateNever]
         public string? RenderedWhatsappMessage { get; set; } 
 
 

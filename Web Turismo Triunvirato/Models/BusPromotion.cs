@@ -1,6 +1,7 @@
 ﻿// Models/BusPromotion.cs
 
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -82,6 +83,8 @@ namespace Web_Turismo_Triunvirato.Models
 
         [BindNever]
         [NotMapped]
+        [ValidateNever]
         public string RenderedWhatsappMessage { get; set; }
+
     }
 }

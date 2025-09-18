@@ -11,7 +11,7 @@
             <h4 class="mb-0">@ViewData["Title"]</h4>
         </div>
         <div class="card-body">
-            <form asp-action="@actionName" method="post">
+            <form asp-action="@actionName" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
 
                 @if (Model.Id > 0)
@@ -20,6 +20,8 @@
                 }
                 <input type="hidden" asp-for="ServiceType" />
                 <input type="hidden" asp-for="DiscountPercentage" />
+                @* Campo oculto para la URL de la imagen existente, si no se sube una nueva *@
+                <input type="hidden" asp-for="ImageUrl" />
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -53,9 +55,17 @@
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
+                    <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
+                        <option value="">-- Seleccione un mensaje --</option>
+                    </select>
+                    <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
+                </div>
+
                 <div class="form-group mb-3">
-                    <label asp-for="ImageUrl" class="form-label">Seleccionar Imagen</label>
-                    <input asp-for="ImageUrl" type="file" class="form-control" accept="image/*" />
+                    <label for="ImageFile" class="form-label">Seleccionar Imagen</label>
+                    <input type="file" id="ImageFile" name="ImageFile" class="form-control" accept="image/*" />
                     <span asp-validation-for="ImageUrl" class="text-danger"></span>
                 </div>
 

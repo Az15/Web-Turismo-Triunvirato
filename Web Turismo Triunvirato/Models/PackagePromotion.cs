@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -81,7 +82,8 @@ namespace Web_Turismo_Triunvirato.Models
         [StringLength(100)]
         public string? HotelName { get; set; }
         public bool IsActive { get; set; } = true;
-
+        
+        [ValidateNever]
         [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }

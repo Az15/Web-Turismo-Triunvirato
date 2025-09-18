@@ -162,7 +162,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 throw new ArgumentException("El ServiceType del hotel debe ser un valor numérico.", nameof(promotion.ServiceType));
             }
 
-            string sql = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
+            string sql = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_whatsapp_id, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
@@ -190,34 +190,36 @@ namespace Web_Turismo_Triunvirato.DataAccess
         // Método para gestionar el ABM de BusPromotion
         public async Task AbmBusPromotionAsync(BusPromotion promotion, string typeExecuted)
         {
-            // CORREGIDO: Conversión segura del ServiceType a un entero
-            int serviceType;
-            if (!int.TryParse(promotion.ServiceType, out serviceType))
+            // Asegúrate de que los nombres de las variables en tu string SQL
+            // coincidan exactamente con los nombres de los parámetros definidos abajo.
+            string sql = "CALL SetActivePromotionBuses(@p_id, @p_servicetype, @p_description, @p_whatsapp_id, @p_destinationname, @p_originname, @p_buscompanyname, @p_category, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_typeexecuted)";
+
+            // Valida y convierte ServiceType a un valor entero
+            if (!int.TryParse(promotion.ServiceType, out int serviceType))
             {
                 throw new ArgumentException("El ServiceType del bus debe ser un valor numérico.", nameof(promotion.ServiceType));
             }
 
-            string sql = "CALL SetActivePromotionBuses(@p_id, @p_servicetype, @p_description, @p_destinationname, @p_originname, @p_buscompanyname, @p_category, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_typeexecuted)";
-
             var parameters = new MySqlParameter[]
             {
-                new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-                // CORREGIDO: Se usa la variable 'serviceType' que ya es un int
-                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
-                new MySqlParameter("p_description", promotion.Description),
-                new MySqlParameter("p_destinationname", promotion.DestinationName),
-                new MySqlParameter("p_originname", promotion.OriginName),
-                new MySqlParameter("p_buscompanyname", promotion.BusCompanyName),
-                new MySqlParameter("p_category", promotion.Category),
-                new MySqlParameter("p_imageurl", promotion.ImageUrl),
-                new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
-                new MySqlParameter("p_originalprice", promotion.OriginalPrice),
-                new MySqlParameter("p_offerprice", promotion.OfferPrice),
-                new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
-                new MySqlParameter("p_startdate", promotion.StartDate),
-                new MySqlParameter("p_enddate", promotion.EndDate),
-                new MySqlParameter("p_isactive", promotion.IsActive),
-                new MySqlParameter("p_typeexecuted", typeExecuted)
+        // Usa una expresión ternaria para manejar Id y que sea compatible con INSERT y UPDATE
+        new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
+        new MySqlParameter("p_servicetype", serviceType), // Usamos la variable convertida
+        new MySqlParameter("p_description", string.IsNullOrEmpty(promotion.Description) ? DBNull.Value : (object)promotion.Description),
+        new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id > 0 ? (object)promotion.Whatsapp_Id : DBNull.Value),
+        new MySqlParameter("p_destinationname", promotion.DestinationName),
+        new MySqlParameter("p_originname", promotion.OriginName),
+        new MySqlParameter("p_buscompanyname", promotion.BusCompanyName),
+        new MySqlParameter("p_category", string.IsNullOrEmpty(promotion.Category) ? DBNull.Value : (object)promotion.Category),
+        new MySqlParameter("p_imageurl", promotion.ImageUrl),
+        new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
+        new MySqlParameter("p_originalprice", promotion.OriginalPrice),
+        new MySqlParameter("p_offerprice", promotion.OfferPrice),
+        new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
+        new MySqlParameter("p_startdate", promotion.StartDate),
+        new MySqlParameter("p_enddate", promotion.EndDate),
+        new MySqlParameter("p_isactive", promotion.IsActive),
+        new MySqlParameter("p_typeexecuted", typeExecuted)
             };
 
             await Database.ExecuteSqlRawAsync(sql, parameters);
@@ -234,7 +236,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
 
             // Define la cadena SQL para llamar al Stored Procedure
             // He corregido la llamada al SP para usar solo los parámetros necesarios.
-            string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, " +
+            string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id " +
                 "@p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, " +
                 "@p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_hotelname, @p_typeexecuted)";
 
@@ -245,6 +247,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_packagetype", promotion.PackageType),
                 new MySqlParameter("p_description", promotion.Description),
+                new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
                 new MySqlParameter("p.CompanyName", promotion.CompanyName ?? (object)DBNull.Value),
                 new MySqlParameter("p_destinationname", promotion.DestinationName),
                 new MySqlParameter("p_originname", promotion.OriginName),
@@ -281,13 +284,14 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public async Task AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
         {
             // Cambiamos el nombre del SP
-            string sql = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_location, @p_imageurl, @p_typeexecuted)";
+            string sql = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_whatsapp_id, @p_location, @p_imageurl, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
         new MySqlParameter("p_id", activity.Id > 0 ? (object)activity.Id : DBNull.Value),
         new MySqlParameter("p_title", activity.Title),
         new MySqlParameter("p_description", activity.Description),
+        new MySqlParameter("p_whatsapp_id", activity.Whatsapp_Id),
         new MySqlParameter("p_location", activity.Location),
         new MySqlParameter("p_imageurl", activity.ImageUrl),
         new MySqlParameter("p_typeexecuted", typeExecuted)
