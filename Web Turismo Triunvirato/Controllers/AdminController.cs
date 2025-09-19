@@ -558,7 +558,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         // POST: Admin/SubmitPromotionBus (Creación)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionBus(IFormFile ImageFile, [Bind("ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionBus(IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
         {
 
             if(promotion.ImageUrl == null)
