@@ -1,5 +1,3 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
@@ -9,15 +7,18 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Web Turismo Triunvirato/Web Turismo Triunvirato.csproj", "Web Turismo Triunvirato/"]
-RUN dotnet restore "./Web-Turismo-Triunvirato/Web Turismo Triunvirato/Web Turismo Triunvirato.csproj"
+# El .csproj está en la raíz, así que solo necesitas copiar el archivo directamente.
+COPY ["Web Turismo Triunvirato.csproj", "."]
+# El .csproj ahora se encuentra en el directorio raíz del contenedor.
+RUN dotnet restore "Web Turismo Triunvirato.csproj"
 COPY . .
-WORKDIR "/src/Web Turismo Triunvirato"
-RUN dotnet build "./Web-Turismo-Triunvirato/Web Turismo Triunvirato/Web Turismo Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# El WORKDIR también debe ser la raíz del proyecto.
+WORKDIR "/src"
+RUN dotnet build "Web Turismo Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Web-Turismo-Triunvirato/Web Turismo Triunvirato/Web Turismo Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Web Turismo Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
