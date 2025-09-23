@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - "ConnectionStrings:DefaultConnection=Server=82.180.175.204;Port=3306;Database=u364059446_turismo;Uid=u364059446_adm;Pwd=Tur1sm0.25.;"
