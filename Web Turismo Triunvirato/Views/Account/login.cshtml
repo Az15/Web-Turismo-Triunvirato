@@ -45,20 +45,16 @@
 <link rel="stylesheet" href="@Url.Content("~/css/Login.css")" />
 
 
-<!-- Script de Google Identity Services, necesario para el login con Google -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<!-- Tu script de login.js, que ahora debe incluir la función handleCredentialResponse -->
-<script src="~/js/login.js"></script>
-
 <script>
-    // Esta función se activará después de que el usuario inicie sesión con Google
     function handleCredentialResponse(response) {
-        // La credencial de Google se encuentra en response.credential
         const idToken = response.credential;
         console.log("ID Token:", idToken);
-
-        alert('¡Inicio de sesión con Google exitoso!);
+        // Corregido el error de comillas en el alert
+        alert('¡Inicio de sesión con Google exitoso!'); 
     }
 </script>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script src="@Url.Content("~/js/login.js")"></script>
 
