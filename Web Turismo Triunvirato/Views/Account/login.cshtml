@@ -42,21 +42,20 @@
 </div>
 
 <!-- Enlace a tu CSS de login -->
-<link rel="stylesheet" href="~/css/Login.css" />
-
-<!-- Script de Google Identity Services, necesario para el login con Google -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<!-- Tu script de login.js, que ahora debe incluir la función handleCredentialResponse -->
-<script src="~/js/login.js"></script>
+<link rel="stylesheet" href="~/css/Login.css" /> 
 
 <script>
-    // Esta función se activará después de que el usuario inicie sesión con Google
-    function handleCredentialResponse(response) {
-        // La credencial de Google se encuentra en response.credential
-        const idToken = response.credential;
-        console.log("ID Token:", idToken);
+    // Esta función debe estar definida en el ámbito global antes de que Google la busque.
+    function handleCredentialResponse(response) {
+        // La credencial de Google se encuentra en response.credential
+        const idToken = response.credential;
+        console.log("ID Token:", idToken);
 
-        alert('¡Inicio de sesión con Google exitoso!);
-    }
+        // Corregí la comilla simple mal cerrada en tu código original
+        alert('¡Inicio de sesión con Google exitoso!'); 
+    }
 </script>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script src="~/js/login.js"></script>
