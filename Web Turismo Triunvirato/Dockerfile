@@ -7,20 +7,21 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-# El .csproj está en la raíz, así que solo necesitas copiar el archivo directamente.
-COPY ["Web Turismo Triunvirato.csproj", "."]
-# El .csproj ahora se encuentra en el directorio raíz del contenedor.
-RUN dotnet restore "Web Turismo Triunvirato.csproj"
+# CORREGIDO: Usamos el nombre real del archivo (.csproj) con guiones bajos.
+COPY ["Web_Turismo_Triunvirato.csproj", "."]
+# CORREGIDO: Usamos el nombre del archivo con guiones bajos para el restore.
+RUN dotnet restore "Web_Turismo_Triunvirato.csproj"
 COPY . .
-# El WORKDIR también debe ser la raíz del proyecto.
-WORKDIR "/src"
-RUN dotnet build "Web Turismo Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# CORREGIDO: Usamos el nombre del archivo con guiones bajos para el build.
+RUN dotnet build "Web_Turismo_Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Web Turismo Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# CORREGIDO: Usamos el nombre del archivo con guiones bajos para el publish.
+RUN dotnet publish "Web_Turismo_Triunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Web Turismo Triunvirato.dll"]
+# CORREGIDO: Usamos el nombre del archivo base (DLL) con guiones bajos para el ENTRYPOINT.
+ENTRYPOINT ["dotnet", "Web_Turismo_Triunvirato.dll"]
