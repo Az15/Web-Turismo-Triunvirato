@@ -24,7 +24,7 @@
                         <a href="@company.CompanyUrl" target="_blank">
                             @if (!string.IsNullOrEmpty(company.ImageUrl))
                             {
-                                <img src="@company.ImageUrl" alt="@company.CompanyName" />
+                                <img src=@Url.Content(@company.ImageUrl) alt="@company.CompanyName" />
                             }
                             else
                             {
