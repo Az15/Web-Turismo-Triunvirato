@@ -283,7 +283,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return NotFound();
             }
 
-            await _dbContext.AbmFlightPromotionAsync(promotion, "DELETE");
+            await _dbContext.AbmFlightPromotionAsync(id, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de vuelo eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionFlights));
         }
