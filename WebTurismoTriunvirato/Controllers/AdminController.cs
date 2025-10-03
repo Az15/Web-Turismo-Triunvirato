@@ -277,11 +277,11 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionFlight(int id)
         {
-            var promotion = await _dbContext.FlightPromotions.FindAsync(id);
-            if (promotion == null)
-            {
-                return NotFound();
-            }
+            //var promotion = await _dbContext.FlightPromotions.FindAsync(id);
+            //if (promotion == null)
+            //{
+            //    return NotFound();
+            //}
 
             await _dbContext.AbmFlightPromotionAsync(id, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de vuelo eliminada exitosamente!";

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web Turismo Triunvirato", "Web Turismo Triunvirato\Web Turismo Triunvirato.csproj", "{1770938C-4F72-4DD5-82D2-049AC93F933D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebTurismoTriunvirato", "WebTurismoTriunvirato\WebTurismoTriunvirato.csproj", "{1770938C-4F72-4DD5-82D2-049AC93F933D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

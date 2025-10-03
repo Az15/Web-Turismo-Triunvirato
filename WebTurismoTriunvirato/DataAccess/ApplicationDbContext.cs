@@ -132,7 +132,6 @@ namespace Web_Turismo_Triunvirato.DataAccess
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("p_id", promotionFlight.Id > 0 ? (object)promotionFlight.Id : DBNull.Value),
-                new MySqlParameter("p_Whatsapp_Id", promotionFlight.Whatsapp_Id),
                 new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotionFlight.Description),
                 new MySqlParameter("p_whatsapp_id", promotionFlight.Whatsapp_Id),
@@ -148,6 +147,18 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 new MySqlParameter("p_isactive", promotionFlight.IsActive),
                 new MySqlParameter("p_stars", promotionFlight.Stars),
                 new MySqlParameter("p_typeexecuted", typeExecuted)
+            };
+            await Database.ExecuteSqlRawAsync(sql, parameters);
+        }
+
+        public async Task AbmFlightPromotionAsync(int id, string typeExecuted)
+        {
+           string sql = "CALL DeleteActivePromotionFlights(@p_id)";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("p_id", id),
+                //new MySqlParameter("p_typeexecuted", typeExecuted)
             };
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
