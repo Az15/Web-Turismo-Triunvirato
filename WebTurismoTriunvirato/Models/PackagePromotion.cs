@@ -13,25 +13,34 @@ namespace Web_Turismo_Triunvirato.Models
 
         public int Whatsapp_Id { get; set; } // El ID que agregaste
 
+       
+        [Required]
+        [Display(Name = "Tipo de servicio")]
+        public string ServiceType { get; set; } = "3"; // '3' para paquetes
+
         [Required]
         [Display(Name = "Tipo de Paquete")]
         // Para diferenciar entre los paquetes: "VueloYHotel" o "BusYHotel"
         public string PackageType { get; set; }
 
-        [Required]
-        [Display(Name = "Tipo de servicio")]
-        public string ServiceType { get; set; } = "3"; // '3' para paquetes
 
         [Required(ErrorMessage = "Descripción es requerida.")]
         [StringLength(200)]
         [Display(Name = "Descripción")]
         public string Description { get; set; }
 
+        //[Column("CompanyName")]
+        [Display(Name = "Empresa")]
+        [StringLength(100)]
+        public string? CompanyName { get; set; }
+
 
         [Required(ErrorMessage = "Destino es requerido.")]
         [StringLength(100)]
         [Display(Name = "Destino")]
         public string DestinationName { get; set; }
+
+   
 
         [Required(ErrorMessage = "Origen es requerido.")]
         [StringLength(100)]
@@ -70,14 +79,7 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Fecha de Fin")]
         public DateTime EndDate { get; set; } = DateTime.Today.AddMonths(1);
 
-
-
-        [Column("Company")]
-        [Display(Name = "Empresa")]
-        [StringLength(100)]
-        public string? CompanyName { get; set; }
-
-        // Nuevo campo para Nombre Hotel
+ 
         [Display(Name = "Nombre Hotel")]
         [StringLength(100)]
         public string? HotelName { get; set; }

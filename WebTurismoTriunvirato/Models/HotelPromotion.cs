@@ -21,16 +21,18 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Tipo de servicio")]
         public string ServiceType = "1";
 
+   
         [Required(ErrorMessage = "El nombre de destino es requerido.")]
         [StringLength(100)]
-        [Display(Name = "Nombre de Hotel")]
+        [Display(Name = "Destino")]
         public string DestinationName { get; set; }
 
-        // Las propiedades comentadas no se alteran, ya que no están activas en tu modelo
-        //[Required(ErrorMessage = "El nombre de origen es requerido.")]
-        //[StringLength(100)]
-        //[Display(Name = "Nombre de Origen")]
-        //public string OriginName { get; set; }
+
+        [Required(ErrorMessage = "El nombre del Hotel es requerido.")]
+        [StringLength(100)]
+        [Display(Name = "Nombre de Hotel")]
+        public string HotelName { get; set; }
+
 
         [StringLength(255)]
         [Display(Name = "URL de Imagen")]
@@ -77,7 +79,7 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Calificación")]
         [Range(1,5, ErrorMessage ="Es necesario dar una calificación entre 1 y 5")]
         [Required(ErrorMessage ="La calificacion tiene que ser mayor a uno")]
-        public int Stars = 0;
+        public int Stars ;
        
         [ValidateNever]
         [BindNever]
