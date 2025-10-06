@@ -892,7 +892,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             // Se llama al método ABM del DbContext para eliminar el paquete.
-            await _dbContext.AbmPackagePromotionAsync(promotion, "DELETE");
+            await _dbContext.AbmPackagePromotionAsync(id, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de paquete eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionPackages));
         }

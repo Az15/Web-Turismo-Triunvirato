@@ -27,7 +27,7 @@
                 <th>Descripción</th>
                 <th>Destino</th>
                 <th>Origen</th>
-                <th>Company</th>
+                <th>Empresa</th>
                 <th>Hotel</th>
                 <th>Precio Original</th>
                 <th>Precio Oferta</th>
@@ -46,26 +46,8 @@
                         <td>@item.Description</td>
                         <td>@item.DestinationName</td>
                         <td>@item.OriginName</td>
-                        <td>
-                        @if (!string.IsNullOrEmpty(item.CompanyName))
-                        {
-                                    <span>@item.CompanyName</span>
-                        }
-                        else
-                        {
-                                    <span>-</span>
-                        }
-                        </td>
-                        <td>
-                        @if (!string.IsNullOrEmpty(item.HotelName))
-                        {
-                                    <span>@item.HotelName</span>
-                        }
-                        else
-                        {
-                                    <span>-</span>
-                        }
-                        </td>
+                        <td>@item.CompanyName</td>
+                        <td>@item.HotelName</td>
                     <td>@item.OriginalPrice.ToString("C", new System.Globalization.CultureInfo("es-AR"))</td>
                     <td>@item.OfferPrice.ToString("C", new System.Globalization.CultureInfo("es-AR"))</td>
                         <td>@item.DiscountPercentage.ToString("F2")%</td>

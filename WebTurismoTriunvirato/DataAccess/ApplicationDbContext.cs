@@ -272,9 +272,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
 
             // Define la cadena SQL para llamar al Stored Procedure
             // He corregido la llamada al SP para usar solo los parámetros necesarios.
-            string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id " +
-                "@p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, " +
-                "@p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate,  @p_hotelname,@p_isactive, @p_typeexecuted)";
+            string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id ,@p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate,  @p_hotelname,@p_isactive, @p_typeexecuted)";
 
             var parameters = new MySqlParameter[]
             {
@@ -302,6 +300,17 @@ namespace Web_Turismo_Triunvirato.DataAccess
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
+        public async Task AbmPackagePromotionAsync(int id, string typeExecuted)
+        {
+            string sql = "CALL DeleteActivePackagePromotions(@p_id)";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("p_id", id),
+                //new MySqlParameter("p_typeexecuted", typeExecuted)
+            };
+            await Database.ExecuteSqlRawAsync(sql, parameters);
+        }
 
 
 
