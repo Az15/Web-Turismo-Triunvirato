@@ -24,11 +24,11 @@ namespace Web_Turismo_Triunvirato.Models
         [StringLength(100, ErrorMessage = "El origen no puede exceder 100 caracteres.")]
         public string OriginName { get; set; }
 
-        [Display(Name = "URL de la Imagen")]
+        [Display(Name = "Imagen")]
         [StringLength(255, ErrorMessage = "La URL de la imagen no puede exceder 255 caracteres.")]
         public string ImageUrl { get; set; }
 
-        [Display(Name = "Es Hot Week")]
+        [Display(Name = "Esta en oferta")]
         public bool IsHotWeek { get; set; } = false;
 
         // Propiedades ya existentes para precios y fechas

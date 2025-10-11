@@ -34,8 +34,8 @@
             </div>
 
             <div class="mb-3">
-                <label for="WhatsappId" class="form-label">Mensaje de Whatsapp</label>
-                <select id="WhatsappId" name="WhatsappId" class="form-select" asp-items="ViewBag.WhatsappMessages">
+                <label for="Whatsapp_Id" class="form-label">Mensaje de Whatsapp</label>
+                <select id="Whatsapp_Id" name="Whatsapp_Id" class="form-select" asp-items="ViewBag.WhatsappMessages">
                     <option value="">-- Seleccionar un mensaje --</option>
                 </select>
                 <span class="text-danger"></span>
@@ -53,7 +53,10 @@
                     </div>
                 }
             </div>
-
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" asp-for="Is_Active" />
+                <label class="form-check-label" asp-for="Is_Active"></label>
+            </div>
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save me-2"></i>

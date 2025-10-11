@@ -34,11 +34,11 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Origen")]
         public string OriginName { get; set; }
 
-        [Display(Name = "URL de Imagen")]
+        [Display(Name = "Imagen Referencia")]
         [StringLength(255)]
         public string ImageUrl { get; set; }
 
-        [Display(Name = "Es Hot Week")]
+        [Display(Name = "Esta en oferta?")]
         public bool IsHotWeek { get; set; } = false;
 
         [Required(ErrorMessage = "Precio original es requerido.")]

@@ -30,15 +30,87 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
-            if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-            {
-                return RedirectToAction("Index", "Admin");
-            }
+            // ... (Lógica de autenticación/redirección) ...
 
             var Carousel = await _dbContext.GetCarouselItemsAsync();
-
             var Destinys = await _dbContext.GetHotDestinyItemsAsync();
+
+            // Diccionario para almacenar en caché las plantillas de WhatsApp ya cargadas (WhatsappId -> WhatsappMessage)
+            var whatsappTemplatesCache = new Dictionary<int, WhatsappMessage>();
+
+            // --- 1. Procesar Carrousel ---
+            foreach (var item in Carousel)
+            {
+                // Asumo que el objeto item tiene una propiedad "WhatsappId"
+                int itemWhatsappId = item.Whatsapp_Id; // **Asegúrate de que esta propiedad exista en tu modelo**
+
+                if (itemWhatsappId > 0)
+                {
+                    WhatsappMessage template;
+
+                    // Intentar obtener la plantilla de la caché
+                    if (!whatsappTemplatesCache.TryGetValue(itemWhatsappId, out template))
+                    {
+                        // Si no está en caché, buscar en la BD y agregar a la caché
+                        template = await _dbContext.GetWhatsappMessageByIdAsync(itemWhatsappId);
+                        if (template != null)
+                        {
+                            whatsappTemplatesCache.Add(itemWhatsappId, template);
+                        }
+                    }
+
+                    // Renderizar el mensaje si la plantilla fue encontrada
+                    if (template != null)
+                    {
+                        item.RenderedWhatsappMessage = WhatsappMessage.RenderWts(template.Message_Template, item);
+                    }
+                    else
+                    {
+                        item.RenderedWhatsappMessage = "¡Descubre este destino increíble con nosotros!";
+                    }
+                }
+                else
+                {
+                    item.RenderedWhatsappMessage = "No se encontro un mensaje para esta ubicación";
+                }
+            }
+
+            // --- 2. Procesar Destinys ---
+            foreach (var item in Destinys)
+            {
+                // Asumo que el objeto item tiene una propiedad "WhatsappId"
+                int itemWhatsappId = item.Whatsapp_Id; // **Asegúrate de que esta propiedad exista en tu modelo**
+
+                if (itemWhatsappId > 0)
+                {
+                    WhatsappMessage template;
+
+                    // Intentar obtener la plantilla de la caché
+                    if (!whatsappTemplatesCache.TryGetValue(itemWhatsappId, out template))
+                    {
+                        // Si no está en caché, buscar en la BD y agregar a la caché
+                        template = await _dbContext.GetWhatsappMessageByIdAsync(itemWhatsappId);
+                        if (template != null)
+                        {
+                            whatsappTemplatesCache.Add(itemWhatsappId, template);
+                        }
+                    }
+
+                    // Renderizar el mensaje si la plantilla fue encontrada
+                    if (template != null)
+                    {
+                        item.RenderedWhatsappMessage = WhatsappMessage.RenderWts(template.Message_Template, item);
+                    }
+                    else
+                    {
+                                                item.RenderedWhatsappMessage = "¡Descubre este destino increíble con nosotros!";
+                    }
+                }
+                else
+                {
+                    item.RenderedWhatsappMessage = "No se encontro un mensaje para esta ubicación";
+                }
+            }
 
             var collection_Index = new View_Index_Collection
             {

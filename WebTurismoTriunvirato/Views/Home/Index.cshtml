@@ -30,7 +30,17 @@
                     <img src="@item.ImageUrl" class="d-block w-100" alt="@item.AltText">
                     <div class="carousel-caption d-flex flex-column justify-content-end h-100">
                         <h5>@item.Title</h5>
-                        <p><a href="@item.LinkUrl">Más información</a></p>
+
+
+                         <!--Aca vamos a tocar-->
+                        @{
+                            var whatsappNumber = "+541122296405";
+                            var encodedMessage = Uri.EscapeDataString(item.RenderedWhatsappMessage);
+                            var whatsappLink = $"https://wa.me/{whatsappNumber}?text={encodedMessage}";
+                        }
+                        <p><a href="@whatsappLink" target="_blank">Más información</a></p>
+
+                        <!--Aca vamos a tocar-->
                     </div>
                 </div>
                 carouselItemCount++;
@@ -83,7 +93,19 @@
                                     @item.From
                                 </p>
                             </div>
-                            <a href="@item.DetailDestinyURL" class="btn btn-primary btn-sm w-100">Ver más</a>
+                            @{
+                                var whatsappNumber = "+541122296405";
+                                var encodedMessage = Uri.EscapeDataString(item.RenderedWhatsappMessage);
+                                var whatsappLink = $"https://wa.me/{whatsappNumber}?text={encodedMessage}";
+                            }
+
+                            <!--Aca vamos a modificar el destino.-->
+
+                            <a href="@whatsappLink" class="btn btn-primary btn-sm w-100" target="_blank">Ver más</a>
+
+
+                            <!--Aca vamos a tocar-->
+
                         </div>
                     </div>
                 </div>

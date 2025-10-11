@@ -1050,13 +1050,8 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AltaActividad([Bind("Id,Title, Is_Active, Description,Whatsapp_Id,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
+        public async Task<IActionResult> AltaActividad([Bind("Id,Title,Description,Whatsapp_Id,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
         {
-            if (ImageFile != null && Actividad.ImageUrl == null)
-            {
-                ModelState.Remove("ImageUrl");
-            }
-
             if (ModelState.IsValid)
             {
                 if (ImageFile != null && ImageFile.Length > 0)
@@ -1121,15 +1116,11 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Se modifica el método de edición para aceptar el IFormFile.
-        public async Task<IActionResult> EditActividad(int id, [Bind("Id,Title, Is_Active, Description,Whatsapp_Id,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
+        public async Task<IActionResult> EditActividad(int id, [Bind("Id,Title,Description,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
         {
             if (id != Actividad.Id)
             {
                 return NotFound();
-            }
-            if (ImageFile == null && Actividad.ImageUrl != null)
-            {
-                ModelState.Remove("imageFile");
             }
 
             if (ModelState.IsValid)
@@ -1187,21 +1178,6 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                 }
             }
-            // Obtener la lista de mensajes de WhatsApp activos
-            var whatsappMessages = await _dbContext.WhatsappMessages
-                .Where(m => m.Is_Active)
-                .OrderBy(m => m.Title)
-                .ToListAsync();
-
-            // Crear una lista de SelectListItem para el dropdown
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
-            {
-                Value = m.Id.ToString(),
-                Text = m.Title
-            }).ToList();
-
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
-            ViewBag.WhatsappMessages = whatsappList;
             ViewData["Title"] = "Editar Actividad";
             return View("AltaActividad", Actividad);
         }
@@ -1231,6 +1207,22 @@ namespace Web_Turismo_Triunvirato.Controllers
             TempData["SuccessMessage"] = "¡Actividad eliminada exitosamente!";
             return RedirectToAction(nameof(AdminActivities));
         }
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteActividad(int id)
+        //{
+        //    //var promotion = await _dbContext.FlightPromotions.FindAsync(id);
+        //    //if (promotion == null)
+        //    //{
+        //    //    return NotFound();
+        //    //}
+
+        //    await _dbContext.AbmFlightPromotionAsync(id, "DELETE");
+        //    TempData["SuccessMessage"] = "¡Promoción de vuelo eliminada exitosamente!";
+        //    return RedirectToAction(nameof(AdminPromotionFlights));
+        //}
 
         [HttpGet]
         public IActionResult Whatsapp()
@@ -1483,17 +1475,10 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             // Carga el elemento existente del DbContext
             var existingItem = await _dbContext.View_DestinationCarouselItems.FindAsync(model.Id);
-
             if (existingItem == null)
             {
                 return NotFound();
             }
-
-            if(imageFile == null && model.ImageUrl != null)
-            {
-                ModelState.Remove("imageFile");
-            }
-
 
             if (ModelState.IsValid)
             {
