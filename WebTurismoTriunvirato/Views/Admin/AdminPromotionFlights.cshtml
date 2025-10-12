@@ -7,6 +7,13 @@
 <div class="container mt-4">
     <h2 class="mb-4">@ViewData["Title"]</h2>
 
+
+    <p>
+        <a asp-action="AltaPromotionFlight" class="btn btn-success">Crear Nueva Promoción</a>
+
+    </p>
+
+
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -14,6 +21,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
+
 
     @if (Model != null && Model.Any())
     {

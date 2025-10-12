@@ -71,13 +71,15 @@
 
                  @*    <a href="@($"https://wa.me/+541122296405?text=Hola, te hablo de la web, me interesaría tener más información para hospedarme en {System.Web.HttpUtility.UrlEncode(promotion.Description)} En  {System.Web.HttpUtility.UrlEncode(promotion.DestinationName)} vi que el precio es {System.Web.HttpUtility.UrlEncode(@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")))} ")" target="_blank"> *@
                     <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" target="_blank">
-                     <div class="image-container">
-                       
-                            <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.Description">
+                        <div class="image-container">
+                            <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
                             <div class="image-overlay">
-                                <h3>@promotion.Description</h3>
-                                <p class="price">@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</p>
-                                <p class="from">Ubicación @promotion.DestinationName</p> 
+                                @* <h3>@promotion.DestinationName</h3> *@
+                                <p class="price">@promotion.OfferPrice.ToString("C0")</p>
+                                <p class="from"> @promotion.DestinationName</p>
+                                <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> Consultar
+                                </a>
                             </div>
                         </div>
                     </a>

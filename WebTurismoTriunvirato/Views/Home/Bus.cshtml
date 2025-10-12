@@ -70,13 +70,16 @@
                     {
                         <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span> 
                     }
-                         <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" target="_blank"> 
+                         <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" target="_blank">
                         <div class="image-container">
                             <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
                             <div class="image-overlay">
-                                <h3>@promotion.DestinationName</h3>
-                                <p class="price">@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</p>
-                                <p class="from">Desde @promotion.OriginName</p>
+                                 <h3>@promotion.OriginName</h3> 
+                                <p class="price">@promotion.OfferPrice.ToString("C0")</p>
+                                <p class="from"> @promotion.DestinationName</p>
+                                <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> Consultar
+                                </a>
                             </div>
                         </div>
                     </a>
