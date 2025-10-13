@@ -3,7 +3,7 @@
 @{
     // Unificamos la acción para siempre usar SubmitPromotionHotel,
     // ya que el Controller maneja el INSERT/UPDATE basado en Model.Id
-    var action = "SubmitPromotionHotel";
+    var action = Model.Id == 0 ? "SubmitPromotionHotel" : "EditPromotionHotel";
     ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Hotel" : "Editar Promoción de Hotel";
 }
 

@@ -79,8 +79,8 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Calificación")]
         [Range(1,5, ErrorMessage ="Es necesario dar una calificación entre 1 y 5")]
         [Required(ErrorMessage ="La calificacion tiene que ser mayor a uno")]
-        public int Stars ;
-       
+        public int Stars { get; set; }
+
         [ValidateNever]
         [BindNever]
         [NotMapped]
