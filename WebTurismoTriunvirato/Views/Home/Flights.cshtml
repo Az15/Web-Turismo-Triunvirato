@@ -1,4 +1,4 @@
-@model IEnumerable<Web_Turismo_Triunvirato.Models.FlightPromotion>  
+@model IEnumerable<Web_Turismo_Triunvirato.Models.FlightPromotion> 
 
 @{
     ViewData["Title"] = "Vuelos";
@@ -56,30 +56,32 @@
     <div class="destinations-grid">
         @if (Model != null && Model.Any())
         {
-
-            @foreach (var promotion in Model) @* Iteramos sobre las promociones *@
+            @foreach (var promotion in Model)
             {
                 <div class="destination-card">
                     @if (promotion.IsHotWeek)
                     {
-                        <span class="hot-week-badge">HOT WEEK</span>
+                        <span class="hot-week-badge">HOT WEEK</span> @* <-- ESTO ES LO QUE DEBES CAMBIAR *@
                     }
                     else if (promotion.DiscountPercentage > 0)
                     {
-                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span> 
+                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span> @* <-- ESTO ES LO QUE DEBES CAMBIAR *@
                     }
-                    @* <a href="@($"https://wa.me/+541122296405?text=Hola, te hablo de la web, me interesaría tener más información para viajar en avion desde {System.Web.HttpUtility.UrlEncode(promotion.OriginName)} hasta  {System.Web.HttpUtility.UrlEncode(promotion.DestinationName)} vi que el precio es {System.Web.HttpUtility.UrlEncode(@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")))} ")" target="_blank"> *@
-                        <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" target="_blank">
+                    @* <a href="@($"https://wa.me/+541122296405?text=Hola, te hablo de la web, me interesaría tener más información para viajar en avion desde {System.Web.HttpUtility.UrlEncode(promotion.OriginName)} hasta  {System.Web.HttpUtility.UrlEncode(promotion.DestinationName)} vi que el precio es {System.Web.HttpUtility.UrlEncode(@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")))} ")" target="_blank"> *@
+                    <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" target="_blank">
                         <div class="image-container">
                             <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
                             <div class="image-overlay">
                                 <h3>@promotion.DestinationName</h3>
-                                <p class="price">@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</p>
+                                <p class="price">@promotion.OfferPrice.ToString("C0")</p>
                                 <p class="from">Desde @promotion.OriginName</p>
+                                <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
+                                    <i class="fab fa-whatsapp"></i> Consultar
+                                </a>
                             </div>
                         </div>
                     </a>
-              
+
                     @* <a href="#" class="btn btn-success ver-detalles-button">Ver Detalles</a> *@
                 </div>
             }
@@ -92,8 +94,3 @@
     </div>
 </section>
 
-@* Si aún usas el viewModel DestinationsViewModel en algún otro lugar de la vista
-   y quieres mantenerlo por alguna razón, podrías adaptarlo.
-   Pero lo ideal es que la vista reciba directamente el modelo que va a renderizar.
-   En este caso, IEnumerable<Promotion> es lo más directo.
-*@

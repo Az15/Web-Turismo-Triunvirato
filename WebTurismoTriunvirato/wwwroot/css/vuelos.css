@@ -1,4 +1,4 @@
-/*
+/*css funciona
  * Sección de búsqueda de vuelos
  * CSS actualizado para subir el botón de búsqueda a la misma línea de los filtros.
  */
@@ -108,7 +108,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.2s ease-in-out;
-    position: relative;
+    position: relative; /* ¡CLAVE! Establece el contexto para los elementos absolutos */
 }
 
     .destination-card:hover {
@@ -163,7 +163,7 @@
         background-color: transparent;
     }
 
-    .destination-card .view-details-button {
+    .destination-card .view-detalles-button {
         display: block;
         background-color: #28a745;
         color: #fff;
@@ -179,18 +179,32 @@
         width: 100%;
     }
 
-        .destination-card .view-details-button:hover {
+        .destination-card .view-detalles-button:hover {
             background-color: #1e7e34;
         }
 
-.hot-week-badge {
-    position: absolute;
+/* ---------------------------------------------------- */
+/* --- AJUSTES DE BADGES (Hot Week y Descuento) --- */
+/* ---------------------------------------------------- */
+
+.hot-week-badge,
+.discount-badge {
+    position: absolute; /* CLAVE: Saca el elemento del flujo normal del documento */
     top: 10px;
     left: 10px;
-    background-color: #dc3545;
     color: #fff;
     padding: 5px 10px;
     border-radius: 4px;
     font-size: 0.8em;
-    z-index: 1;
+    z-index: 10; /* Asegura que esté por encima de la imagen y el overlay */
+    font-weight: bold;
+}
+
+.hot-week-badge {
+    background-color: #dc3545; /* Rojo de Hot Week */
+}
+
+.discount-badge {
+    background-color: #ffc107; /* Amarillo para el descuento */
+    color: #333; /* Texto oscuro para contraste */
 }

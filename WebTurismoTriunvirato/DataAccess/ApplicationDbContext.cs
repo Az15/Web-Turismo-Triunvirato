@@ -173,14 +173,14 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 throw new ArgumentException("El ServiceType del hotel debe ser un valor numérico.", nameof(promotion.ServiceType));
             }
 
-            string sql = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_whatsapp_id, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
+            string sql = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_whatsapp_Id, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_stars , @p_isactive, @p_typeexecuted)";
                                
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
                 new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
                 new MySqlParameter("p_description", promotion.Description),
-                new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
+                new MySqlParameter("p_whatsapp_Id", promotion.Whatsapp_Id),
                 new MySqlParameter("p_destinationname",promotion.DestinationName),
                 new MySqlParameter("p_hotelname",promotion.HotelName),
                 new MySqlParameter("p_imageurl", promotion.ImageUrl),
@@ -190,8 +190,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
                 new MySqlParameter("p_startdate", promotion.StartDate),
                 new MySqlParameter("p_enddate", promotion.EndDate),
-                new MySqlParameter("p_isactive", promotion.IsActive),
                 new MySqlParameter("p_stars", promotion.Stars),
+                new MySqlParameter("p_isactive", promotion.IsActive),                
                 new MySqlParameter("p_typeexecuted", typeExecuted)
             };
 
