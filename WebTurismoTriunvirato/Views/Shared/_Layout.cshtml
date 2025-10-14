@@ -34,13 +34,13 @@
                     @if (!User.Identity.IsAuthenticated)
                     {
                         <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                            <i class="fas fa-compass"></i> Turismo Triunvirato
+                            <img src="/images/icono/iconofinal.png" alt="" class="icono-personalizado"> Turismo Triunvirato
                         </a>
                     }
                     else
                     {
                         <a class="navbar-brand" asp-controller="Admin" asp-action="Index">
-                            <i class="fas fa-compass"></i> Turismo Triunvirato
+                            <img src="/images/icono/iconofinal.png" alt="" class="icono-personalizado"> Turismo Triunvirato
                         </a>
                     }
 
@@ -48,9 +48,6 @@
 
                     </div>
 
-                    <div class="search-container">
-                        <input class="form-control search-input" type="search" placeholder="Buscar destinos" aria-label="Buscar" />                       
-                    </div>
 
                     <div class="d-flex align-items-center">
                         <div class="navbar-nav d-flex flex-row">

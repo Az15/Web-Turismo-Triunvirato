@@ -34,6 +34,7 @@
     margin-right: auto; /* Empuja el buscador hacia la izquierda, logrando el centrado */
 }
 
+
     .search-container .search-input {
         border: none;
         padding: 8px 15px;
@@ -85,6 +86,17 @@
 .dropdown-menu {
     left: auto !important; /* Alinea el menú desplegable a la derecha */
     right: 0 !important;
+}
+
+
+.icono-personalizado {
+    /* Define el ancho y el alto. Ajustá estos valores a tu gusto. */
+    width: 32px;
+    height: 32px;
+    /* Para que el icono se mantenga dentro de su contenedor sin deformarse */
+    object-fit: contain;
+    /* Opcional: Para alinearlo como un texto si está en una línea */
+    vertical-align: middle;
 }
 
 /* Media query para pantallas de hasta 768px (típicamente móviles y tablets pequeñas) */

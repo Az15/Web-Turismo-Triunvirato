@@ -73,7 +73,7 @@
                             <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
                             <div class="image-overlay">
                                 <h3>@promotion.DestinationName</h3>
-                                <p class="price">@promotion.OfferPrice.ToString("C0")</p>
+                                <p class="price">@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</p>
                                 <p class="from">Desde @promotion.OriginName</p>
                                 <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
                                     <i class="fab fa-whatsapp"></i> Consultar
