@@ -75,3 +75,11 @@
 .activity-card.hidden {
     display: none;
 }
+
+/* --- SOLUCIÓN PARA ELIMINAR EL SUBRAYADO --- */
+
+/* Aplica el estilo al enlace (<a>) que está inmediatamente dentro del contenedor de la tarjeta (.activity-card) */
+.activity-card > a {
+    text-decoration: none !important; /* Quita el subrayado y fuerza la anulación */
+    color: inherit; /* Hereda el color del texto del padre (negro) */
+}

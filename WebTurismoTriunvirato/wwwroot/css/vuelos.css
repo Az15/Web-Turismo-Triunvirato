@@ -110,6 +110,11 @@
     transition: transform 0.2s ease-in-out;
     position: relative; /* ¡CLAVE! Establece el contexto para los elementos absolutos */
 }
+    .destination-card a {
+        text-decoration: none !important; /* ELIMINA EL SUBRAYADO FORZADAMENTE */
+        color: inherit; /* Asegura que el texto herede el color (y no se ponga azul) */
+    }
+
 
     .destination-card:hover {
         transform: scale(1.02);
@@ -164,6 +169,7 @@
     }
 
     .destination-card .view-detalles-button {
+        text-decoration: none !important;
         display: block;
         background-color: #28a745;
         color: #fff;
