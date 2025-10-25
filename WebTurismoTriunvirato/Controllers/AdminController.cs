@@ -228,7 +228,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    promotion.ImageUrl = "/img/PromocionesVuelos/" + uniqueFileName;
+                    promotion.ImageUrl = "img/PromocionesVuelos/" + uniqueFileName;
                 }
 
                 try
@@ -371,7 +371,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     await ImageFile.CopyToAsync(fileStream);
                 }
                 // Asignar la nueva URL al modelo ANTES de la validación
-                promotion.ImageUrl = "/img/PromocionesHoteles/" + uniqueFileName;
+                promotion.ImageUrl = "img/PromocionesHoteles/" + uniqueFileName;
 
                 // Quitar ImageUrl del ModelState si se subió el archivo
                 ModelState.Remove("ImageUrl");
@@ -463,7 +463,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    promotion.ImageUrl = "/img/PromocionesHoteles/" + uniqueFileName;
+                    promotion.ImageUrl = "img/PromocionesHoteles/" + uniqueFileName;
                 }
 
                 try
@@ -629,7 +629,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     await ImageFile.CopyToAsync(fileStream);
                 }
-                promotion.ImageUrl = "/img/PromocionesBuses/" + uniqueFileName;
+                promotion.ImageUrl = "img/PromocionesBuses/" + uniqueFileName;
             }
             else
             {
