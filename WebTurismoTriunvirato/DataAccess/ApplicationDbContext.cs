@@ -331,7 +331,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public async Task AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
         {
             // Cambiamos el nombre del SP
-            string sql = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_whatsapp_id, @p_location, @p_imageurl, @p_typeexecuted)";
+            string sql = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_whatsapp_id, @p_location, @p_imageurl, @p_typeexecuted,@p_isactive)";
 
             var parameters = new MySqlParameter[]
             {
@@ -341,11 +341,26 @@ namespace Web_Turismo_Triunvirato.DataAccess
         new MySqlParameter("p_whatsapp_id", activity.Whatsapp_Id),
         new MySqlParameter("p_location", activity.Location),
         new MySqlParameter("p_imageurl", activity.ImageUrl),
+        new MySqlParameter("p_isactive", activity.IsActive),
         new MySqlParameter("p_typeexecuted", typeExecuted)
             };
 
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
+
+
+        //public async Task AbmActivityAsync(int id, string typeExecuted)
+        //{
+        //    string sql = "CALL DeleteActiveActivitiesPromotion(@p_id)";
+
+        //    var parameters = new MySqlParameter[]
+        //    {
+        //        new MySqlParameter("p_id", id),
+        //        //new MySqlParameter("p_typeexecuted", typeExecuted)
+        //    };
+        //    await Database.ExecuteSqlRawAsync(sql, parameters);
+        //}
+
 
         // NUEVO MÉTODO para obtener una promoción de bus por ID
         public async Task<BusPromotion> GetBusPromotionByIdAsync(int id)

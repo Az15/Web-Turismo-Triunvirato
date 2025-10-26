@@ -18,8 +18,8 @@ namespace Web_Turismo_Triunvirato.Models
         [DisplayName("Mensaje de Whatsapp")]
         public int Whatsapp_Id { get; set; } // El ID que agregaste
 
-        [DisplayName("Activo")]
-        public bool Is_Active { get; set; } // Campo para indicar si la promoción está activa
+        //[DisplayName("Activo")]
+        //public bool Is_Active { get; set; } // Campo para indicar si la promoción está activa
 
         // Título de la actividad. Este campo es obligatorio.
         [DisplayName("Titulo")]
@@ -41,6 +41,9 @@ namespace Web_Turismo_Triunvirato.Models
         // sin una URL inicial.
         [DisplayName("Eliga una imagen")]
         public string? ImageUrl { get; set; }
+
+        [Display(Name = "Está Activo")]
+        public bool IsActive { get; set; } = true;
 
 
         [BindNever]

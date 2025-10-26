@@ -1079,7 +1079,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AltaActividad([Bind("Id,Title, Is_Active, Description,Whatsapp_Id,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
+        public async Task<IActionResult> AltaActividad([Bind("Id,Title, Description,Whatsapp_Id,Location,ImageUrl,IsActive")] ActivitiesPromotion Actividad, IFormFile ImageFile)
         {
             if (ImageFile != null && Actividad.ImageUrl == null)
             {
@@ -1150,7 +1150,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Se modifica el método de edición para aceptar el IFormFile.
-        public async Task<IActionResult> EditActividad(int id, [Bind("Id,Title, Is_Active, Description,Whatsapp_Id,Location,ImageUrl")] ActivitiesPromotion Actividad, IFormFile ImageFile)
+        public async Task<IActionResult> EditActividad(int id, [Bind("Id,Title, Description,Whatsapp_Id,Location,ImageUrl,IsActive")] ActivitiesPromotion Actividad, IFormFile ImageFile)
         {
             if (id != Actividad.Id)
             {
