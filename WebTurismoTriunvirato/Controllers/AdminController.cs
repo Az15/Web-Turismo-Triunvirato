@@ -215,7 +215,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 // Lógica para manejar la subida de la nueva imagen
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/PromocionesVuelos");
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesVuelos");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -228,7 +228,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    promotion.ImageUrl = "img/PromocionesVuelos/" + uniqueFileName;
+                    promotion.ImageUrl = "/img/PromocionesVuelos/" + uniqueFileName;
                 }
 
                 try
@@ -358,7 +358,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             // 1. Manejar la subida de la imagen si se proporcionó un archivo
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/PromocionesHoteles");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -371,7 +371,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     await ImageFile.CopyToAsync(fileStream);
                 }
                 // Asignar la nueva URL al modelo ANTES de la validación
-                promotion.ImageUrl = "img/PromocionesHoteles/" + uniqueFileName;
+                promotion.ImageUrl = "/img/PromocionesHoteles/" + uniqueFileName;
 
                 // Quitar ImageUrl del ModelState si se subió el archivo
                 ModelState.Remove("ImageUrl");
@@ -449,7 +449,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
         
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/PromocionesHoteles");
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -463,7 +463,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    promotion.ImageUrl = "img/PromocionesHoteles/" + uniqueFileName;
+                    promotion.ImageUrl = "/img/PromocionesHoteles/" + uniqueFileName;
                 }
 
                 try
@@ -617,7 +617,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (ImageFile != null )
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/PromocionesBuses");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesBuses");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -629,7 +629,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     await ImageFile.CopyToAsync(fileStream);
                 }
-                promotion.ImageUrl = "img/PromocionesBuses/" + uniqueFileName;
+                promotion.ImageUrl = "/img/PromocionesBuses/" + uniqueFileName;
             }
             else
             {
@@ -837,28 +837,68 @@ namespace Web_Turismo_Triunvirato.Controllers
         // Método POST para la edición de una promoción de paquete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
-        public async Task<IActionResult> EditPromotionPackage(int id, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+        public async Task<IActionResult> EditPromotionPackage(
+           int id,
+           IFormFile ImageFile, // <-- ARCHIVO RECIBIDO POR SEPARADO
+           [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
             if (id != promotion.Id)
             {
                 return NotFound();
             }
 
+            // Si no se sube un nuevo archivo, eliminamos el error de validación para ImageUrl y ImageFile
+            if (promotion.ImageUrl == null)
+            {
+                ModelState.Remove("ImageUrl");
+            }
+            if (ImageFile == null)
+            {
+                ModelState.Remove("ImageFile");
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Se recalcula el porcentaje de descuento en caso de que los precios se hayan modificado.
+                    // Lógica para manejar la subida de la nueva imagen
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Paquetes"); // Ruta
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+                        var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(fileStream);
+                        }
+
+                        // Se actualiza la URL del modelo con la nueva imagen
+                        promotion.ImageUrl = "/img/Paquetes/" + uniqueFileName;
+                    }
+                    else
+                    {
+                        // Si NO se subió un archivo nuevo, debemos cargar la URL antigua
+                        // 1. Obtenemos el registro existente SÓLO para su ImageUrl
+                        var existingPromotion = await _dbContext.GetPackagePromotionByIdAsync(id);
+                        if (existingPromotion != null)
+                        {
+                            // 2. Mantenemos la URL anterior
+                            promotion.ImageUrl = existingPromotion.ImageUrl;
+                        }
+                        // Si el registro no existe, el error será manejado por el Abm más abajo.
+                    }
+
                     if (promotion.OriginalPrice > 0)
                     {
                         promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                     }
+                    promotion.ServiceType = "3"; // Tipo de servicio de paquetes
 
-                    // El tipo de servicio para los paquetes es "3".
-                    promotion.ServiceType = "3";
-
-                    // Se llama al método ABM del DbContext para actualizar el paquete.
                     await _dbContext.AbmPackagePromotionAsync(promotion, "UPDATE");
                     TempData["SuccessMessage"] = "¡Promoción de paquete actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminPromotionPackages));
@@ -874,33 +914,22 @@ namespace Web_Turismo_Triunvirato.Controllers
                         throw;
                     }
                 }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al actualizar la promoción o al guardar la imagen: " + ex.Message);
+                }
             }
 
+            // Si el modelo es inválido, vuelve a cargar la vista
+            // await CargarWhatsappMessages(); 
             ViewData["Title"] = "Editar Promoción de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
 
-        // Método POST para la eliminación de una promoción de paquete
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeletePromotionPackage(int id)
-        {
-            var promotion = await _dbContext.PackagePromotions.FindAsync(id);
-            if (promotion == null)
-            {
-                return NotFound();
-            }
 
-            // Se llama al método ABM del DbContext para eliminar el paquete.
-            await _dbContext.AbmPackagePromotionAsync(id, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de paquete eliminada exitosamente!";
-            return RedirectToAction(nameof(AdminPromotionPackages));
-        }
-    
+        ///////////// NUEVAS ACCIONES PARA LA GESTIÓN DE ENCOMIENDAS  ////////////////////////////////////////////
 
-    ///////////// NUEVAS ACCIONES PARA LA GESTIÓN DE ENCOMIENDAS  ////////////////////////////////////////////
-
-    [HttpGet]
+        [HttpGet]
     public async Task<IActionResult> AdminEncomiendas()
     {
         ViewData["Title"] = "Administrar Empresas de Encomiendas";
@@ -1061,7 +1090,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/Actividades");
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Actividades");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -1140,7 +1169,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
                         // Lógica para guardar la nueva imagen (similar a AltaActividad).
-                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/Actividades");
+                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Actividades");
                         if (!Directory.Exists(uploadsFolder))
                         {
                             Directory.CreateDirectory(uploadsFolder);
@@ -1379,7 +1408,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             if (ModelState.IsValid && imageFile != null && imageFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/");
                 var uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -1428,7 +1457,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             // Lógica para guardar la imagen
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/");
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/");
 
             // Asegúrate de que la carpeta de destino exista
             if (!Directory.Exists(uploadsFolder))
@@ -1529,7 +1558,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 // Actualiza los demás campos
                 existingItem.Title = model.Title;
                 existingItem.AltText = model.AltText;
-                existingItem.LinkUrl = model.LinkUrl;
+                //existingItem.LinkUrl = model.LinkUrl;
                 existingItem.IsActive = model.IsActive;
 
                 _dbContext.Entry(existingItem).State = EntityState.Modified;

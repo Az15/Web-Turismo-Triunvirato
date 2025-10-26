@@ -16,7 +16,7 @@
                     <th>ID</th>
                     <th>Imagen</th>
                     <th>Título</th>
-                    <th>Enlace</th>
+                    @* <th>Enlace</th> *@
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -30,7 +30,7 @@
                             <img src="@Url.Content(item.ImageUrl)" alt="@item.AltText" style="width: 100px; height: auto;" />
                         </td>
                         <td>@item.Title</td>
-                        <td>@item.LinkUrl</td>
+                        @* <td>@item.LinkUrl</td> *@
                         <td>
                             <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
                                 @(item.IsActive ? "Activo" : "Inactivo")
