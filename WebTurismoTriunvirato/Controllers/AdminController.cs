@@ -148,14 +148,45 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionFlight([Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionFlight(
+    IFormFile ImageFile, // ¡Añadido! Debe ir como primer parámetro
+    [Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
         {
+            // === Lógica de Subida de Imagen ===
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                // 🛑 CRÍTICO: Corregido el Path.Combine para Linux (sin '/') y en minúsculas
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(fileStream); // <-- Aquí puede fallar por permisos
+                }
+
+                // 🛑 CRÍTICO: URL de la DB en minúsculas para consistencia en Linux
+                promotion.ImageUrl = "/img/promocionesvuelos/" + uniqueFileName;
+                ModelState.Remove("ImageUrl");
+            }
+            else
+            {
+                // Si es un nuevo registro y no hay imagen, lanza error de validación
+                if (promotion.Id == 0)
+                {
+                    ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción de Vuelo.");
+                }
+            }
+            // ===================================
+
             if (ModelState.IsValid)
             {
-                if (promotion.OriginalPrice > 0)
-                {
-                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
-                }
+                // ... (Tu lógica de cálculo de descuento) ...
                 promotion.ServiceType = "0";
 
                 await _dbContext.AbmFlightPromotionAsync(promotion, "INSERT");
@@ -164,21 +195,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return RedirectToAction(nameof(AdminPromotionFlights));
             }
 
-            // Obtener la lista de mensajes de WhatsApp activos
-            var whatsappMessages = await _dbContext.WhatsappMessages
-                .Where(m => m.Is_Active)
-                .OrderBy(m => m.Title)
-                .ToListAsync();
-
-            // Crear una lista de SelectListItem para el dropdown
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
-            {
-                Value = m.Id.ToString(),
-                Text = m.Title
-            }).ToList();
-
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
-            ViewBag.WhatsappMessages = whatsappList;
+            // ... (Tu lógica para recargar ViewBag.WhatsappMessages si falla el ModelState) ...
             ViewData["Title"] = "Alta de Promoción de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
@@ -215,7 +232,9 @@ namespace Web_Turismo_Triunvirato.Controllers
                 // Lógica para manejar la subida de la nueva imagen
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesVuelos");
+                    //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesVuelos");
+                    
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
