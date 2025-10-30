@@ -37,13 +37,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // Registro de tus servicios personalizados
-// Registrar la interfaz y la implementación del servicio de correo
-builder.Services.AddTransient<IEmailService, EmailService>();
-
-// También necesitas la configuración para que el servicio pueda acceder a ella
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-
-// Registro del servicio de usuarios
 builder.Services.AddScoped<IUserService, InMemoryUserService>();
 // *** AGREGAR ESTA LÍNEA PARA EL SERVICIO DE PROMOCIONES ***
 builder.Services.AddScoped<IPromotionService, InMemoryPromotionService>(); // <--- ¡Esta es la línea que faltaba!

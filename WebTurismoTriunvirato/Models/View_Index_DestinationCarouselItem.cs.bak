@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using Web_Turismo_Triunvirato.DataAccess;
 
@@ -10,7 +9,6 @@ namespace Web_Turismo_Triunvirato.Models
     public class View_Index_DestinationCarouselItem //CARRUSEL DE DESTINOS DEL INDEX
     {
         public int? Id { get; set; }
-        [DisplayName("Mensaje de Whatsapp Asociado")]
         public int Whatsapp_Id { get; set; }
         public string? ImageUrl { get; set; }
         public string? AltText { get; set; }

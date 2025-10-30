@@ -65,6 +65,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View();
         }
 
+        [HttpGet]
         public IActionResult Encomiendas()
         {
             ViewData["Title"] = "Administración de Encomiendas";

@@ -1,0 +1,52 @@
+@model Web_Turismo_Triunvirato.Models.ViewModels.ModalContratoViewModel
+@* Nota: No usamos @using System.Globalization; porque este es el formulario *@
+
+<div class="p-3">
+    <h5 class="mb-3 text-center text-primary">
+        Consulta sobre: @Model.Title
+    </h5>
+
+    @* Este formulario va a enviar los datos a la acción POST FormularioConsulta 
+        en ContactoController, usando el ID del paquete como referencia.
+    *@
+    <form id="consultaMailForm"
+          asp-controller="Contacto"
+          asp-action="FormularioConsulta"
+          method="post"
+          data-id="@Model.IdItem">
+
+        @* Campo Oculto (Crucial para el backend) *@
+        <input type="hidden" name="DestinyId" value="@Model.IdItem" />
+
+        <div class="mb-3">
+            <label for="Name" class="form-label">Nombre Completo</label>
+            <input type="text" name="Name" class="form-control" required placeholder="Tu nombre" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input type="email" name="Email" class="form-control" required placeholder="tu.correo@ejemplo.com" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Phone" class="form-label">Teléfono/WhatsApp</label>
+            <input type="tel" name="Phone" class="form-control" required placeholder="+54 9 11 XXXX-XXXX" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Message" class="form-label">Mensaje</label>
+            <textarea name="Message" class="form-control" rows="4" required placeholder="Me interesa este paquete..."></textarea>
+        </div>
+
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-paper-plane"></i> Enviar Consulta
+            </button>
+        </div>
+    </form>
+
+    @* Opcional: Para mostrar mensajes de error/éxito después del envío AJAX *@
+    <div id="formMessage-@Model.IdItem" class="mt-3 text-center" style="display:none;"></div>
+
+</div>
+

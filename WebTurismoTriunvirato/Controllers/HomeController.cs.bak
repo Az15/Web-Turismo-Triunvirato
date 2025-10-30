@@ -152,13 +152,12 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         }
 
-
-		[HttpGet]
-        public  IActionResult RutaAtlantica() 
+        [HttpGet]
+        public async Task<IActionResult> RutaAtlantica() 
         {
+
             return View(); 
         }
-
 
         [HttpGet]
         public IActionResult Privacy()

@@ -1,4 +1,4 @@
-﻿@using Web_Turismo_Triunvirato.Models.ViewModels
+﻿@using Web_Turismo_Triunvirato.ViewModels
 @using System.Globalization; @* Necesario para CultureInfo para el formato de moneda *@
 
 @model View_Index_Collection 
@@ -23,48 +23,27 @@
 
         @* Iterar sobre los elementos del carrusel desde el modelo *@
         @if (Model.DestinationCarrousel != null && Model.DestinationCarrousel.Any())
-{
+        {
             @foreach (var item in Model.DestinationCarrousel)
             {
-                // 1. Mapeo al ModalContratoViewModel
-                var modalData = new Web_Turismo_Triunvirato.Models.ViewModels.ModalContratoViewModel
-                {
-                    IdItem = item.Id ?? 0, // Usar 0 si el ID es nulo
-                    Title = item.Title ?? "Destino en Carrusel",
-                    ImageUrl = item.ImageUrl,            
-                    // ATENCIÓN: Estos campos NO EXISTEN en View_Index_DestinationCarouselItem.
-                    // Los llenamos con valores por defecto para que el modal funcione.
-                    // **RECOMENDACIÓN:** Si este destino tiene un precio, agrégalo al modelo del carrusel.
-                    Price = 0.00M, 
-                    DetailText = "¡Consulta por este gran destino!", 
-                    LongDescription = item.Title ?? "Consulta por disponibilidad, precio y fechas.",
-
-                    RenderedWhatsappMessage = item.RenderedWhatsappMessage,
-                };
-                var modalTargetId = $"packageModal-{modalData.IdItem}-carousel"; // ID único para evitar conflicto
-        
                 <div class="carousel-item @(carouselItemCount == 0 ? "active" : "")">
                     <img src="@item.ImageUrl" class="d-block w-100" alt="@item.AltText">
                     <div class="carousel-caption d-flex flex-column justify-content-end h-100">
                         <h5>@item.Title</h5>
-                
-@*                         <p>
-                            <button type="button"
-                                    class="btn btn-primary btn-sm w-100"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#@modalTargetId">
-                                Ver más
-                            </button>
-                        </p> *@
 
+
+                         <!--Aca vamos a tocar-->
+                        @{
+                            var whatsappNumber = "+541122296405";
+                            var encodedMessage = Uri.EscapeDataString(item.RenderedWhatsappMessage);
+                            var whatsappLink = $"https://wa.me/{whatsappNumber}?text={encodedMessage}";
+                        }
+                        <p><a href="@whatsappLink" target="_blank">Más información</a></p>
+
+                        <!--Aca vamos a tocar-->
                     </div>
                 </div>
-
-                carouselItemCount++; // Ya que estás dentro del @foreach
-@*                 @Html.Partial("_MasInformacionGenerico", modalData)     *@ 
-                
-                        
-                    
+                carouselItemCount++;
             }
         }
         else
@@ -99,20 +78,6 @@
         {
             @foreach (var item in Model.PopularDestinations)
             {
-                var modalData = new Web_Turismo_Triunvirato.Models.ViewModels.ModalContratoViewModel
-                {
-                    IdItem = item.Id, // Propiedad que actúa como ID único
-                    Title = item.Title,
-                    ImageUrl = item.PictureDestiny,
-                    // Usaremos Title como descripción larga por ahora, pero DEBES cambiarlo por la propiedad real de descripción larga
-                    LongDescription = item.Title,
-                    Price = item.Price,
-                    DetailText = $"{item.TripType} | Desde {item.From}",
-                    RenderedWhatsappMessage = item.RenderedWhatsappMessage,
-                    // WhatsappNumber es opcional, ya está por defecto en el ViewModel de Contrato
-                };
-                var modalTargetId = $"packageModal-{modalData.IdItem}";
-
                 <div class="col-md-4">
                     <div class="card rounded-3 shadow-sm d-flex flex-row">
                         <img src="@item.PictureDestiny" class="card-img-left rounded-start-3" alt="@item.Title" style="width: 150px; height: 120px; object-fit: cover;">
@@ -128,15 +93,17 @@
                                     @item.From
                                 </p>
                             </div>
+                            @{
+                                var whatsappNumber = "+541122296405";
+                                var encodedMessage = Uri.EscapeDataString(item.RenderedWhatsappMessage);
+                                var whatsappLink = $"https://wa.me/{whatsappNumber}?text={encodedMessage}";
+                            }
 
-                            <button type="button"
-                                    class="btn btn-primary btn-sm w-100"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#@modalTargetId">
-                                Ver más
-                            </button>
+                            <!--Aca vamos a modificar el destino.-->
 
-                            @Html.Partial("_MasInformacionGenerico", modalData)
+                            <a href="@whatsappLink" class="btn btn-primary btn-sm w-100" target="_blank">Ver más</a>
+
+
                             <!--Aca vamos a tocar-->
 
                         </div>
@@ -154,4 +121,3 @@
 
     </div>
 </div>
-

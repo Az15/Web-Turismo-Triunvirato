@@ -1,0 +1,73 @@
+@model Web_Turismo_Triunvirato.Models.ViewModels.ModalContratoViewModel
+@using System.Globalization;
+
+@{
+    var modalTargetId = $"packageModal-{Model.IdItem}";
+    var modalMailId = $"mailModal-{Model.IdItem}"; // Nuevo ID para el segundo modal
+    // ... (otras variables de WhatsApp Link, etc., se mantienen) ...
+    var encodedMessage = Uri.EscapeDataString(Model.RenderedWhatsappMessage);
+    var whatsappLink = $"https://wa.me/{Model.WhatsappNumber}?text={encodedMessage}";
+
+    var descriptionContent = string.IsNullOrEmpty(Model.LongDescription) ? "Detalles del paquete no disponibles." : Model.LongDescription;
+}
+
+<div class="modal fade" id="@modalTargetId" tabindex="-1" aria-labelledby="@($"title-{modalTargetId}")" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="@($"title-{modalTargetId}")">@Model.Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <img src="@Model.ImageUrl" class="img-fluid rounded shadow-sm" alt="@Model.Title" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <p class="text-muted small">@Model.DetailText</p>
+                        <div class="package-description-container">
+                            <p>@descriptionContent</p>
+                        </div>
+                        <p class="h4 fw-bold text-success mt-3">
+                            @Model.Price.ToString("C", new CultureInfo("es-AR"))
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between">
+
+                <a href="@whatsappLink" target="_blank" class="btn btn-success flex-fill me-2">
+                    <i class="fab fa-whatsapp"></i> Consultar más
+                </a>
+
+                <button type="button"
+                        class="btn btn-outline-primary flex-fill"
+                        data-bs-toggle="modal"
+                        data-bs-target="#@modalMailId">
+                    <i class="fas fa-envelope"></i> Enviar por Mail
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="@modalMailId" tabindex="-1" aria-labelledby="@($"title-{modalMailId}")" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@($"title-{modalMailId}")">Formulario de Contacto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* INYECCIÓN DEL FORMULARIO *@
+                @await Html.PartialAsync("_FormularioConsultaMail", Model)
+            </div>
+        </div>
+    </div>
+</div>
+

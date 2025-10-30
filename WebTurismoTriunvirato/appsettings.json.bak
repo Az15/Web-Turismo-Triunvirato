@@ -5,13 +5,6 @@
       "Microsoft.AspNetCore": "Warning"
     }
   },
- "EmailSettings": {
-    "SmtpHost": "smtp.tudominio.com",
-    "SmtpPort": 587,
-    "SmtpUser": "info@tudominio.com",
-    "SmtpPass": "TuContraseñaSegura",
-    "DefaultFromEmail": "noreply@tudominio.com"
-  },
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "DefaultConnection": "Server=82.180.175.204;Port=3306;Database=u364059446_turismo;Uid=u364059446_adm;Pwd=Tur1sm0.25.;"

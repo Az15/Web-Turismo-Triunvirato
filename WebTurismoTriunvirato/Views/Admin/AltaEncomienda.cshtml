@@ -11,7 +11,9 @@
     <div class="col-md-6">
         <!-- Se ha agregado el atributo enctype para permitir la subida de archivos -->
         <form asp-action="AltaEncomienda" method="post" enctype="multipart/form-data">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.AntiForgeryToken()
 
             <div class="mb-3">
                 <label asp-for="CompanyName" class="form-label"></label>
