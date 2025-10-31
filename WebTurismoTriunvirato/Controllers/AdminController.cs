@@ -375,7 +375,8 @@ namespace Web_Turismo_Triunvirato.Controllers
             // 1. Manejar la subida de la imagen si se proporcionó un archivo
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "PromocionesHoteles");
+                //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
