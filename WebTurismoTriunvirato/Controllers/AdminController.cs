@@ -149,15 +149,12 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionFlight(
-    IFormFile ImageFile, // ¡Añadido! Debe ir como primer parámetro
-    [Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionFlight(IFormFile ImageFile,[Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
         {
             // === Lógica de Subida de Imagen ===
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                // 🛑 CRÍTICO: Corregido el Path.Combine para Linux (sin '/') y en minúsculas
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "PromocionesVuelos");
 
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -168,11 +165,11 @@ namespace Web_Turismo_Triunvirato.Controllers
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    await ImageFile.CopyToAsync(fileStream); // <-- Aquí puede fallar por permisos
-                }
+                    await ImageFile.CopyToAsync(fileStream); 
+                    }
 
                 // 🛑 CRÍTICO: URL de la DB en minúsculas para consistencia en Linux
-                promotion.ImageUrl = "/img/promocionesvuelos/" + uniqueFileName;
+                promotion.ImageUrl = "/img/PromocionesVuelos/" + uniqueFileName;
                 ModelState.Remove("ImageUrl");
             }
             else
@@ -235,7 +232,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesVuelos");
                     
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "PromocionesVuelos");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
