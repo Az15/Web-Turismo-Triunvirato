@@ -154,7 +154,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             // === Lógica de Subida de Imagen ===
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "PromocionesVuelos");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
 
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -168,8 +168,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     await ImageFile.CopyToAsync(fileStream); 
                     }
 
-                // 🛑 CRÍTICO: URL de la DB en minúsculas para consistencia en Linux
-                promotion.ImageUrl = "/img/PromocionesVuelos/" + uniqueFileName;
+                promotion.ImageUrl = "/img/promocionesvuelos/" + uniqueFileName;
                 ModelState.Remove("ImageUrl");
             }
             else
@@ -232,7 +231,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesVuelos");
                     
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "PromocionesVuelos");
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -245,7 +244,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    promotion.ImageUrl = "/img/PromocionesVuelos/" + uniqueFileName;
+                    promotion.ImageUrl = "/img/promocionesvuelos/" + uniqueFileName;
                 }
 
                 try
