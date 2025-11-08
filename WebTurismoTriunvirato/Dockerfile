@@ -1,7 +1,6 @@
 # Primera etapa: Base Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-# Usuario de ejecución de la aplicación (el usuario que necesita permisos de escritura)
-USER app 
+# NOTA: NO USAMOS USER app AQUÍ TODAVÍA, para permitir que el paso RUN funcione como root.
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -25,20 +24,20 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# === INICIO DE CORRECCIÓN DE PERMISOS PARA SUBIDAS ===
+# === INICIO DE CORRECCIÓN DE PERMISOS (EJECUTADO COMO ROOT) ===
 
-# El usuario 'app' necesita permisos de escritura en esta carpeta.
-# 1. Creamos la estructura de directorios si no existe.
+# 1. Creamos la estructura de directorios con el usuario ROOT (que tiene permisos).
 RUN mkdir -p wwwroot/img/promocionesvuelos
 
-# 2. Cambiamos el propietario de la carpeta de subidas al usuario 'app'.
-# Esto es crucial para que el proceso de la aplicación (que corre como 'app') pueda escribir.
+# 2. Cambiamos el propietario de la carpeta al usuario 'app'. Esto es vital.
 RUN chown -R app:app wwwroot/img/promocionesvuelos
 
-# 3. Asignamos permisos 775 (rwxrwxr-x) recursivamente a la carpeta de subidas.
-# Esto asegura que el dueño ('app') tenga permiso de ESCRITURA.
+# 3. Asignamos permisos 775 (rwxrwxr-x) recursivamente.
 RUN chmod -R 775 wwwroot/img/promocionesvuelos
 
 # === FIN DE CORRECCIÓN DE PERMISOS ===
+
+# Ahora, y solo ahora, cambiamos al usuario 'app' para la ejecución final.
+USER app 
 
 ENTRYPOINT ["dotnet", "WebTurismoTriunvirato.dll"]
