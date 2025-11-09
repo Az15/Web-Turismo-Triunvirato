@@ -25,10 +25,6 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # === INICIO DE CORRECCIÓN DE PERMISOS (EJECUTADO COMO ROOT) ===
-
-# 1. Creamos la estructura de directorios con el usuario ROOT (que tiene permisos).
-RUN mkdir -p wwwroot/img/promocionesvuelos
-
 # 2. Cambiamos el propietario de la carpeta al usuario 'app'. Esto es vital.
 RUN chown -R app:app wwwroot/img/promocionesvuelos
 
