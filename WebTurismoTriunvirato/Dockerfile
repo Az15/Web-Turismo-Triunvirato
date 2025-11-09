@@ -17,6 +17,7 @@ RUN dotnet build "WebTurismoTriunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/
 # Tercera etapa: Publish
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
+RUN ls -la
 RUN dotnet publish "WebTurismoTriunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Cuarta etapa: Final
