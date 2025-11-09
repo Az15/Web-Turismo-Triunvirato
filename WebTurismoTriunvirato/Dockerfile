@@ -23,19 +23,17 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# === INICIO DE CORRECCIÓN DE PERMISOS PARA SUBIDAS ===
+# 1. Aseguramos la existencia de las carpetas de subida que podrían faltar
+# El flag '-p' es crucial: crea la estructura de directorios y no da error si ya existe.
+RUN mkdir -p wwwroot/img
+RUN mkdir -p wwwroot/images
 
-# El usuario 'app' necesita permisos de escritura en esta carpeta.
-# 1. Creamos la estructura de directorios si no existe.
-#RUN mkdir -p wwwroot/img/promocionesvuelos
-
-# 2. Cambiamos el propietario de la carpeta de subidas al usuario 'app'.
-# Esto es crucial para que el proceso de la aplicación (que corre como 'app') pueda escribir.
+# 2. Cambiamos el propietario al usuario 'app'.
+# Esto es necesario para que la aplicación pueda escribir.
 RUN chown -R app:app wwwroot/img
 RUN chown -R app:app wwwroot/images
 
-# 3. Asignamos permisos 775 (rwxrwxr-x) recursivamente a la carpeta de subidas.
-# Esto asegura que el dueño ('app') tenga permiso de ESCRITURA.
+# 3. Asignamos permisos 775 (rwxrwxr-x).
 RUN chmod -R 775 wwwroot/img
 RUN chmod -R 775 wwwroot/images
 
