@@ -31,11 +31,14 @@ COPY --from=publish /app/publish .
 
 # 2. Cambiamos el propietario de la carpeta de subidas al usuario 'app'.
 # Esto es crucial para que el proceso de la aplicación (que corre como 'app') pueda escribir.
-RUN chown -R app:app wwwroot/img/promocionesvuelos
+RUN chown -R app:app wwwroot/img
+RUN chown -R app:app wwwroot/images
 
 # 3. Asignamos permisos 775 (rwxrwxr-x) recursivamente a la carpeta de subidas.
 # Esto asegura que el dueño ('app') tenga permiso de ESCRITURA.
-RUN chmod -R 775 wwwroot/img/promocionesvuelos
+RUN chmod -R 775 wwwroot/img
+RUN chmod -R 775 wwwroot/images
+
 
 # === FIN DE CORRECCIÓN DE PERMISOS ===
 
