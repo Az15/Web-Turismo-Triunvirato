@@ -13,41 +13,36 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# [CORRECCIÓN CLAVE] Copiamos TODOS los archivos del repositorio a /src de una vez.
-# Esto asegura que todos los archivos fuente (.cs) estén presentes para la compilación,
-# resolviendo el 'exit code 1' en la compilación.
+# Copiamos TODOS los archivos del repositorio a /src.
 COPY . .
 
-# Ejecutamos restore y build.
+# Ejecutamos restore
 RUN dotnet restore "WebTurismoTriunvirato.csproj"
-RUN dotnet build "WebTurismoTriunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# [CAMBIO CLAVE] Ejecutamos build con alta verbosidad (/v:d)
+# Esto DEBE forzar a que el log muestre el error exacto de compilación (CSxxxx).
+RUN dotnet build "WebTurismoTriunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/build /v:d
 
 # -------------------------------------------------------------------------
-# ETAPA 3: PUBLISH - Prepara los archivos finales
+# ETAPA 3: PUBLISH
 # -------------------------------------------------------------------------
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "WebTurismoTriunvirato.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # -------------------------------------------------------------------------
-# ETAPA 4: FINAL - Imagen de ejecución de la aplicación (RUNTIME)
+# ETAPA 4: FINAL - Imagen de ejecución (RUNTIME)
 # -------------------------------------------------------------------------
 FROM base AS final
 WORKDIR /app
-# Copia la aplicación publicada al entorno de ejecución
 COPY --from=publish /app/publish .
 
-# === CORRECCIÓN DE PERMISOS DE ESCRITURA (para solucionar el error 405) ===
-# Ejecutado como ROOT. La carpeta 'wwwroot/img/promocionesvuelos' ya existe.
-
-# 1. Cambiamos el propietario de la carpeta al usuario 'app'.
+# === CORRECCIÓN DE PERMISOS DE ESCRITURA (para el error 405) ===
+# Se ejecuta como ROOT.
 RUN chown -R app:app wwwroot/img/promocionesvuelos
-
-# 2. Asignamos permisos 775 (rwxrwxr-x) recursivamente, dando escritura al usuario 'app'.
 RUN chmod -R 775 wwwroot/img/promocionesvuelos
 
-# 3. Definimos el usuario 'app' para la ejecución final (seguridad).
+# Definimos el usuario 'app' para la ejecución final.
 USER app 
 
 ENTRYPOINT ["dotnet", "WebTurismoTriunvirato.dll"]
-
