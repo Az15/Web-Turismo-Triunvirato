@@ -27,7 +27,7 @@ COPY --from=publish /app/publish .
 
 # El usuario 'app' necesita permisos de escritura en esta carpeta.
 # 1. Creamos la estructura de directorios si no existe.
-RUN mkdir -p wwwroot/img/promocionesvuelos
+#RUN mkdir -p wwwroot/img/promocionesvuelos
 
 # 2. Cambiamos el propietario de la carpeta de subidas al usuario 'app'.
 # Esto es crucial para que el proceso de la aplicación (que corre como 'app') pueda escribir.
