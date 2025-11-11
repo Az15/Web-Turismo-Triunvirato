@@ -1,6 +1,5 @@
-# Primera etapa: Base Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-# NOTA: NO USAMOS USER app AQUÍ TODAVÍA, para permitir que el paso RUN funcione como root.
+USER app
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -24,20 +23,27 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# === INICIO DE CORRECCIÓN DE PERMISOS (EJECUTADO COMO ROOT) ===
+# 1. Creamos directorios
+RUN mkdir -p wwwroot/img
+RUN mkdir -p wwwroot/images
 
-# 1. Creamos la estructura de directorios con el usuario ROOT (que tiene permisos).
-RUN mkdir -p wwwroot/img/promocionesvuelos
+# === INICIO DE CORRECCIÓN DE PERMISOS ===
 
-# 2. Cambiamos el propietario de la carpeta al usuario 'app'. Esto es vital.
-RUN chown -R app:app wwwroot/img/promocionesvuelos
+# Ejecutar chown y chmod como root para evitar conflictos de usuario.
+# Esto asegura que el sistema siempre encuentre al usuario/grupo 'app'.
+USER root
 
-# 3. Asignamos permisos 775 (rwxrwxr-x) recursivamente.
-RUN chmod -R 775 wwwroot/img/promocionesvuelos
+# 2. Cambiamos el propietario al usuario 'app'.
+RUN chown -R app:app wwwroot/img
+RUN chown -R app:app wwwroot/images
+
+# 3. Asignamos permisos 775 (rwxrwxr-x).
+RUN chmod -R 775 wwwroot/img
+RUN chmod -R 775 wwwroot/images
+
+# Revertir al usuario de bajo privilegio 'app' para la ejecución de la aplicación.
+USER app 
 
 # === FIN DE CORRECCIÓN DE PERMISOS ===
-
-# Ahora, y solo ahora, cambiamos al usuario 'app' para la ejecución final.
-USER app 
 
 ENTRYPOINT ["dotnet", "WebTurismoTriunvirato.dll"]
