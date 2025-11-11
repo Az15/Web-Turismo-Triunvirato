@@ -271,8 +271,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            // Si el ModelState no es válido por otras razones, vuelve a cargar los datos necesarios
-            // para mostrar la vista con los errores de validación.
+
             var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
@@ -293,11 +292,6 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionFlight(int id)
         {
-            //var promotion = await _dbContext.FlightPromotions.FindAsync(id);
-            //if (promotion == null)
-            //{
-            //    return NotFound();
-            //}
 
             await _dbContext.AbmFlightPromotionAsync(id, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de vuelo eliminada exitosamente!";
@@ -424,17 +418,11 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return RedirectToAction(nameof(AdminPromotionHotels));
             }
 
-
-            // Si el modelo NO es válido, vuelve a cargar la lista de mensajes de WhatsApp
-            // Aquí asumo que 'CargarWhatsappMessages' es un método que alimenta al ViewBag
-            // Si no existe, reemplázalo con el bloque de carga de WhatsApp que usas en tus otros métodos GET.
             await CargarWhatsappMessages();
             ViewData["Title"] = "Alta de Promoción de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
-
-        // Para el método de edición, el approach es similar, pero con ModelState.Remove
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionHotel(int id, IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,Stars,IsActive")] HotelPromotion promotion)
@@ -448,7 +436,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (promotion.ImageUrl == null && ImageFile == null) { }
             else
             {
-                // Paso 1: Si no se sube un nuevo archivo, elimina el error de validación para ImageUrl.
+
                 if (promotion.ImageUrl == null)
                 {
                     ModelState.Remove("ImageUrl");
@@ -459,10 +447,9 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            //ModelState.Remove("RenderedWhatsappMessage");
             if (ModelState.IsValid)
             {
-                // Lógica para manejar la subida de la nueva imagen
+  
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
         
@@ -521,14 +508,12 @@ namespace Web_Turismo_Triunvirato.Controllers
             }).ToList();
             ViewBag.WhatsappMessages = whatsappList;
 
-            // Si el modelo es inválido, vuelve a cargar la lista de mensajes de WhatsApp
+
             await CargarWhatsappMessages();
             ViewData["Title"] = "Editar Promoción de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
-
-        // Método auxiliar para cargar la lista de mensajes de WhatsApp
         private async Task CargarWhatsappMessages()
         {
             var whatsappMessages = await _dbContext.WhatsappMessages
@@ -549,11 +534,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionHotel(int id)
         {
-            //var promotion = await _dbContext.HotelPromotions.FindAsync(id);
-            //if (promotion == null)
-            //{
-            //    return NotFound();
-            //}
+
 
             await _dbContext.AbmHotelPromotionAsync(id, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de hotel eliminada exitosamente!";
@@ -562,7 +543,6 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE BUSES ****************
 
-        // GET: Admin/AdminPromotionBuses
         [HttpGet]
         public async Task<IActionResult> AdminPromotionBuses()
         {
@@ -937,8 +917,8 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            // Si el modelo es inválido, vuelve a cargar la vista
-            // await CargarWhatsappMessages(); 
+
+            await CargarWhatsappMessages();
             ViewData["Title"] = "Editar Promoción de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
@@ -1155,7 +1135,11 @@ namespace Web_Turismo_Triunvirato.Controllers
 
                     Actividad.ImageUrl = "/img/actividades/" + uniqueFileName;
                 }
-                ViewData["Title"] = "Gestionar Promociones de Hoteles";
+
+                ViewData["Title"] = "Administrar Actividades";
+                //ViewData["Title"] = "Gestionar Promociones de Hoteles";
+
+
 
                 _dbContext.Add(Actividad);
 
@@ -1176,7 +1160,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 return NotFound();
             }
-            ViewData["Title"] = "Gestionar Promociones de Hoteles";
+            ViewData["Title"] = "Administrar Actividades";
 
             // Obtener la lista de mensajes de WhatsApp activos
             var whatsappMessages = await _dbContext.WhatsappMessages
@@ -1242,12 +1226,9 @@ namespace Web_Turismo_Triunvirato.Controllers
                             }
                         }
 
-                        // Se actualiza la URL de la imagen del modelo.
                         Actividad.ImageUrl = "/img/actividades/" + uniqueFileName;
                     }
 
-                    // Si no se subió una nueva imagen, se mantiene la URL existente.
-                    // Esto se maneja automáticamente ya que el campo ImageUrl se incluye en el bind y el campo hidden.
                     _dbContext.Update(Actividad);
                     await _dbContext.SaveChangesAsync();
                     TempData["SuccessMessage"] = "¡Actualizada exitosamente!";
@@ -1265,20 +1246,18 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                 }
             }
-            // Obtener la lista de mensajes de WhatsApp activos
             var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
                 .ToListAsync();
 
-            // Crear una lista de SelectListItem para el dropdown
+
             var whatsappList = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
 
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
             ViewBag.WhatsappMessages = whatsappList;
             ViewData["Title"] = "Editar Actividad";
             return View("AltaActividad", Actividad);
