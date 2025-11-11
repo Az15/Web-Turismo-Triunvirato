@@ -1012,41 +1012,107 @@ namespace Web_Turismo_Triunvirato.Controllers
         return View("AltaEncomienda", company);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditEncomienda(int id, [Bind("Id,CompanyName,CompanyUrl")] EncomiendaCompany company)
-    {
-        if (id != company.Id)
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> EditEncomienda(int id, [Bind("Id,CompanyName,CompanyUrl")] EncomiendaCompany company)
+        //{
+        //    if (id != company.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _dbContext.Update(company);
+        //            await _dbContext.SaveChangesAsync();
+        //            TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+        //            return RedirectToAction(nameof(AdminEncomiendas));
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!await _dbContext.EncomiendaCompanies.AnyAsync(e => e.Id == company.Id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //    }
+        //    ViewData["Title"] = "Editar Empresa de Encomiendas";
+        //    return View("AltaEncomienda", company);
+        //}
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditEncomienda(
+     int id,
+     IFormFile ImageFile,
+    
+     [Bind("Id,CompanyName,CompanyUrl,ImageUrl")] EncomiendaCompany company)
         {
-            return NotFound();
+            if (id != company.Id)
+            {
+                return NotFound();
+            }
+
+           if (ImageFile == null && !string.IsNullOrEmpty(company.ImageUrl))
+            {
+                ModelState.Remove("ImageFile");
+            }
+
+            if (ModelState.IsValid)
+            {
+               if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/encomiendas");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+           
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(fileStream);
+                    }
+                    if (!string.IsNullOrEmpty(company.ImageUrl))
+                    {
+                        var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, company.ImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+                 
+                    company.ImageUrl = "/images/encomiendas/" + uniqueFileName;
+                }
+                         try
+                {
+                    _dbContext.Update(company);
+                    await _dbContext.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                    return RedirectToAction(nameof(AdminEncomiendas));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Ocurrió un error al actualizar: {ex.Message}");
+                    return View("AltaEncomienda", company);
+                }
+            }
+
+            ViewData["Title"] = "Editar Empresa de Encomiendas";
+            return View("AltaEncomienda", company);
         }
 
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                _dbContext.Update(company);
-                await _dbContext.SaveChangesAsync();
-                TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
-                return RedirectToAction(nameof(AdminEncomiendas));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _dbContext.EncomiendaCompanies.AnyAsync(e => e.Id == company.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-        ViewData["Title"] = "Editar Empresa de Encomiendas";
-        return View("AltaEncomienda", company);
-    }
-
-    [HttpPost]
+        [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteEncomienda(int id)
     {

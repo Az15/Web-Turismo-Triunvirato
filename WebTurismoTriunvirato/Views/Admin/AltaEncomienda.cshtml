@@ -1,7 +1,8 @@
 ﻿@model Web_Turismo_Triunvirato.Models.EncomiendaCompany
 
 @{
-    ViewData["Title"] = "Alta de Empresa de Encomiendas";
+ 
+    ViewData["Title"] = (Model != null && Model.Id > 0) ? "Editar Empresa de Encomiendas" : "Alta de Empresa de Encomiendas";
 }
 
 <h2 class="mt-4">@ViewData["Title"]</h2>
@@ -9,23 +10,51 @@
 
 <div class="row">
     <div class="col-md-6">
-        <!-- Se ha agregado el atributo enctype para permitir la subida de archivos -->
-        <form asp-action="AltaEncomienda" method="post" enctype="multipart/form-data">
+
+        @{
+            
+            string actionName = (Model != null && Model.Id > 0) ? "EditEncomienda" : "AltaEncomienda";
+        }
+
+        <form asp-action="@actionName" method="post" enctype="multipart/form-data">
 
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-              @Html.AntiForgeryToken()
+            @Html.AntiForgeryToken()
+
+            
+            @if (Model != null && Model.Id > 0)
+            {
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ImageUrl" /> 
+            }
 
             <div class="mb-3">
                 <label asp-for="CompanyName" class="form-label"></label>
                 <input asp-for="CompanyName" class="form-control" />
                 <span asp-validation-for="CompanyName" class="text-danger"></span>
             </div>
-            <div class="mb-3">
-                <label for="ImageFile" class="form-label">Subir Imagen</label>
-                <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" required />
-                <span class="text-danger"></span>
+
+            <div class="form-group mb-3">
+                <label for="ImageFile" class="form-label">
+                    Seleccionar Imagen
+                    @* Añade un texto indicador para el usuario *@
+                    @((Model != null && !string.IsNullOrEmpty(Model.ImageUrl)) ? "(Dejar vacío para conservar la imagen actual)" : "")
+                </label>
+
+                <input type="file" id="ImageFile" name="ImageFile"class="form-control" accept="image/*"
+                 @((Model == null || Model.Id == 0) ? "required" : "") />
+
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
-            <div class="mb-3">
+
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <div class="mb-3">
+                    <label class="form-label">Imagen Actual:</label>
+                    <img src="@Model.ImageUrl" alt="Imagen actual" class="img-thumbnail" style="max-height: 100px;" />
+                </div>
+            }
+                        <div class="mb-3">
                 <label asp-for="CompanyUrl" class="form-label"></label>
                 <input asp-for="CompanyUrl" class="form-control" />
                 <span asp-validation-for="CompanyUrl" class="text-danger"></span>
