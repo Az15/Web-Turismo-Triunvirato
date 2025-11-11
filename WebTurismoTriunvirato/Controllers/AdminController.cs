@@ -1012,39 +1012,6 @@ namespace Web_Turismo_Triunvirato.Controllers
         return View("AltaEncomienda", company);
     }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> EditEncomienda(int id, [Bind("Id,CompanyName,CompanyUrl")] EncomiendaCompany company)
-        //{
-        //    if (id != company.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _dbContext.Update(company);
-        //            await _dbContext.SaveChangesAsync();
-        //            TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
-        //            return RedirectToAction(nameof(AdminEncomiendas));
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!await _dbContext.EncomiendaCompanies.AnyAsync(e => e.Id == company.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //    }
-        //    ViewData["Title"] = "Editar Empresa de Encomiendas";
-        //    return View("AltaEncomienda", company);
-        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -1142,8 +1109,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> AltaActividad()
         {
             ViewData["Title"] = "Alta de Actividades";
-            // Obtener la lista de mensajes de WhatsApp activos
-            var whatsappMessages = await _dbContext.WhatsappMessages
+               var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
                 .ToListAsync();
@@ -1173,7 +1139,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Actividades");
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/actividades");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -1187,7 +1153,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
+                    Actividad.ImageUrl = "/img/actividades/" + uniqueFileName;
                 }
                 ViewData["Title"] = "Gestionar Promociones de Hoteles";
 
@@ -1252,7 +1218,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
                         // Lógica para guardar la nueva imagen (similar a AltaActividad).
-                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Actividades");
+                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/actividades");
                         if (!Directory.Exists(uploadsFolder))
                         {
                             Directory.CreateDirectory(uploadsFolder);
@@ -1277,14 +1243,14 @@ namespace Web_Turismo_Triunvirato.Controllers
                         }
 
                         // Se actualiza la URL de la imagen del modelo.
-                        Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
+                        Actividad.ImageUrl = "/img/actividades/" + uniqueFileName;
                     }
 
                     // Si no se subió una nueva imagen, se mantiene la URL existente.
                     // Esto se maneja automáticamente ya que el campo ImageUrl se incluye en el bind y el campo hidden.
                     _dbContext.Update(Actividad);
                     await _dbContext.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "¡Actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminActivities));
                 }
                 catch (DbUpdateConcurrencyException)
