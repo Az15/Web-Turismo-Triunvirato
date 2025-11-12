@@ -11,9 +11,11 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
-        public int Whatsapp_Id { get; set; } // El ID que agregaste
+        [Display(Name = "Mensaje de Whatsapp")]
+        [Required(ErrorMessage = "No se especifico un tipo de mensaje")]
+        public int Whatsapp_Id { get; set; }
 
-       
+
         [Required]
         [Display(Name = "Tipo de servicio")]
         public string ServiceType { get; set; } = "3"; // '3' para paquetes
