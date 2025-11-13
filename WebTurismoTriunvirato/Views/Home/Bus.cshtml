@@ -2,9 +2,27 @@
 
 @{
     ViewData["Title"] = "Autobuses";
-} 
+}
 
-<link rel="stylesheet" href="~/css/vuelos.css" />
+<head>
+    <link rel="stylesheet" href="~/css/RutaAtlantica.css" />
+    <link rel="stylesheet" href="~/css/BusAnimation.css" />
+    <link rel="stylesheet" href="~/css/vuelos.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra de boletos</title>
+</head>
+
+<div class="header-container">
+    <img src="~/img/RutaAtlantica/Bus_Header.gif" alt="Bus Header" class="bus-header-image" />
+    <div class="overlay-text">
+        <h1 class="animated-heading">Busca tu próximo destino</h1>
+        <p class="signature-text">Turismo Triunvirato</p>
+    </div>
+</div>
+
+<script src="https://rutatlantica.com.ar/js/ruta-widget.js" data-sellerid="d95be34d-bb0f-45c8-b7ac-b80178814006" data-theme="default"></script>
+
 
 <div class="flight-search-container">
     <h4>Encuentra tu Autobus ideal</h4>

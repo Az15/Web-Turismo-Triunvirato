@@ -90,9 +90,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AdminPromotionFlights", flightPromotions);
         }
 
-
-
-
         [HttpGet]
         public async Task<IActionResult> AltaPromotionFlight()
         {
@@ -270,8 +267,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            // Si el ModelState no es válido por otras razones, vuelve a cargar los datos necesarios
-            // para mostrar la vista con los errores de validación.
+
             var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
@@ -418,17 +414,11 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return RedirectToAction(nameof(AdminPromotionHotels));
             }
 
-
-            // Si el modelo NO es válido, vuelve a cargar la lista de mensajes de WhatsApp
-            // Aquí asumo que 'CargarWhatsappMessages' es un método que alimenta al ViewBag
-            // Si no existe, reemplázalo con el bloque de carga de WhatsApp que usas en tus otros métodos GET.
             await CargarWhatsappMessages();
             ViewData["Title"] = "Alta de Promoción de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
-
-        // Para el método de edición, el approach es similar, pero con ModelState.Remove
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionHotel(int id, IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,Stars,IsActive")] HotelPromotion promotion)
@@ -442,7 +432,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (promotion.ImageUrl == null && ImageFile == null) { }
             else
             {
-                // Paso 1: Si no se sube un nuevo archivo, elimina el error de validación para ImageUrl.
+
                 if (promotion.ImageUrl == null)
                 {
                     ModelState.Remove("ImageUrl");
@@ -453,10 +443,9 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            //ModelState.Remove("RenderedWhatsappMessage");
             if (ModelState.IsValid)
             {
-                // Lógica para manejar la subida de la nueva imagen
+  
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
         
@@ -515,14 +504,12 @@ namespace Web_Turismo_Triunvirato.Controllers
             }).ToList();
             ViewBag.WhatsappMessages = whatsappList;
 
-            // Si el modelo es inválido, vuelve a cargar la lista de mensajes de WhatsApp
+
             await CargarWhatsappMessages();
             ViewData["Title"] = "Editar Promoción de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
-
-        // Método auxiliar para cargar la lista de mensajes de WhatsApp
         private async Task CargarWhatsappMessages()
         {
             var whatsappMessages = await _dbContext.WhatsappMessages
@@ -543,11 +530,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionHotel(int id)
         {
-            //var promotion = await _dbContext.HotelPromotions.FindAsync(id);
-            //if (promotion == null)
-            //{
-            //    return NotFound();
-            //}
+
 
             await _dbContext.AbmHotelPromotionAsync(id, "DELETE");
             TempData["SuccessMessage"] = "¡Promoción de hotel eliminada exitosamente!";
@@ -556,7 +539,6 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE BUSES ****************
 
-        // GET: Admin/AdminPromotionBuses
         [HttpGet]
         public async Task<IActionResult> AdminPromotionBuses()
         {
@@ -628,7 +610,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (ImageFile != null )
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesBuses");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/promocionesbuses");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -683,7 +665,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionBus", promotion);
         }
 
-        // POST: Admin/EditPromotionBus/{id} (Edición)
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionBus(int id, IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
@@ -704,7 +686,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (ImageFile != null /*&& ImageFile.Length > 0*/)
             {
                 // 1. Guarda la nueva imagen en la carpeta de destino.
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/PromocionesBuses");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionesbuses");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -781,7 +763,6 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
 
-
         // **************** ACCIONES PARA ADMINISTRACIÓN DE PROMOCIONES DE PAQUETES ****************
 
         public async Task<IActionResult> AdminPromotionPackages()
@@ -792,16 +773,43 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         // Método GET para mostrar la vista de creación de una nueva promoción de paquete
-        public IActionResult AltaPromotionPackage()
+        public async Task<IActionResult> AltaPromotionPackage()
         {
+            var whatsappMessages = await _dbContext.WhatsappMessages
+             .Where(m => m.Is_Active)
+             .OrderBy(m => m.Title)
+             .ToListAsync();
+
+
+            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+           
+            ViewBag.WhatsappMessages = whatsappList;
             ViewData["Title"] = "Alta de Promoción de Paquete";
-            // Pasa un nuevo modelo vacío a la vista para evitar la excepción
-            return View(new PackagePromotion());
+           
+            return View("AltaPromotionPackage", new PackagePromotion { ServiceType = "3" });
+
         }
 
-        // Método GET para mostrar la vista de edición de una promoción de paquete
-        public async Task<IActionResult> EditPromotionPackage(int? id)
+        [HttpGet]
+       public async Task<IActionResult> EditPromotionPackage(int? id)
         {
+
+            var whatsappMessages = await _dbContext.WhatsappMessages
+              .Where(m => m.Is_Active)
+              .OrderBy(m => m.Title)
+              .ToListAsync();
+
+            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+
+            ViewBag.WhatsappMessages = whatsappList;
             if (id == null)
             {
                 return NotFound();
@@ -816,14 +824,52 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionPackage", promotion);
         }
 
-        // Método POST para la creación de una promoción de paquete
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
-        public async Task<IActionResult> SubmitPromotionPackage([Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+        public async Task<IActionResult> SubmitPromotionPackage(IFormFile ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
+
+            if (promotion.ImageUrl == null)
+            {
+                ModelState.Remove("ImageUrl");
+            }
+
+            if (ImageFile != null)
+            {
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionespaquetes");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(fileStream);
+                }
+                promotion.ImageUrl = "/img/promocionespaquetes/" + uniqueFileName;
+            }
+            else
+            {
+                if (promotion.ImageUrl != null)
+                {
+
+                    ModelState.Remove("ImageFile");
+                }
+                else
+                {
+                    ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción.");
+                }
+            }
+
+
+
             if (ModelState.IsValid)
             {
+                
                 // Se calcula el descuento si los precios son válidos.
                 if (promotion.OriginalPrice > 0)
                 {
@@ -839,6 +885,18 @@ namespace Web_Turismo_Triunvirato.Controllers
                 TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionPackages));
             }
+            var whatsappMessages = await _dbContext.WhatsappMessages
+         .Where(m => m.Is_Active)
+         .OrderBy(m => m.Title)
+         .ToListAsync();
+
+            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+
+            ViewBag.WhatsappMessages = whatsappList;
 
             // Si el modelo no es válido, se regresa a la vista para mostrar los errores.
             ViewData["Title"] = "Alta de Promoción de Paquete";
@@ -848,23 +906,41 @@ namespace Web_Turismo_Triunvirato.Controllers
         // Método POST para la edición de una promoción de paquete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionPackage(
-           int id,
-           IFormFile ImageFile, // <-- ARCHIVO RECIBIDO POR SEPARADO
-           [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+        public async Task<IActionResult> EditPromotionPackage(int id,IFormFile ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
             if (id != promotion.Id)
             {
                 return NotFound();
             }
 
-            // Si no se sube un nuevo archivo, eliminamos el error de validación para ImageUrl y ImageFile
             if (promotion.ImageUrl == null)
             {
                 ModelState.Remove("ImageUrl");
             }
-            if (ImageFile == null)
+
+            if (ImageFile != null /*&& ImageFile.Length > 0*/)
             {
+                // 1. Guarda la nueva imagen en la carpeta de destino.
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionespaquetes");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(fileStream);
+                }
+
+                // 2. Actualiza la propiedad ImageUrl del modelo con la nueva ruta.
+                promotion.ImageUrl = "/img/promocionespaquetes/" + uniqueFileName;
+            }
+            else
+            {
+                // Si no se subió un nuevo archivo, elimina el error de validación de ImageUrl del ModelState
+                // para permitir que el resto del modelo se valide.
                 ModelState.Remove("ImageFile");
             }
 
@@ -872,38 +948,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 try
                 {
-                    // Lógica para manejar la subida de la nueva imagen
-                    if (ImageFile != null && ImageFile.Length > 0)
-                    {
-                        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Paquetes"); // Ruta
-                        if (!Directory.Exists(uploadsFolder))
-                        {
-                            Directory.CreateDirectory(uploadsFolder);
-                        }
-                        var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await ImageFile.CopyToAsync(fileStream);
-                        }
-
-                        // Se actualiza la URL del modelo con la nueva imagen
-                        promotion.ImageUrl = "/img/Paquetes/" + uniqueFileName;
-                    }
-                    else
-                    {
-                        // Si NO se subió un archivo nuevo, debemos cargar la URL antigua
-                        // 1. Obtenemos el registro existente SÓLO para su ImageUrl
-                        var existingPromotion = await _dbContext.GetPackagePromotionByIdAsync(id);
-                        if (existingPromotion != null)
-                        {
-                            // 2. Mantenemos la URL anterior
-                            promotion.ImageUrl = existingPromotion.ImageUrl;
-                        }
-                        // Si el registro no existe, el error será manejado por el Abm más abajo.
-                    }
-
                     if (promotion.OriginalPrice > 0)
                     {
                         promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
@@ -913,6 +957,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     await _dbContext.AbmPackagePromotionAsync(promotion, "UPDATE");
                     TempData["SuccessMessage"] = "¡Promoción de paquete actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminPromotionPackages));
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -925,16 +970,33 @@ namespace Web_Turismo_Triunvirato.Controllers
                         throw;
                     }
                 }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error al actualizar la promoción o al guardar la imagen: " + ex.Message);
-                }
-            }
 
-            // Si el modelo es inválido, vuelve a cargar la vista
-            // await CargarWhatsappMessages(); 
+
+
+            }
+            var whatsappMessages = await _dbContext.WhatsappMessages
+          .Where(m => m.Is_Active)
+          .OrderBy(m => m.Title)
+          .ToListAsync();
+            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+            ViewBag.WhatsappMessages = whatsappList;
+
             ViewData["Title"] = "Editar Promoción de Paquete";
             return View("AltaPromotionPackage", promotion);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePromotionPackage(int id)
+        {
+
+            await _dbContext.AbmPackagePromotionAsync(id, "DELETE");
+            TempData["SuccessMessage"] = "¡Promoción  eliminada exitosamente!";
+            return RedirectToAction(nameof(AdminPromotionPackages));
         }
 
 
@@ -1006,41 +1068,74 @@ namespace Web_Turismo_Triunvirato.Controllers
         return View("AltaEncomienda", company);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditEncomienda(int id, [Bind("Id,CompanyName,CompanyUrl")] EncomiendaCompany company)
-    {
-        if (id != company.Id)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditEncomienda(
+     int id,
+     IFormFile ImageFile,
+    
+     [Bind("Id,CompanyName,CompanyUrl,ImageUrl")] EncomiendaCompany company)
         {
-            return NotFound();
+            if (id != company.Id)
+            {
+                return NotFound();
+            }
+
+           if (ImageFile == null && !string.IsNullOrEmpty(company.ImageUrl))
+            {
+                ModelState.Remove("ImageFile");
+            }
+
+            if (ModelState.IsValid)
+            {
+               if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images/encomiendas");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+           
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(fileStream);
+                    }
+                    if (!string.IsNullOrEmpty(company.ImageUrl))
+                    {
+                        var oldFilePath = Path.Combine(_webHostEnvironment.WebRootPath, company.ImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+                 
+                    company.ImageUrl = "/images/encomiendas/" + uniqueFileName;
+                }
+                         try
+                {
+                    _dbContext.Update(company);
+                    await _dbContext.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                    return RedirectToAction(nameof(AdminEncomiendas));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Ocurrió un error al actualizar: {ex.Message}");
+                    return View("AltaEncomienda", company);
+                }
+            }
+
+            ViewData["Title"] = "Editar Empresa de Encomiendas";
+            return View("AltaEncomienda", company);
         }
 
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                _dbContext.Update(company);
-                await _dbContext.SaveChangesAsync();
-                TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
-                return RedirectToAction(nameof(AdminEncomiendas));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _dbContext.EncomiendaCompanies.AnyAsync(e => e.Id == company.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-        ViewData["Title"] = "Editar Empresa de Encomiendas";
-        return View("AltaEncomienda", company);
-    }
-
-    [HttpPost]
+        [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteEncomienda(int id)
     {
@@ -1070,8 +1165,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> AltaActividad()
         {
             ViewData["Title"] = "Alta de Actividades";
-            // Obtener la lista de mensajes de WhatsApp activos
-            var whatsappMessages = await _dbContext.WhatsappMessages
+               var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
                 .ToListAsync();
@@ -1101,7 +1195,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Actividades");
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/actividades");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -1115,9 +1209,13 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
+                    Actividad.ImageUrl = "/img/actividades/" + uniqueFileName;
                 }
-                ViewData["Title"] = "Gestionar Promociones de Hoteles";
+
+                ViewData["Title"] = "Administrar Actividades";
+                //ViewData["Title"] = "Gestionar Promociones de Hoteles";
+
+
 
                 _dbContext.Add(Actividad);
 
@@ -1138,7 +1236,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 return NotFound();
             }
-            ViewData["Title"] = "Gestionar Promociones de Hoteles";
+            ViewData["Title"] = "Administrar Actividades";
 
             // Obtener la lista de mensajes de WhatsApp activos
             var whatsappMessages = await _dbContext.WhatsappMessages
@@ -1180,7 +1278,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
                         // Lógica para guardar la nueva imagen (similar a AltaActividad).
-                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/Actividades");
+                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/actividades");
                         if (!Directory.Exists(uploadsFolder))
                         {
                             Directory.CreateDirectory(uploadsFolder);
@@ -1204,15 +1302,12 @@ namespace Web_Turismo_Triunvirato.Controllers
                             }
                         }
 
-                        // Se actualiza la URL de la imagen del modelo.
-                        Actividad.ImageUrl = "/img/Actividades/" + uniqueFileName;
+                        Actividad.ImageUrl = "/img/actividades/" + uniqueFileName;
                     }
 
-                    // Si no se subió una nueva imagen, se mantiene la URL existente.
-                    // Esto se maneja automáticamente ya que el campo ImageUrl se incluye en el bind y el campo hidden.
                     _dbContext.Update(Actividad);
                     await _dbContext.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "¡Empresa de encomiendas actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "¡Actualizada exitosamente!";
                     return RedirectToAction(nameof(AdminActivities));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -1227,20 +1322,18 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                 }
             }
-            // Obtener la lista de mensajes de WhatsApp activos
             var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
                 .ToListAsync();
 
-            // Crear una lista de SelectListItem para el dropdown
+
             var whatsappList = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
 
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
             ViewBag.WhatsappMessages = whatsappList;
             ViewData["Title"] = "Editar Actividad";
             return View("AltaActividad", Actividad);

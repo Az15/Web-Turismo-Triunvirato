@@ -327,6 +327,17 @@ namespace Web_Turismo_Triunvirato.DataAccess
             );
         }
 
+        public async Task AbmEncomiendaCompanyAsync(int id, string typeExecuted)
+        {
+            string sql = "CALL DeleteActiveEncomiendaCompanies(@p_id)";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("p_id", id),
+                //new MySqlParameter("p_typeexecuted", typeExecuted)
+            };
+            await Database.ExecuteSqlRawAsync(sql, parameters);
+        }
 
         public async Task AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
         {
