@@ -610,7 +610,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (ImageFile != null )
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/promocionesbuses");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionesbuses");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
