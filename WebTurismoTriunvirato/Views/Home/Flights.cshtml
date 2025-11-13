@@ -1,4 +1,6 @@
 @model IEnumerable<Web_Turismo_Triunvirato.Models.FlightPromotion> 
+@using System.Globalization;
+@using Web_Turismo_Triunvirato.Models.ViewModels
 
 @{
     ViewData["Title"] = "Vuelos";
@@ -58,32 +60,71 @@
         {
             @foreach (var promotion in Model)
             {
+                // --- 1. IMPLEMENTACIÓN DEL MAPEO ---
+                // Creamos el ViewModel que el modal espera (ModalContratoViewModel)
+                // a partir de los datos del modelo actual (promotion - FlightPromotion).
+                var modalVM = new ModalContratoViewModel
+                {
+                    IdItem = promotion.Id,
+                    Title = $"Vuelo a {promotion.DestinationName}", // Título con origen/destino
+                    ImageUrl = Url.Content(promotion.ImageUrl),
+                    Price = promotion.OfferPrice,
+
+                    // Descripción que aparecerá dentro del modal
+                    LongDescription = $"Vuelo desde {promotion.OriginName} a {promotion.DestinationName}. Salida: {promotion.StartDate:dd/MM/yyyy}. {promotion.Description}",
+
+                    // Texto de detalle corto
+                    DetailText = $"Desde {promotion.OriginName} | Servicio: {promotion.ServiceType}",
+
+                    // Datos para el formulario de Mail/WhatsApp
+                    RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
+                    // (Otros campos como WhatsappNumber si aplican)
+                };
+
+                var modalTargetId = $"packageModal-{modalVM.IdItem}"; // ID ÚNICO
+
                 <div class="destination-card">
+                    @* BADGES *@
                     @if (promotion.IsHotWeek)
                     {
-                        <span class="hot-week-badge">HOT WEEK</span> @* <-- ESTO ES LO QUE DEBES CAMBIAR *@
+                        <span class="hot-week-badge">HOT WEEK</span>
                     }
                     else if (promotion.DiscountPercentage > 0)
                     {
-                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span> @* <-- ESTO ES LO QUE DEBES CAMBIAR *@
+                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span>
                     }
-                    @* <a href="@($"https://wa.me/+541122296405?text=Hola, te hablo de la web, me interesaría tener más información para viajar en avion desde {System.Web.HttpUtility.UrlEncode(promotion.OriginName)} hasta  {System.Web.HttpUtility.UrlEncode(promotion.DestinationName)} vi que el precio es {System.Web.HttpUtility.UrlEncode(@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")))} ")" target="_blank"> *@
-                    <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" target="_blank">
-                        <div class="image-container">
-                            <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
-                            <div class="image-overlay">
-                                <h3>@promotion.DestinationName</h3>
-                                <p class="price">@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</p>
-                                <p class="from">Desde @promotion.OriginName</p>
-                                <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
-                                    <i class="fab fa-whatsapp"></i> Consultar
-                                </a>
-                            </div>
-                        </div>
-                    </a>
 
-                    @* <a href="#" class="btn btn-success ver-detalles-button">Ver Detalles</a> *@
+                    @* CONTENEDOR DE IMAGEN *@
+                    <div class="image-container">
+                        <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
+                    </div>
+
+                    @* SECCIÓN DE INFORMACIÓN VISIBLE *@
+                    <div class="destination-info">
+
+                        <h3 class="mb-1">@promotion.DestinationName</h3>
+
+                        <p class="price">
+                            @promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                        </p>
+
+                        @* Descripción corta y origen *@
+                        <p class="details-text">
+                            Desde: **@promotion.OriginName**
+                        </p>
+
+                        @* BOTÓN DE ACCIÓN: Abrir el Modal *@
+                        <button type="button"
+                                class="ver-detalles-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#@modalTargetId">
+                            Ver Detalles
+                        </button>
+                    </div>
                 </div>
+
+                @* --- LLAMADA A LA VISTA PARCIAL (con el ViewModel Mapeado) --- *@
+                @await Html.PartialAsync("_MasInformacionGenerico", modalVM)
             }
         }
         else
