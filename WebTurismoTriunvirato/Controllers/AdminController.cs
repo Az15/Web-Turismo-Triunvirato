@@ -364,7 +364,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             // 1. Manejar la subida de la imagen si se proporcionó un archivo
             if (ImageFile != null && ImageFile.Length > 0)
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "PromocionesHoteles");
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocioneshoteles");
                 //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -378,7 +378,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     await ImageFile.CopyToAsync(fileStream);
                 }
                 // Asignar la nueva URL al modelo ANTES de la validación
-                promotion.ImageUrl = "/img/PromocionesHoteles/" + uniqueFileName;
+                promotion.ImageUrl = "/img/promocioneshoteles/" + uniqueFileName;
 
                 // Quitar ImageUrl del ModelState si se subió el archivo
                 ModelState.Remove("ImageUrl");
@@ -449,7 +449,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
         
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/promocioneshoteles");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -463,7 +463,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                         await ImageFile.CopyToAsync(fileStream);
                     }
 
-                    promotion.ImageUrl = "/img/PromocionesHoteles/" + uniqueFileName;
+                    promotion.ImageUrl = "/img/promocioneshoteles/" + uniqueFileName;
                 }
 
                 try
@@ -622,7 +622,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     await ImageFile.CopyToAsync(fileStream);
                 }
-                promotion.ImageUrl = "/img/PromocionesBuses/" + uniqueFileName;
+                promotion.ImageUrl = "/img/promocionesbuses/" + uniqueFileName;
             }
             else
             {
@@ -700,7 +700,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
 
                 // 2. Actualiza la propiedad ImageUrl del modelo con la nueva ruta.
-                promotion.ImageUrl = "/img/PromocionesBuses/" + uniqueFileName;
+                promotion.ImageUrl = "/img/promocionesbuses/" + uniqueFileName;
             }
             else
             {
