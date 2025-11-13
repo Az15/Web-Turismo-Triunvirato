@@ -94,59 +94,69 @@
     <h3>Paquetes más vendidos</h3>
     <div class="row flex-nowrap overflow-auto mt-4">
 
-        @* Iterar sobre los destinos populares desde el modelo *@
         @if (Model.PopularDestinations != null && Model.PopularDestinations.Any())
         {
-            @foreach (var item in Model.PopularDestinations)
-            {
-                var modalData = new Web_Turismo_Triunvirato.Models.ViewModels.ModalContratoViewModel
-                {
-                    IdItem = item.Id, // Propiedad que actúa como ID único
-                    Title = item.Title,
-                    ImageUrl = item.PictureDestiny,
-                    // Usaremos Title como descripción larga por ahora, pero DEBES cambiarlo por la propiedad real de descripción larga
-                    LongDescription = item.Title,
-                    Price = item.Price,
-                    DetailText = $"{item.TripType} | Desde {item.From}",
-                    RenderedWhatsappMessage = item.RenderedWhatsappMessage,
-                    // WhatsappNumber es opcional, ya está por defecto en el ViewModel de Contrato
-                };
-                var modalTargetId = $"packageModal-{modalData.IdItem}";
+            @* Usamos las clases destacadas para el layout y scroll *@
+            <div class="destacados-horizontal">
+                <div class="destacados-row">
+                    @foreach (var item in Model.PopularDestinations)
+                    {
+                        // Mapeo (se mantiene igual)
+                        var modalData = new ModalContratoViewModel
+                        {
+                            IdItem = item.Id,
+                            Title = item.Title,
+                            ImageUrl = item.PictureDestiny,
+                            LongDescription = item.Title,
+                            Price = item.Price,
+                            DetailText = $"{item.TripType} | Desde {item.From}",
+                            RenderedWhatsappMessage = item.RenderedWhatsappMessage,
+                        };
+                        var modalTargetId = $"packageModal-{modalData.IdItem}";
 
-                <div class="col-md-4">
-                    <div class="card rounded-3 shadow-sm d-flex flex-row">
-                        <img src="@item.PictureDestiny" class="card-img-left rounded-start-3" alt="@item.Title" style="width: 150px; height: 120px; object-fit: cover;">
-                        <div class="card-body d-flex flex-column justify-content-between p-3">
-                            <div>
-                                @if (!string.IsNullOrEmpty(item.TripType))
-                                {
-                                    <h6 class="card-subtitle text-muted small">@item.TripType</h6> @* Usamos la nueva propiedad TripType *@
-                                }
-                                <h5 class="card-title mb-0">@item.Title</h5>
-                                <p class="card-text small mt-2">
-                                    <span class="fw-bold">@item.Price.ToString("C", new CultureInfo("es-AR"))</span><br> @* Formato de moneda para Argentina *@
-                                    @item.From
-                                </p>
+                        @* CLAVE: La tarjeta ahora es VERTICAL *@
+                        <div class="card rounded-3 shadow-sm">
+
+                            @* Imagen: Cambiamos a card-img-top para formato vertical *@
+                            <img src="@item.PictureDestiny" class="card-img-left" alt="@item.Title">
+
+                            @* Cuerpo: Contiene el texto y el botón *@
+                            <div class="card-body">
+                                <div>
+                                    @* Subtítulo (Ej: IDA Y VUELTA) *@
+                                    @if (!string.IsNullOrEmpty(item.TripType))
+                                    {
+                                        <h6 class="card-subtitle">@item.TripType</h6>
+                                    }
+
+                                    @* Título (Ej: Cataratas de Iguazú) *@
+                                    <h5 class="card-title">@item.Title</h5>
+
+                                    @* Precio y Origen *@
+                                    <p class="card-text">
+                                        <span class="fw-bold">@item.Price.ToString("C", new CultureInfo("es-AR"))</span><br>
+                                        Desde @item.From
+                                    </p>
+                                </div>
+
+                                @* Botón: Con estilo azul y pegado al final *@
+                                <button type="button"
+                                        class="destacados-button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#@modalTargetId">
+                                    Ver más
+                                </button>
+
+                                @* Inyectamos el modal *@
+                                @await Html.PartialAsync("_MasInformacionGenerico", modalData)
                             </div>
-
-                            <button type="button"
-                                    class="btn btn-primary btn-sm w-100"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#@modalTargetId">
-                                Ver más
-                            </button>
-
-                            @Html.Partial("_MasInformacionGenerico", modalData)
-                            <!--Aca vamos a tocar-->
-
                         </div>
-                    </div>
+                    }
                 </div>
-            }
+            </div>
         }
         else
         {
-            @* Contenido de respaldo si no hay destinos populares (opcional) *@
             <div class="col-12 text-center text-muted">
                 <p>No hay paquetes más vendidos disponibles en este momento.</p>
             </div>

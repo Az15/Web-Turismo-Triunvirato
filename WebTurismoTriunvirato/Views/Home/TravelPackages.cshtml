@@ -1,4 +1,6 @@
 @model IEnumerable<Web_Turismo_Triunvirato.Models.PackagePromotion>  
+@using System.Globalization;
+@using Web_Turismo_Triunvirato.Models.ViewModels
 
 @{
     ViewData["Title"] = "¡Promociones!";
@@ -40,7 +42,30 @@
         {
             @foreach (var promotion in Model)
             {
+                // --- 1. IMPLEMENTACIÓN DEL MAPEO ---
+                // Creamos el ViewModel que el modal espera (ModalContratoViewModel)
+                // a partir de los datos del modelo actual (promotion - PackagePromotion).
+                var modalVM = new ModalContratoViewModel
+                {
+                    IdItem = promotion.Id,
+                    Title = $"Paquete a {promotion.DestinationName} ({promotion.PackageType})", // Título detallado
+                    ImageUrl = Url.Content(promotion.ImageUrl),
+                    Price = promotion.OfferPrice,
+
+                    // Descripción larga para el cuerpo del modal
+                    LongDescription = $"Tipo: {promotion.PackageType}. Hotel: {promotion.HotelName}. Origen: {promotion.OriginName}. Duración: Del {promotion.StartDate:dd/MM/yyyy} al {promotion.EndDate:dd/MM/yyyy}. {promotion.Description}",
+
+                    // Texto de detalle corto para la parte visible de la tarjeta
+                    DetailText = $"{promotion.PackageType} | Hotel: {promotion.HotelName}",
+
+                    // Datos para el formulario de Mail/WhatsApp
+                    RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
+                };
+
+                var modalTargetId = $"packageModal-{modalVM.IdItem}"; // ID ÚNICO
+
                 <div class="destination-card">
+                    @* BADGES *@
                     @if (promotion.IsHotWeek)
                     {
                         <span class="hot-week-badge">HOT WEEK</span>
@@ -49,18 +74,39 @@
                     {
                         <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span>
                     }
+
+                    @* CONTENEDOR DE IMAGEN (Nuevo diseño, sin <a> principal) *@
                     <div class="image-container">
                         <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
-                        <div class="image-overlay">
-                            <h3>@promotion.DestinationName</h3>
-                            <p class="price">@promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))</p>
-                            <p class="from">Desde @promotion.OriginName</p>
-                            <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(promotion.RenderedWhatsappMessage)}")" class="whatsapp-button" target="_blank">
-                                <i class="fab fa-whatsapp"></i> Consultar
-                            </a>
-                        </div>
+                    </div>
+
+                    @* SECCIÓN DE INFORMACIÓN VISIBLE *@
+                    <div class="destination-info">
+
+                        <h3 class="mb-1">@promotion.DestinationName</h3>
+
+                        <p class="price">
+                            @promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                        </p>
+
+                        @* Descripción corta y tipo de paquete *@
+                        <p class="details-text">
+                            @* Usamos el DetailText mapeado, o una combinación de datos *@
+                            @modalVM.DetailText
+                        </p>
+
+                        @* BOTÓN DE ACCIÓN: Abrir el Modal con el ID único *@
+                        <button type="button"
+                                class="ver-detalles-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#@modalTargetId">
+                            Ver Detalles
+                        </button>
                     </div>
                 </div>
+
+                @* --- LLAMADA A LA VISTA PARCIAL (con el ViewModel Mapeado) --- *@
+                @await Html.PartialAsync("_MasInformacionGenerico", modalVM)
             }
         }
         else

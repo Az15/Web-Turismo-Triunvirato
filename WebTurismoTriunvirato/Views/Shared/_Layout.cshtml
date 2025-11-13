@@ -34,13 +34,13 @@
                     @if (!User.Identity.IsAuthenticated)
                     {
                         <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                            <img src="/images/icono/iconofinal.png" alt="" class="icono-personalizado"> Turismo Triunvirato
+                            <img src="/Recurso4_4x.png" alt="" class="icono-personalizado"> @* Turismo Triunvirato *@
                         </a>
                     }
                     else
                     {
                         <a class="navbar-brand" asp-controller="Admin" asp-action="Index">
-                            <img src="/images/icono/iconofinal.png" alt="" class="icono-personalizado"> Turismo Triunvirato
+                            <img src="/Recurso4_4x.pngg" alt="" class="icono-personalizado"> @* Turismo Triunvirato *@
                         </a>
                     }
 
@@ -119,9 +119,9 @@
                     <div class="col-auto">
                         <a class="icon-button" asp-controller="Home" asp-action="TravelPackages" data-section="paquetes"><i class="fas fa-suitcase"></i> Paquetes de viaje</a>
                     </div>
-                <div class="col-auto">
+@*                 <div class="col-auto">
                     <a class="icon-button" asp-controller="Home" asp-action="RutaAtlantica" data-section="compras"><i class="fas fa-van-shuttle"></i> Comprar Pasajes</a>
-                </div>
+                </div> *@
 @*                     <div class="col-auto">
                         <a class="icon-button" asp-controller="Home" asp-action="Offers" data-section="ofertas"><i class="fas fa-tag"></i> Ofertas <span class="badge bg-warning text-dark small">Hot</span></a>
                     </div> *@
