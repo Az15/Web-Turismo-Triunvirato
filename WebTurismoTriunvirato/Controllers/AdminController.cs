@@ -170,17 +170,21 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
             else
             {
-                // Si es un nuevo registro y no hay imagen, lanza error de validación
+                
                 if (promotion.Id == 0)
                 {
                     ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción de Vuelo.");
                 }
             }
-            // ===================================
+            
 
             if (ModelState.IsValid)
             {
-                // ... (Tu lógica de cálculo de descuento) ...
+                if (promotion.OriginalPrice > 0)
+                {
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                }
+
                 promotion.ServiceType = "0";
 
                 await _dbContext.AbmFlightPromotionAsync(promotion, "INSERT");
@@ -189,7 +193,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 return RedirectToAction(nameof(AdminPromotionFlights));
             }
 
-            // ... (Tu lógica para recargar ViewBag.WhatsappMessages si falla el ModelState) ...
+            
             ViewData["Title"] = "Alta de Promoción de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
@@ -208,7 +212,6 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (promotion.ImageUrl == null && ImageFile == null) { }
             else
             {              
-                // Paso 1: Si no se sube un nuevo archivo, elimina el error de validación para ImageUrl.
                 if (promotion.ImageUrl == null)
                 {
                     ModelState.Remove("ImageUrl");
@@ -219,14 +222,12 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
-            // Ahora, si el ModelState es válido, puedes continuar.
             if (ModelState.IsValid)
             {
-                // Lógica para manejar la subida de la nueva imagen
+ 
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesVuelos");
-                    
+                                       
                     var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
                     if (!Directory.Exists(uploadsFolder))
                     {
@@ -308,20 +309,19 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> AltaPromotionHotel()
         {
             ViewData["Title"] = "Alta de Promoción de Hotel";
-            // Obtener la lista de mensajes de WhatsApp activos
+            
             var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
                 .ToListAsync();
 
-            // Crear una lista de SelectListItem para el dropdown
             var whatsappList = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
 
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
+            
             ViewBag.WhatsappMessages = whatsappList;
             return View("AltaPromotionHotel", new HotelPromotion { ServiceType = "1" });
         }
@@ -335,7 +335,6 @@ namespace Web_Turismo_Triunvirato.Controllers
                .OrderBy(m => m.Title)
                .ToListAsync();
 
-            // Crear una lista de SelectListItem para el dropdown
             var whatsappList = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
@@ -359,13 +358,10 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             ModelState.Remove("RenderedWhatsappMessage");
 
-            // === INICIO DE LÓGICA DE IMAGEN (MOVIDA Y CORREGIDA) ===
-
-            // 1. Manejar la subida de la imagen si se proporcionó un archivo
             if (ImageFile != null && ImageFile.Length > 0)
             {
                 var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocioneshoteles");
-                //var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/PromocionesHoteles");
+                
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -377,15 +373,15 @@ namespace Web_Turismo_Triunvirato.Controllers
                 {
                     await ImageFile.CopyToAsync(fileStream);
                 }
-                // Asignar la nueva URL al modelo ANTES de la validación
+                
                 promotion.ImageUrl = "/img/promocioneshoteles/" + uniqueFileName;
 
-                // Quitar ImageUrl del ModelState si se subió el archivo
+                
                 ModelState.Remove("ImageUrl");
             }
             else
             {
-                // Si es una creación (INSERT), la imagen es obligatoria.
+                
                 if (string.IsNullOrEmpty(promotion.ImageUrl))
                 {
                     ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción.");
@@ -427,9 +423,8 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 return NotFound();
             }
-
-
-            if (promotion.ImageUrl == null && ImageFile == null) { }
+            if (promotion.ImageUrl == null && ImageFile == null) 
+            { }
             else
             {
 
@@ -449,7 +444,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
         
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/promocioneshoteles");
+                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img","promocioneshoteles");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -1195,7 +1190,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             {
                 if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/actividades");
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img","actividades");
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
@@ -1278,7 +1273,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
                         // Lógica para guardar la nueva imagen (similar a AltaActividad).
-                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "/img/actividades");
+                        string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img","actividades");
                         if (!Directory.Exists(uploadsFolder))
                         {
                             Directory.CreateDirectory(uploadsFolder);
