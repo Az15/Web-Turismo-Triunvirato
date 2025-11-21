@@ -28,4 +28,25 @@
             }
         });
     }
+
+    // Usamos jQuery (ya que está incluido en el layout)
+    $('#toggleNavButton').click(function () {
+        var navBarContainer = $('#iconBarContainer');
+        var button = $(this);
+
+        // Alterna la visibilidad del contenedor de la botonera
+        navBarContainer.toggle(400); // Oculta/Muestra con una pequeña animación (400ms)
+
+        // Cambia el texto del botón
+        if (navBarContainer.is(':visible')) {
+            button.text('Ocultar Botones');
+        } else {
+            button.text('Mostrar Botones');
+        }
+    });
+
+    // ***** FIN DE LÓGICA AGREGADA *****
+});
+
+
 });

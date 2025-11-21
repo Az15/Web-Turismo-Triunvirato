@@ -9,8 +9,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" /> @* Asegúrate de que tu site.css exista y tenga estilos básicos *@
     <link rel="stylesheet" href="~/css/admin_layout.css" /> @* NUEVO CSS para el layout de admin *@
+
+    <div class="col-auto">
+        <a class="icon-button" asp-controller="Home" asp-action="Hotels" data-section="alojamientos"><i class="fas fa-bed"></i> Alojamientos</a>
+    </div>
+
 </head>
 <body>
+
     <div class="wrapper">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
