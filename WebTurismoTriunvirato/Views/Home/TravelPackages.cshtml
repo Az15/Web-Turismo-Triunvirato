@@ -42,9 +42,7 @@
         {
             @foreach (var promotion in Model)
             {
-                // --- 1. IMPLEMENTACIÓN DEL MAPEO ---
-                // Creamos el ViewModel que el modal espera (ModalContratoViewModel)
-                // a partir de los datos del modelo actual (promotion - PackagePromotion).
+
                 var modalVM = new ModalContratoViewModel
                 {
                     IdItem = promotion.Id,
@@ -52,13 +50,11 @@
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
 
-                    // Descripción larga para el cuerpo del modal
                     LongDescription = $"Tipo: {promotion.PackageType}. Hotel: {promotion.HotelName}. Origen: {promotion.OriginName}. Duración: Del {promotion.StartDate:dd/MM/yyyy} al {promotion.EndDate:dd/MM/yyyy}. {promotion.Description}",
 
-                    // Texto de detalle corto para la parte visible de la tarjeta
+                  
                     DetailText = $"{promotion.PackageType} | Hotel: {promotion.HotelName}",
 
-                    // Datos para el formulario de Mail/WhatsApp
                     RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
                 };
 

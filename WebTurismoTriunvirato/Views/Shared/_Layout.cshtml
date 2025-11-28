@@ -101,10 +101,10 @@
         
     </header>
 
-    @* ...código anterior... *@
+ 
 
-        @if(!User.Identity.IsAuthenticated)
-        {
+@*         @if(!User.Identity.IsAuthenticated)
+        { *@
             <div class="container mt-2">
                 <div class="row justify-content-center icon-bar">
                     <div class="col-auto">
@@ -119,12 +119,6 @@
                     <div class="col-auto">
                         <a class="icon-button" asp-controller="Home" asp-action="TravelPackages" data-section="paquetes"><i class="fas fa-suitcase"></i> Paquetes de viaje</a>
                     </div>
-@*                 <div class="col-auto">
-                    <a class="icon-button" asp-controller="Home" asp-action="RutaAtlantica" data-section="compras"><i class="fas fa-van-shuttle"></i> Comprar Pasajes</a>
-                </div> *@
-@*                     <div class="col-auto">
-                        <a class="icon-button" asp-controller="Home" asp-action="Offers" data-section="ofertas"><i class="fas fa-tag"></i> Ofertas <span class="badge bg-warning text-dark small">Hot</span></a>
-                    </div> *@
                     <div class="col-auto">
                         <a class="icon-button" asp-controller="Home" asp-action="Activities" data-section="actividades"><i class="fas fa-map-signs"></i> Actividades</a>
                     </div>
@@ -135,12 +129,8 @@
                         <a class="icon-button" asp-controller="Home" asp-action="SendBox" data-section="encomiendas"><i class="fa-solid fa-truck-ramp-box"></i> Encomiendas</a>
                     </div>
                 </div>
-            </div> @* <-- Se agregó el cierre del div aquí *@
-        } @* <-- Se agregó el cierre del bloque if aquí *@
-
-
-    
-
+            </div> 
+            
     </div>
     <main class="container-fluid">
         @RenderBody()

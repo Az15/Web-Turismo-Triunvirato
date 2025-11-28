@@ -128,7 +128,9 @@
             width: 100%;
             height: 100%;
             display: block;
+            /* CAMBIOS CLAVE: object-fit: cover para llenar, object-position: top para priorizar la parte superior */
             object-fit: cover;
+            object-position: top;
         }
 
     /* --- OVERLAY OBSOLETO: ELIMINADO --- */
