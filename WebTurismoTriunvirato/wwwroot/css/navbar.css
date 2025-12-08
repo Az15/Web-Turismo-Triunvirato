@@ -99,6 +99,16 @@
     vertical-align: middle;
 }
 
+.icono-personalizado-futter {
+    /* Define el ancho y el alto. Ajustá estos valores a tu gusto. */
+    width: 250px;
+    height: 100px;
+    /* Para que el icono se mantenga dentro de su contenedor sin deformarse */
+    object-fit: contain;
+    /* Opcional: Para alinearlo como un texto si está en una línea */
+    vertical-align: middle;
+}
+
 /* Media query para pantallas de hasta 768px (típicamente móviles y tablets pequeñas) */
 @media (max-width: 768px) {
 
