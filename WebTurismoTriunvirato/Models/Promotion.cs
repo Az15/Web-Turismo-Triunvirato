@@ -72,14 +72,7 @@ namespace Web_Turismo_Triunvirato.Models
                     new[] { nameof(Stars) });
             }
 
-            // Aquí puedes agregar otras validaciones condicionales si las necesitas
-            // Por ejemplo, para Vuelos, si OriginName es obligatorio
-            // if (ServiceType == ServiceType.Vuelos && string.IsNullOrEmpty(OriginName))
-            // {
-            //     yield return new ValidationResult(
-            //         "El nombre de origen es obligatorio para vuelos.",
-            //         new[] { nameof(OriginName) });
-            // }
+
         }
     }
 }

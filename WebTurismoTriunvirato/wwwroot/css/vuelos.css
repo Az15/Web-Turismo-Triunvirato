@@ -119,7 +119,7 @@
     /* --- IMAGEN: Altura fija más baja para dejar espacio al contenido --- */
     .destination-card .image-container {
         width: 100%;
-        height: 180px; /* Altura de imagen más pequeña */
+        height: 180px;  
         overflow: hidden;
         border-radius: 8px 8px 0 0;
     }
@@ -128,9 +128,8 @@
             width: 100%;
             height: 100%;
             display: block;
-            /* CAMBIOS CLAVE: object-fit: cover para llenar, object-position: top para priorizar la parte superior */
             object-fit: cover;
-            object-position: top;
+            object-position: 50% 5%;
         }
 
     /* --- OVERLAY OBSOLETO: ELIMINADO --- */
