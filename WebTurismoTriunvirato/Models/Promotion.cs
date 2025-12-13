@@ -58,7 +58,7 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Activa")]
         public bool IsActive { get; set; } = true;
 
-        [StringLength(200, ErrorMessage = "La descripción no puede exceder 200 caracteres.")]
+        [StringLength(4000, ErrorMessage = "La descripción no puede exceder 4000 caracteres.")]
         public string Description { get; set; }
 
         // Implementación de IValidatableObject para validación condicional

@@ -71,7 +71,7 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Está Activo")]
         public bool IsActive { get; set; } = true;
 
-        [StringLength(200)]
+        [StringLength(4000)]
         [Display(Name = "Descripción")]
         [Required(ErrorMessage ="Es necesario dar una descripcion o nombre de hotel")]
         public string Description { get; set; }

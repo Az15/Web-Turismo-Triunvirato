@@ -27,7 +27,7 @@ namespace Web_Turismo_Triunvirato.Models
 
 
         [Required(ErrorMessage = "Descripción es requerida.")]
-        [StringLength(200)]
+        [StringLength(4000)]
         [Display(Name = "Descripción")]
         public string Description { get; set; }
 

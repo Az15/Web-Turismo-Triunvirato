@@ -37,7 +37,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [Range(1, 5, ErrorMessage = "La calidad debe ser entre 1 y 5.")]
         public int Quality { get; set; } // Calidad (1-5 estrellas, etc.)
 
-        [StringLength(1000)]
+        [StringLength(4000)]
         public string Description { get; set; }
     }
 }
