@@ -35,7 +35,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [DisplayName("Monto")]
         public decimal Amount { get; set; }
 
-        [StringLength(500)]
+        [StringLength(400)]
         [DisplayName("Descripcion de equipaje")]
         public string Luggage { get; set; } // Descripción del equipaje (ej. "1 maleta, 1 de mano")
 
@@ -43,7 +43,7 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [DisplayName("Descripcion adicional")]
         public string Addons { get; set; } // Descripción de adicionales (ej. "Asiento premium, Comida especial")
 
-        [StringLength(1000)]
+        [StringLength(4000)]
         [DisplayName("Descripcion")]
         public string Description { get; set; } // Descripción general del destino o viaje
 

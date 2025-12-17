@@ -20,7 +20,7 @@ namespace Web_Turismo_Triunvirato.Models
         public string ServiceType { get; set; } = "2"; // Valor por defecto para buses
 
         [Required(ErrorMessage = "Descripción es requerida.")]
-        [StringLength(200)]
+        [StringLength(4000)]
         [Display(Name = "Descripción")]
         public string Description { get; set; }
 
