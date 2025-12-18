@@ -50,8 +50,11 @@
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
 
-                    LongDescription = $"Tipo: {promotion.PackageType}. Hotel: {promotion.HotelName}. Origen: {promotion.OriginName}. Duración: Del {promotion.StartDate:dd/MM/yyyy} al {promotion.EndDate:dd/MM/yyyy}. {promotion.Description}",
+                    LongDescription = $"Disfruta del Hotel {promotion.HotelName}.<br>" +
+                    $"Salí desde {promotion.OriginName}.<br>" +
+                    $"Promoción válida hasta el {promotion.EndDate:dd/MM/yyyy}.",
 
+                    LongDescription2=promotion.Description, 
                   
                     DetailText = $"{promotion.PackageType} | Hotel: {promotion.HotelName}",
 

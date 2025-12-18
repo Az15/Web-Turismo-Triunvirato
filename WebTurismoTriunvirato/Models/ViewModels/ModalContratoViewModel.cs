@@ -5,11 +5,8 @@ namespace Web_Turismo_Triunvirato.Models.ViewModels
     // Usaremos el nombre que solicitaste
     public class ModalContratoViewModel
     {
-        // 1. Identificador único para el botón de Mail y el ID del Modal
-        public int IdItem { get; set; }
-
-        // 2. Título principal del paquete/item
-        public string Title { get; set; }
+          public int IdItem { get; set; }
+          public string Title { get; set; }
 
         // 3. URL de la imagen (la que va en el modal)
         public string ImageUrl { get; set; }
@@ -17,6 +14,7 @@ namespace Web_Turismo_Triunvirato.Models.ViewModels
         // 4. Descripción larga o detallada (cuerpo del modal)
         // Puedes usar el atributo [AllowHtml] si manejas HTML en la descripción.
         public string LongDescription { get; set; }
+        public string LongDescription2 { get; set; }
 
         // 5. El precio o valor (para mostrar con formato de moneda)
         public decimal Price { get; set; }

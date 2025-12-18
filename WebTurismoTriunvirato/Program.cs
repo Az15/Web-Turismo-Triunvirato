@@ -6,20 +6,12 @@ using Web_Turismo_Triunvirato.Services; // Asegúrate de tener este using para I
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-// ...
-
-// Cambia esta línea:
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Por esta, especificando la versión del servidor MySQL:
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
