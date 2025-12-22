@@ -60,21 +60,22 @@
         {
             @foreach (var promotion in Model)
             {
-                // --- 1. IMPLEMENTACIÓN DEL MAPEO ---
-                // Creamos el ViewModel que el modal espera (ModalContratoViewModel)
-                // a partir de los datos del modelo actual (promotion - FlightPromotion).
+             
                 var modalVM = new ModalContratoViewModel
                 {
                     IdItem = promotion.Id,
-                    Title = $"Vuelo a {promotion.DestinationName}", // Título con origen/destino
+                    Title = $"Vola a {promotion.DestinationName}", 
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
 
                     // Descripción que aparecerá dentro del modal
-                    LongDescription = $"Vuelo desde {promotion.OriginName} a {promotion.DestinationName}. Salida: {promotion.StartDate:dd/MM/yyyy}. {promotion.Description}",
+                        LongDescription =
+                    $"<strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
+                    $"{promotion.Description}<br /><br />" +
+                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
 
                     // Texto de detalle corto
-                    DetailText = $"Desde {promotion.OriginName} | Servicio: {promotion.ServiceType}",
+                    @* DetailText = $"Desde {promotion.OriginName} | Servicio: {promotion.ServiceType}", *@
 
                     // Datos para el formulario de Mail/WhatsApp
                     RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,

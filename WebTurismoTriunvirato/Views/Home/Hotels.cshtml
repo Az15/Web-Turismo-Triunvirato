@@ -75,9 +75,10 @@
                         Price = promotion.OfferPrice,
 
                         // REORGANIZADO: Primero el Hotel, luego las Estrellas y al final la Descripción
-           LongDescription = $"<strong>Hotel {promotion.HotelName}</strong><br />" +
-           $"<span style='color: #FFD700; font-size: 1.2em;'>{estrellasVisuales}</span><br /><br />" +
-                    $"{promotion.Description} <br /><br />" + $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
+                        LongDescription = $"<strong> 🏨 Hotel  {promotion.HotelName}</strong><br />" +
+                    $"<span style='color: #FFD700; font-size: 1.2em;'>{estrellasVisuales}</span><br /><br />" +
+                    $"{promotion.Description}<br /><br />" +
+                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
 
            RenderedWhatsappMessage = promotion.RenderedWhatsappMessage
                     };
