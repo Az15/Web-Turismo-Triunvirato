@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web_Turismo_Triunvirato.DataAccess;
 using Web_Turismo_Triunvirato.Models;
+using Web_Turismo_Triunvirato.Models.ViewModels;
 using Web_Turismo_Triunvirato.Services;
 
 namespace Web_Turismo_Triunvirato.Controllers
@@ -20,6 +21,7 @@ namespace Web_Turismo_Triunvirato.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IPromotionService _promotionService;
+        
         private readonly ApplicationDbContext _dbContext;
         
         public AdminController(IPromotionService promotionService, ApplicationDbContext dbContext, IWebHostEnvironment webHostEnvironment)
@@ -27,6 +29,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             _promotionService = promotionService;
             _dbContext = dbContext;
             _webHostEnvironment = webHostEnvironment;
+            
         }
 
         public IActionResult Index()
@@ -1773,5 +1776,15 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             return RedirectToAction("AdminDestination");
         }
+
+
     }
+
+
+
+
+
+
+
 }
+

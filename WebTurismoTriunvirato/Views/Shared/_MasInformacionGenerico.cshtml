@@ -1,13 +1,15 @@
 @model Web_Turismo_Triunvirato.Models.ViewModels.ModalContratoViewModel
 @using System.Globalization;
+@using System.Text.RegularExpressions; 
 
 @{
     var modalTargetId = $"packageModal-{Model.IdItem}";
     var modalMailId = $"mailModal-{Model.IdItem}"; // Nuevo ID para el segundo modal
-    // ... (otras variables de WhatsApp Link, etc., se mantienen) ...
+
+
+    var cleanTitle = Regex.Replace(Model.Title ?? "", @"\s*\(.*?\)\s*", "").Trim();
     var encodedMessage = Uri.EscapeDataString(Model.RenderedWhatsappMessage);
     var whatsappLink = $"https://wa.me/{Model.WhatsappNumber}?text={encodedMessage}";
-
     var descriptionContent = string.IsNullOrEmpty(Model.LongDescription) ? "Detalles del paquete no disponibles." : Model.LongDescription;
 }
 
@@ -16,7 +18,8 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title" id="@($"title-{modalTargetId}")">@Model.Title</h5>
+              
+                <h5 class="modal-title" id="@($"title-{modalTargetId}")">@cleanTitle</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -29,7 +32,7 @@
                     <div class="col-md-6">
                         <p class="text-muted small">@Model.DetailText</p>
                         <div class="package-description-container">
-                            <p>@descriptionContent</p>
+                            <p>@Html.Raw(descriptionContent)</p>
                         </div>
                         <p class="h4 fw-bold text-success mt-3">
                             @Model.Price.ToString("C", new CultureInfo("es-AR"))
@@ -70,4 +73,3 @@
         </div>
     </div>
 </div>
-

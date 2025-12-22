@@ -1,14 +1,15 @@
-@model IEnumerable<Web_Turismo_Triunvirato.Models.PackagePromotion>  
+@model IEnumerable<Web_Turismo_Triunvirato.Models.PackagePromotion>
 @using System.Globalization;
 @using Web_Turismo_Triunvirato.Models.ViewModels
 
 @{
     ViewData["Title"] = "¡Promociones!";
-} 
+}
 <link rel="stylesheet" href="~/css/vuelos.css" />
 
 <div class="flight-search-container">
     <h2>¡Encuentra tu Promocion ideal!</h2>
+
     <div class="flight-search-options">
         <label>
             <input type="radio" name="flight-type" value="round-trip" checked> Ida y Vuelta
@@ -20,10 +21,8 @@
             <input type="radio" name="flight-type" value="multi-destination"> Multidestino
         </label>
     </div>
-    <div class="flight-search-inputs">
 
-       
-       
+    <div class="flight-search-inputs">
         <div class="input-group">
             <label for="origin">Origen</label>
             <input type="text" id="origin" placeholder="Ingresa ciudad, país o región">
@@ -31,36 +30,48 @@
 
         <button class="search-button">Buscar</button>
     </div>
-    <div class="more-options">
-    </div>
 </div>
 
 <section class="destinations-section">
-    <h2>¡Promociones mas buscadas!</h2>
+    <h2>¡Promociones más buscadas!</h2>
+
     <div class="destinations-grid">
         @if (Model != null && Model.Any())
         {
-            @foreach (var promotion in Model)
+            foreach (var promotion in Model)
             {
+                              
+                    string tipoViaje = promotion.PackageType switch
+                    {
+                        "BusYHotel" => "Traslado",
+                        "VueloYHotel" => "Vuelo",
+                        _ => promotion.PackageType
+                    };
+                
 
                 var modalVM = new ModalContratoViewModel
                 {
                     IdItem = promotion.Id,
-                    Title = $"Paquete a {promotion.DestinationName} ({promotion.PackageType})", // Título detallado
+                    Title = $"Paquete a {promotion.DestinationName} ({promotion.PackageType})",
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
 
-                    LongDescription = $"Tipo: {promotion.PackageType}. Hotel: {promotion.HotelName}. Origen: {promotion.OriginName}. Duración: Del {promotion.StartDate:dd/MM/yyyy} al {promotion.EndDate:dd/MM/yyyy}. {promotion.Description}",
+                    LongDescription =
+                    $"{promotion.OriginName} ⮂ {promotion.DestinationName}.<br><br><br>" +
+                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
 
-                  
-                    DetailText = $"{promotion.PackageType} | Hotel: {promotion.HotelName}",
+
+                    LongDescription2 = promotion.Description,
+
+                    DetailText = $"{tipoViaje} + Hospedaje",
 
                     RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
                 };
 
-                var modalTargetId = $"packageModal-{modalVM.IdItem}"; // ID ÚNICO
+                var modalTargetId = $"packageModal-{modalVM.IdItem}";
 
                 <div class="destination-card">
+
                     @* BADGES *@
                     @if (promotion.IsHotWeek)
                     {
@@ -68,30 +79,28 @@
                     }
                     else if (promotion.DiscountPercentage > 0)
                     {
-                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span>
+                        <span class="discount-badge">
+                            ¡@promotion.DiscountPercentage.ToString("F0")% OFF!
+                        </span>
                     }
 
-                    @* CONTENEDOR DE IMAGEN (Nuevo diseño, sin <a> principal) *@
                     <div class="image-container">
-                        <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
+                        <img src="@Url.Content(promotion.ImageUrl)"
+                             alt="@promotion.DestinationName">
                     </div>
 
-                    @* SECCIÓN DE INFORMACIÓN VISIBLE *@
                     <div class="destination-info">
-
                         <h3 class="mb-1">@promotion.DestinationName</h3>
 
                         <p class="price">
-                            @promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
+                            @promotion.OfferPrice.ToString("C0",
+                                new CultureInfo("es-AR"))
                         </p>
 
-                        @* Descripción corta y tipo de paquete *@
                         <p class="details-text">
-                            @* Usamos el DetailText mapeado, o una combinación de datos *@
                             @modalVM.DetailText
                         </p>
 
-                        @* BOTÓN DE ACCIÓN: Abrir el Modal con el ID único *@
                         <button type="button"
                                 class="ver-detalles-button"
                                 data-bs-toggle="modal"
@@ -101,14 +110,14 @@
                     </div>
                 </div>
 
-                @* --- LLAMADA A LA VISTA PARCIAL (con el ViewModel Mapeado) --- *@
                 @await Html.PartialAsync("_MasInformacionGenerico", modalVM)
             }
         }
         else
         {
-            <p class="col-12 alert alert-info text-center">No hay destinos populares de ¡Promociones! disponibles en este momento.</p>
+            <p class="col-12 alert alert-info text-center">
+                No hay destinos populares de ¡Promociones! disponibles en este momento.
+            </p>
         }
     </div>
 </section>
-
