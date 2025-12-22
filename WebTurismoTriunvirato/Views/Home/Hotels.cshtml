@@ -1,10 +1,10 @@
-@model IEnumerable<Web_Turismo_Triunvirato.Models.HotelPromotion>  
+@model IEnumerable<Web_Turismo_Triunvirato.Models.HotelPromotion>
 @using Web_Turismo_Triunvirato.Models.ViewModels
 @using System.Globalization;
 
 @{
     ViewData["Title"] = "Hospedaje";
-} 
+}
 <link rel="stylesheet" href="~/css/vuelos.css" />
 
 <div class="flight-search-container">
@@ -54,83 +54,74 @@
 </div>
 
 <section class="destinations-section">
-    <h4 style="color:darkblue">Destinos Populares</h4> @* Título actualizado *@
+    <h4 style="color:darkblue">Destinos Populares</h4>
     <div class="destinations-grid">
         @if (Model != null && Model.Any())
         {
-
             @foreach (var promotion in Model)
-{
+            {
+               
+                string estrellasVisuales = "";
+                for (int i = 0; i < promotion.Stars; i++)
+                {
+                    estrellasVisuales += "★"; 
+                }
 
-    var modalVM = new ModalContratoViewModel
-    {
-        IdItem = promotion.Id, // Se mapea el Id
-        Title = promotion.DestinationName, // Título principal del modal
-        ImageUrl = Url.Content(promotion.ImageUrl), // URL de la imagen
-        Price = promotion.OfferPrice, // Precio de la oferta
-        
-        // La descripción larga debe ser la más detallada disponible
-        LongDescription = $"Hotel: {promotion.HotelName}. Calificación: {promotion.Stars} estrellas.", 
-        
-        // Texto de detalle para la parte superior del modal
-        DetailText = $"Servicio: {promotion.ServiceType} | {promotion.Description}", 
-        
-        // Datos para el formulario de Mail/WhatsApp
-        RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
-        // (Otros campos como WhatsappNumber si el ViewModel los tiene)
-    };
-    
-    var modalTargetId = $"packageModal-{modalVM.IdItem}"; // ID ÚNICO
+                var modalVM = new ModalContratoViewModel
+             {
+                        IdItem = promotion.Id,
+                        Title = promotion.DestinationName,
+                        ImageUrl = Url.Content(promotion.ImageUrl),
+                        Price = promotion.OfferPrice,
 
-    <div class="destination-card">
-        @* BADGES (se mantienen igual) *@
-        @if (promotion.IsHotWeek)
-        {
-            <span class="hot-week-badge">HOT WEEK</span>
-        }
-        else if (promotion.DiscountPercentage > 0)
-        {
-            <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span>
-        }
+                        // REORGANIZADO: Primero el Hotel, luego las Estrellas y al final la Descripción
+           LongDescription = $"<strong>Hotel {promotion.HotelName}</strong><br />" +
+           $"<span style='color: #FFD700; font-size: 1.2em;'>{estrellasVisuales}</span><br /><br />" +
+                    $"{promotion.Description} <br /><br />" + $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
 
-        @* CONTENEDOR DE IMAGEN *@
-        <div class="image-container">
-            <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
-        </div>
+           RenderedWhatsappMessage = promotion.RenderedWhatsappMessage
+                    };
 
-        @* NUEVA SECCIÓN DE INFORMACIÓN VISIBLE *@
-        <div class="destination-info">
+                var modalTargetId = $"packageModal-{modalVM.IdItem}";
 
-            <h3 class="mb-1">@promotion.DestinationName</h3>
+                <div class="destination-card">
+                    @if (promotion.IsHotWeek)
+                    {
+                        <span class="hot-week-badge">HOT WEEK</span>
+                    }
+                    else if (promotion.DiscountPercentage > 0)
+                    {
+                        <span class="discount-badge">¡@promotion.DiscountPercentage.ToString("F0")% OFF!</span>
+                    }
 
-            <p class="price">
-                @promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR"))
-            </p>
+                    <div class="image-container">
+                        <img src="@Url.Content(promotion.ImageUrl)" alt="@promotion.DestinationName">
+                    </div>
 
-            <p class="details-text">
-                @promotion.Description
-            </p>
+                    <div class="destination-info">
+                        <h3 class="mb-1">@promotion.DestinationName</h3>
+                        <p class="price">
+                           @promotion.OfferPrice.ToString("C0", new CultureInfo("es-AR"))
+                        </p>
+                        <p class="details-text">
+                            <strong>@promotion.HotelName</strong><br />
+                            @promotion.Description
+                        </p>
 
-            @* BOTÓN DE ACCIÓN: Usa el ID generado por el ViewModel mapeado *@
-            <button type="button"
-                    class="ver-detalles-button"
-                    data-bs-toggle="modal"
-                    data-bs-target="#@modalTargetId">
-                Ver Detalles
-            </button>
-            
-            @* OPCIONAL: Botón de WhatsApp *@
-            @* ... *@@* Aquí se ha quitado el código comentado para mantener la respuesta limpia. *@
-            
-        </div>
-    </div>
-    @await Html.PartialAsync("_MasInformacionGenerico", modalVM)
-}
+                        <button type="button"
+                                class="ver-detalles-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#@modalTargetId">
+                            Ver Detalles
+                        </button>
+                    </div>
+                </div>
+                @await Html.PartialAsync("_MasInformacionGenerico", modalVM)
+            }
         }
         else
         {
             <p class="col-12 alert alert-info text-center">No hay destinos populares de Hospedaje disponibles en este momento.</p>
-
         }
     </div>
 </section>

@@ -214,3 +214,9 @@
     background-color: #ffc107;
     color: #333;
 }
+
+.promo-fecha {
+    color: #007BFF; /* azul eléctrico */
+    font-weight: 600; /* un poco más fuerte */
+}
+
