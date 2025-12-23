@@ -57,12 +57,9 @@
                     Price = promotion.OfferPrice,
 
                     LongDescription =
-                    $"{promotion.OriginName} ⮂ {promotion.DestinationName}.<br><br><br>" +
-                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
-
-
-                    LongDescription2 = promotion.Description,
-
+$"{promotion.OriginName} ⮂ {promotion.DestinationName}.<br><br><br>" +
+$"{promotion.Description}<br /><br />" +
+$"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
                     DetailText = $"{tipoViaje} + Hospedaje",
 
                     RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
