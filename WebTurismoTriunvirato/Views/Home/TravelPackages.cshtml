@@ -59,7 +59,8 @@
                     LongDescription =
                     $"{promotion.OriginName} ⮂ {promotion.DestinationName}.<br><br><br>" +
                     $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
-
+                    // --- SOLUCIÓN: Serialización detallada para el paquete combinado ---
+                    PackageDetailsSerialized = $"PAQUETE: {promotion.DestinationName} | TIPO: {tipoViaje} + Hotel | ORIGEN: {promotion.OriginName} | PRECIO: {promotion.OfferPrice:C} | VALIDEZ: {promotion.EndDate:dd/MM/yyyy}",
 
                     LongDescription2 = promotion.Description,
 

@@ -29,5 +29,14 @@ namespace Web_Turismo_Triunvirato.Models.ViewModels
         public string WhatsappNumber { get; set; } = "+541122296405";
         [Required]
         public string PackageDetailsSerialized { get; set; } // O un string plano con formato
+
+        // Datos del que reserva (el contacto principal)
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Message { get; set; }
+        public string DocumentoResponsable { get; set; }
+        // LA CLAVE: La lista de pasajeros
+        public List<PasajeroViewModel> Pasajeros { get; set; } = new List<PasajeroViewModel>();
     }
 }

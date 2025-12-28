@@ -19,75 +19,56 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Asegúrate de que tu formulario HTML contenga @Html.AntiForgeryToken()
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> FormularioConsulta(ConsultaMailViewModel model)
         {
-            // --- 1. VALIDACIÓN ---
             if (ModelState.IsValid)
             {
-                // NOTA IMPORTANTE: Ya NO llamamos a la BD aquí.
-                // Asumimos que model.PackageDetailsSerialized contiene toda la información del paquete.
+                var subject = $"Nueva Reserva de Paquete | ID: {model.DestinyId} | {model.Name}";
 
-                // --- 2. ARMADO DEL CUERPO DEL CORREO ---
-                // El título del correo lo podemos inferir del detalle serializado o usar un valor genérico.
-                // Si el detalle incluye el título, lo parseamos. Si no, usamos el Title del ViewModel (si lo tienes).
-                var subject = $"Consulta de Nuevo Cliente | ID Paquete: {model.DestinyId}";
+                // --- 1. CONSTRUCCIÓN DINÁMICA DE PASAJEROS ---
+                string pasajerosHtml = "";
+                if (model.Pasajeros != null && model.Pasajeros.Count > 0)
+                {
+                    pasajerosHtml = "\n--- DATOS DE LOS PASAJEROS ---";
+                    for (int i = 0; i < model.Pasajeros.Count; i++)
+                    {
+                        pasajerosHtml += $"\nPasajero #{i + 1}: {model.Pasajeros[i].NombreCompleto} - DNI: {model.Pasajeros[i].Dni}";
+                    }
+                }
 
-                // Construcción del cuerpo del correo usando el detalle del paquete del frontend (para evitar BD)
+                // --- 2. CUERPO DEL MAIL ---
                 var body = $@"
-                Consulta de Cliente a través del sitio web.
+        Nueva solicitud de reserva recibida.
 
-                --- DATOS DEL CLIENTE ---
-                Nombre: {model.Name}
-                Email: {model.Email}
-                Teléfono/WhatsApp: {model.Phone}
+        --- CONTACTO PRINCIPAL ---
+        Nombre: {model.Name}
+        Email: {model.Email}
+        Teléfono: {model.Phone}
+        {pasajerosHtml}
 
-                --- MENSAJE DEL CLIENTE ---
-                {model.Message}
+        --- MENSAJE ADICIONAL ---
+        {model.Message}
 
-                --- DETALLES DEL PAQUETE (Cargados del Frontend) ---
-                {model.PackageDetailsSerialized}
-                ";
+        --- DETALLES TÉCNICOS DE LA SOLICITUD ---
+        {model.PackageDetailsSerialized}
+        ";
 
                 try
                 {
-                    // --- 3. USO DEL SERVICIO DE CORREO ---
                     await _emailService.SendEmailAsync(_agenciaEmail, subject, body);
 
-                    // --- 4. DEVOLVER ÉXITO JSON para AJAX ---
-                    return Json(new
-                    {
-                        success = true,
-                        message = "¡Consulta enviada con éxito! Te contactaremos pronto."
-                    });
+                    return Json(new { success = true, message = "Reserva enviada con éxito. Un agente te contactará pronto." });
                 }
                 catch (Exception ex)
                 {
-                    // Manejo de errores de envío de correo
-                    // Lo registramos para debugging
-                    // _logger.LogError($"Error al enviar correo: {ex.Message}"); 
-
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Ocurrió un error al procesar tu solicitud. Intenta con WhatsApp."
-                    });
+                    return Json(new { success = false, message = "Error al enviar el correo. Por favor, intenta por WhatsApp." });
                 }
             }
 
-            // --- 5. MANEJO DE ERRORES DE VALIDACIÓN (ModelState.IsValid == false) ---
-
-            // Obtener el primer mensaje de error de validación para devolver a AJAX
-            var errorMessage = ModelState.Values
-                                       .SelectMany(v => v.Errors)
-                                       .FirstOrDefault()?.ErrorMessage;
-
-            // Si hay un error, lo devolvemos en formato JSON
-            return Json(new
-            {
-                success = false,
-                message = errorMessage ?? "Datos inválidos. Por favor, revisa todos los campos."
-            });
+            // Manejo de errores de validación...
+            var errorMessage = ModelState.Values.SelectMany(v => v.Errors).FirstOrDefault()?.ErrorMessage;
+            return Json(new { success = false, message = errorMessage ?? "Revisa los datos ingresados." });
         }
     }
 }

@@ -73,7 +73,7 @@
                         Title = promotion.DestinationName,
                         ImageUrl = Url.Content(promotion.ImageUrl),
                         Price = promotion.OfferPrice,
-
+                    PackageDetailsSerialized = $"Hotel: {promotion.HotelName} ({promotion.Stars} estrellas) | Destino: {promotion.DestinationName} | Precio: {promotion.OfferPrice:C} | Validez hasta: {promotion.EndDate:dd/MM/yyyy}",
                         // REORGANIZADO: Primero el Hotel, luego las Estrellas y al final la Descripción
                         LongDescription = $"<strong> 🏨 Hotel  {promotion.HotelName}</strong><br />" +
                     $"<span style='color: #FFD700; font-size: 1.2em;'>{estrellasVisuales}</span><br /><br />" +

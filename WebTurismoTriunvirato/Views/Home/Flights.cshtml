@@ -73,7 +73,8 @@
                     $"<strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
                     $"{promotion.Description}<br /><br />" +
                     $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
-
+                    PackageDetailsSerialized = $"Vuelo: {promotion.OriginName} a {promotion.DestinationName} | Precio: {promotion.OfferPrice:C} | Validez: {promotion.EndDate:dd/MM/yyyy} | ID: {promotion.Id}",
+                   
                     // Texto de detalle corto
                     @* DetailText = $"Desde {promotion.OriginName} | Servicio: {promotion.ServiceType}", *@
 

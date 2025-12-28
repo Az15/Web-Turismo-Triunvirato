@@ -35,7 +35,9 @@
                     // ATENCIÓN: Estos campos NO EXISTEN en View_Index_DestinationCarouselItem.
                     // Los llenamos con valores por defecto para que el modal funcione.
                     // **RECOMENDACIÓN:** Si este destino tiene un precio, agrégalo al modelo del carrusel.
-                    Price = 0.00M, 
+                    Price = 0.00M,
+                    // --- AGREGADO: Serialización para el carrusel ---
+                    PackageDetailsSerialized = $"Consulta desde Carrusel: {item.Title} | ID: {item.Id}",
                     DetailText = "¡Consulta por este gran destino!", 
                     LongDescription = item.Title ?? "Consulta por disponibilidad, precio y fechas.",
 
@@ -108,6 +110,7 @@
                             Title = item.Title,
                             ImageUrl = item.PictureDestiny,
                             LongDescription = item.Title,
+                            PackageDetailsSerialized = $"PAQUETE POPULAR: {item.Title} | Tipo: {item.TripType} | Origen: {item.From} | Precio: {item.Price:C}",
                             Price = item.Price,
                             DetailText = $"{item.TripType} | Desde {item.From}",
                             RenderedWhatsappMessage = item.RenderedWhatsappMessage,

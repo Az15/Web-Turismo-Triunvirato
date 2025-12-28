@@ -1,73 +1,86 @@
-/**
- * Script para manejar el envío AJAX del formulario de consulta de correo.
- * Se ejecuta al cargar el DOM.
- */
+window.agregarPasajero = function (itemId) {
+    const container = document.getElementById(`pasajeros-container-${itemId}`);
+    if (!container) return;
+
+    const index = container.querySelectorAll('.pasajero-row').length;
+    const div = document.createElement('div');
+    div.className = 'pasajero-row card shadow-sm p-3 mb-3 border-start border-primary border-4 w-100';
+
+    div.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="text-primary small fw-bold mb-0">Pasajero #${index + 1}</h6>
+            <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="eliminarPasajero(this, ${itemId})">
+                <i class="fas fa-trash"></i> Quitar
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-2">
+                <label class="ultra-small text-muted">Nombre y Apellido</label>
+                <input type="text" name="Pasajeros[${index}].NombreCompleto" class="form-control form-control-sm" required />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="ultra-small text-muted">DNI / Pasaporte</label>
+                <input type="text" name="Pasajeros[${index}].Dni" class="form-control form-control-sm" required />
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="ultra-small text-muted">Fecha de Nacimiento</label>
+                <input type="date" name="Pasajeros[${index}].FechaNacimiento" class="form-control form-control-sm" required />
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+};
+
+window.eliminarPasajero = function (btn, itemId) {
+    btn.closest('.pasajero-row').remove();
+    const container = document.getElementById(`pasajeros-container-${itemId}`);
+    const rows = container.querySelectorAll('.pasajero-row');
+
+    rows.forEach((r, i) => {
+        r.querySelector('h6').innerText = `Pasajero #${i + 1}`;
+        r.querySelectorAll('input').forEach(input => {
+            const name = input.name;
+            if (name.includes('NombreCompleto')) input.name = `Pasajeros[${i}].NombreCompleto`;
+            if (name.includes('Dni')) input.name = `Pasajeros[${i}].Dni`;
+            if (name.includes('FechaNacimiento')) input.name = `Pasajeros[${i}].FechaNacimiento`;
+        });
+    });
+};
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
-
-    // Seleccionamos todos los formularios que tengan el ID 'consultaMailForm'
     const forms = document.querySelectorAll('#consultaMailForm');
-
     forms.forEach(form => {
-        // Usamos un listener de 'submit' en cada formulario
         form.addEventListener('submit', function (e) {
-            e.preventDefault(); // Detiene el envío estándar del formulario
-
+            e.preventDefault();
             const formData = new FormData(this);
-            // Obtenemos el ID del paquete desde el atributo data-id del formulario
             const itemId = this.getAttribute('data-id');
             const messageDiv = document.getElementById(`formMessage-${itemId}`);
 
-            // 1. Mostrar estado de envío
-            messageDiv.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Enviando consulta...</span>';
+            messageDiv.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Procesando reserva...</span>';
             messageDiv.style.display = 'block';
 
-            // 2. Envío de datos mediante Fetch API
             fetch(this.action, {
                 method: 'POST',
-                // Para enviar datos de formulario usando Fetch, usamos URLSearchParams
                 body: new URLSearchParams(formData),
-                // Es importante incluir el token de validación (si lo estás usando)
                 headers: {
                     'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
                 }
             })
-                .then(response => {
-                    // Verificar si la respuesta es JSON antes de parsear
-                    if (!response.ok) {
-                        throw new Error(`Error HTTP: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    // Asumo que el Controller devuelve { success: true, message: "Mensaje de éxito" }
                     if (data.success) {
                         messageDiv.innerHTML = `<span class="text-success"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
-
-                        // Cierra ambos modales después de un breve retraso
-                        setTimeout(() => {
-                            // Necesitamos obtener la instancia de Bootstrap Modal para cerrarlo
-                            // Es importante que Bootstrap ya esté cargado
-                            const mailModalElement = document.getElementById(`mailModal-${itemId}`);
-                            const mainModalElement = document.getElementById(`packageModal-${itemId}`);
-
-                            // Cierra el segundo modal
-                            if (mailModalElement) {
-                                bootstrap.Modal.getInstance(mailModalElement)?.hide();
-                            }
-                            // Cierra el modal principal
-                            if (mainModalElement) {
-                                bootstrap.Modal.getInstance(mainModalElement)?.hide();
-                            }
-                        }, 1500);
-
+                        setTimeout(() => { location.reload(); }, 1500);
                     } else {
-                        // Muestra errores de validación o del servidor
-                        messageDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> Error: ${data.message || 'Error en el envío.'}</span>`;
+                        messageDiv.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> Error: ${data.message}</span>`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error de conexión o de servidor:', error);
-                    messageDiv.innerHTML = '<span class="text-danger">Ocurrió un error de conexión o el servidor no respondió.</span>';
+                    messageDiv.innerHTML = '<span class="text-danger">Error de conexión.</span>';
                 });
         });
     });

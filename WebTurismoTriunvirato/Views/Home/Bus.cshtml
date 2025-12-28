@@ -88,7 +88,7 @@
                     Title = $"Micro a {promotion.DestinationName}",
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
-
+                    PackageDetailsSerialized = $"Bus: {promotion.BusCompanyName} | Trayecto: {promotion.OriginName} a {promotion.DestinationName} | Categoría: {promotion.Category} | Precio: {promotion.OfferPrice:C} | Validez: {promotion.EndDate:dd/MM/yyyy}",
                     // Descripción larga para el cuerpo del modal
                         LongDescription = $"Viaja con {promotion.BusCompanyName}.<br> Categoría: {promotion.Category}.<br><br> <strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
                     $"{promotion.Description}<br /><br />" +
