@@ -11,6 +11,7 @@ namespace Web_Turismo_Triunvirato.Models
     {
         [Key]
         public int Id { get; set; }
+        public int entidad { get; set; }
 
         [Display(Name = "Mensaje de Whatsapp")]
         [Required(ErrorMessage ="No se especifico un tipo de mensaje")]

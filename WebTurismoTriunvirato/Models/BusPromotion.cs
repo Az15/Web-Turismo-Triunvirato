@@ -13,6 +13,8 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
+        public int entidad { get; set; }
+
         public int Whatsapp_Id { get; set; } // El ID que agregaste
 
         [Required]

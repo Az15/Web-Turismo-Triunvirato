@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
@@ -10,6 +11,10 @@ namespace Web_Turismo_Triunvirato.Models
     public class View_Index_Destination
     {
         public int Id { get; set; } // ¿Está el SP devolviendo una columna 'Id'?
+
+        public int entidad { get; set; }
+
+
         [DisplayName("Mensaje de Whatsapp")]
         public int Whatsapp_Id { get; set; }
         [DisplayName("Titulo")]
@@ -31,5 +36,12 @@ namespace Web_Turismo_Triunvirato.Models
         [NotMapped]
         [ValidateNever]
         public string RenderedWhatsappMessage { get; set; }
+
+        [BindNever]
+        [NotMapped]
+        [ValidateNever]
+        public List<Imagen> imagenes { get; set; }
+
+
     }
 }

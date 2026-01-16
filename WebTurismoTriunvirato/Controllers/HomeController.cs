@@ -77,6 +77,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                 }
             }
 
+            
             // --- 2. Procesar Destinys ---
             foreach (var item in Destinys)
             {
@@ -102,6 +103,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     if (template != null)
                     {
                         item.RenderedWhatsappMessage = WhatsappMessage.RenderWts(template.Message_Template, item);
+                      
                     }
                     else
                     {
@@ -119,6 +121,10 @@ namespace Web_Turismo_Triunvirato.Controllers
                 DestinationCarrousel = Carousel,
                 PopularDestinations = Destinys
             };
+
+
+
+
 
             return View(collection_Index);
         }

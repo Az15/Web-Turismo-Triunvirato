@@ -12,6 +12,8 @@ namespace Web_Turismo_Triunvirato.Models // Ajusta el namespace a tu proyecto
         [Key]
         public int Id { get; set; } // Identificador único del destino
 
+        public int entidad { get; set; }
+
         public int Whatsapp_Id { get; set; } // El ID que agregaste
 
         [Required(ErrorMessage = "El origen es obligatorio.")]
