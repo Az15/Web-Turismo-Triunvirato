@@ -17,8 +17,13 @@ namespace Web_Turismo_Triunvirato.Models
 
         [DisplayName("Mensaje de Whatsapp")]
         public int Whatsapp_Id { get; set; }
+       
+        
         [DisplayName("Titulo")]
         public string Title { get; set; }
+
+
+
         [DisplayName("Foto del destino")]
         public string? PictureDestiny { get; set; }
         [DisplayName("Precio")]
@@ -26,9 +31,10 @@ namespace Web_Turismo_Triunvirato.Models
         [DisplayName("Desde donde saldria")]
         public string From { get; set; }
         
-        public string? DetailDestinyURL { get; set; }
-        [DisplayName("Oferta")]
+        //public string? DetailDestinyURL { get; set; }
+        //[DisplayName("Oferta")]
         public bool IsHotWeek { get; set; }
+
         public string TripType { get; set; } // Asegúrate de que esta columna esté en el SP si es un campo nuevo
 
 

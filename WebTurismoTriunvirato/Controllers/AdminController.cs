@@ -1577,7 +1577,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             // Asignar los valores del modelo
             model.PictureDestiny = "/img/" + uniqueFileName;
-            model.DetailDestinyURL = "/destinations/" + model.Title; // O la lógica que uses para generar esta URL
+         //   model.DetailDestinyURL = "/destinations/" + model.Title; // O la lógica que uses para generar esta URL
 
             // Guardar los cambios en la base de datos.
             _dbContext.Destinations.Add(model);
