@@ -37,6 +37,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public DbSet<PackagePromotion> PackagePromotions { get; set; }
         public DbSet<EncomiendaCompany> EncomiendaCompanies { get; set; }
         public DbSet<ActivitiesPromotion> Activities { get; set; }
+        public DbSet<Entidad> Entidades { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Mapeo de entidades a tablas/vistas
@@ -269,43 +270,126 @@ namespace Web_Turismo_Triunvirato.DataAccess
         }
 
         // NUEVO: Método para gestionar el ABM de PackagePromotion
-        public async Task AbmPackagePromotionAsync(PackagePromotion promotion, string typeExecuted)
+        //public async Task AbmPackagePromotionAsync(PackagePromotion promotion, string typeExecuted)
+        //{
+        //    // 1. Validamos que el ServiceType (que ahora es el ID de la tabla Entidades) sea un número válido
+        //    if (!int.TryParse(promotion.ServiceType, out int entityId))
+        //    {
+        //        throw new ArgumentException("El ID de entidad (ServiceType) debe ser un valor numérico válido proveniente de la tabla Entidades.", nameof(promotion.ServiceType));
+        //    }
+
+        //    // 2. Definimos la cadena de llamada al Stored Procedure
+        //    // Asegúrate de que el nombre del parámetro p_servicetype o p_entityid coincida con tu SP
+        //    string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id, @p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_hotelname, @p_isactive, @p_typeexecuted)";
+
+        //    var parameters = new MySqlParameter[]
+        //    {
+        //new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
+        //new MySqlParameter("p_servicetype", entityId), // Enviamos el ID de la tabla Entidades
+        //new MySqlParameter("p_packagetype", promotion.PackageType),
+        //new MySqlParameter("p_description", promotion.Description),
+        //new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
+        //new MySqlParameter("p_companyname", promotion.CompanyName ?? (object)DBNull.Value),
+        //new MySqlParameter("p_destinationname", promotion.DestinationName),
+        //new MySqlParameter("p_originname", promotion.OriginName),
+        //new MySqlParameter("p_imageurl", promotion.ImageUrl ?? (object)DBNull.Value),
+        //new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
+        //new MySqlParameter("p_originalprice", promotion.OriginalPrice),
+        //new MySqlParameter("p_offerprice", promotion.OfferPrice),
+        //new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
+        //new MySqlParameter("p_startdate", promotion.StartDate),
+        //new MySqlParameter("p_enddate", promotion.EndDate),
+        //new MySqlParameter("p_hotelname", promotion.HotelName ?? (object)DBNull.Value),
+        //new MySqlParameter("p_isactive", promotion.IsActive),
+        //new MySqlParameter("p_typeexecuted", typeExecuted)
+        //    };
+
+        //    // 3. Ejecutamos el comando
+        //    await Database.ExecuteSqlRawAsync(sql, parameters);
+        //}
+
+        public async Task<int> AbmPackagePromotionAsync(PackagePromotion promotion, string typeExecuted)
         {
-            // Valida y convierte ServiceType a un valor entero
+            int idGenerado = 0;
+
+            // 1. Validar ServiceType
             if (!int.TryParse(promotion.ServiceType, out int serviceType))
             {
-                throw new ArgumentException("El ServiceType del paquete debe ser un valor numérico.", nameof(promotion.ServiceType));
+                serviceType = 3;
             }
 
-            // Define la cadena SQL para llamar al Stored Procedure
-            // He corregido la llamada al SP para usar solo los parámetros necesarios.
-            string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id ,@p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate,  @p_hotelname,@p_isactive, @p_typeexecuted)";
+            // 2. Ejecutar el procedimiento
+            var connection = Database.GetDbConnection();
+            if (connection.State != System.Data.ConnectionState.Open)
+                await connection.OpenAsync();
 
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id, @p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_hotelname, @p_isactive, @p_typeexecuted)";
+
+                command.Parameters.Add(new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_servicetype", serviceType));
+                command.Parameters.Add(new MySqlParameter("p_packagetype", promotion.PackageType));
+                command.Parameters.Add(new MySqlParameter("p_description", promotion.Description));
+                command.Parameters.Add(new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id));
+                command.Parameters.Add(new MySqlParameter("p_companyname", promotion.CompanyName ?? (object)DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_destinationname", promotion.DestinationName));
+                command.Parameters.Add(new MySqlParameter("p_originname", promotion.OriginName));
+                command.Parameters.Add(new MySqlParameter("p_imageurl", promotion.ImageUrl ?? (object)DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_ishotweek", promotion.IsHotWeek));
+                command.Parameters.Add(new MySqlParameter("p_originalprice", promotion.OriginalPrice));
+                command.Parameters.Add(new MySqlParameter("p_offerprice", promotion.OfferPrice));
+                command.Parameters.Add(new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage));
+                command.Parameters.Add(new MySqlParameter("p_startdate", promotion.StartDate));
+                command.Parameters.Add(new MySqlParameter("p_enddate", promotion.EndDate));
+                command.Parameters.Add(new MySqlParameter("p_hotelname", promotion.HotelName ?? (object)DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_isactive", promotion.IsActive));
+                command.Parameters.Add(new MySqlParameter("p_typeexecuted", typeExecuted));
+
+                if (typeExecuted == "INSERT")
+                {
+                    // Usamos un bloque USING para que el Reader se cierre INMEDIATAMENTE
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            idGenerado = reader.GetInt32(0);
+                            promotion.Id = idGenerado;
+                        }
+                    }
+                    // Aquí el Reader ya se cerró, la conexión queda libre.
+                }
+                else
+                {
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+
+            return idGenerado;
+        }
+
+
+        public async Task InsertarImagenGenericaAsync(string url, int entidadId, int referenciaId)
+        {
+            // 1. Definimos la llamada al nuevo SP genérico
+            string sql = "CALL sp_InsertarImagenGenerica(@p_url, @p_entidad_id, @p_referencia_id)";
+
+            // 2. Creamos los parámetros
             var parameters = new MySqlParameter[]
             {
-                // El orden de estos parámetros debe ser idéntico al de la cadena SQL y el Stored Procedure
-                new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
-                new MySqlParameter("p_packagetype", promotion.PackageType),
-                new MySqlParameter("p_description", promotion.Description),
-                new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
-                new MySqlParameter("p_companyname", promotion.CompanyName ?? (object)DBNull.Value),
-                new MySqlParameter("p_destinationname", promotion.DestinationName),
-                new MySqlParameter("p_originname", promotion.OriginName),
-                new MySqlParameter("p_imageurl", promotion.ImageUrl ?? (object)DBNull.Value),
-                new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
-                new MySqlParameter("p_originalprice", promotion.OriginalPrice),
-                new MySqlParameter("p_offerprice", promotion.OfferPrice),
-                new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
-                new MySqlParameter("p_startdate", promotion.StartDate),
-                new MySqlParameter("p_enddate", promotion.EndDate),
-                new MySqlParameter("p_hotelname", promotion.HotelName ?? (object)DBNull.Value),
-                new MySqlParameter("p_isactive", promotion.IsActive),
-                new MySqlParameter("p_typeexecuted", typeExecuted)
+        new MySqlParameter("p_url", url ?? (object)DBNull.Value),
+        new MySqlParameter("p_entidad_id", entidadId),
+        new MySqlParameter("p_referencia_id", referenciaId)
             };
 
+            // 3. Ejecutamos el procedimiento
+            // Usamos ExecuteSqlRawAsync ya que es una operación de inserción
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
+
+
+
+
 
         public async Task AbmPackagePromotionAsync(int id, string typeExecuted)
         {

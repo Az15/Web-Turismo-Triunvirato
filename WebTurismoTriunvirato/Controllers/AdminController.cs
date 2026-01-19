@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -822,81 +823,93 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionPackage", promotion);
         }
 
-      
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Se ajusta el Bind para incluir solo los campos que se envían desde la vista.
-        public async Task<IActionResult> SubmitPromotionPackage(IFormFile ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+        public async Task<IActionResult> SubmitPromotionPackage(Collection<IFormFile> ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
-
-            if (promotion.ImageUrl == null)
-            {
-                ModelState.Remove("ImageUrl");
-            }
-
-            if (ImageFile != null)
+            // 1. Procesamiento de Imágenes con foreach
+            if (ImageFile != null && ImageFile.Count > 0)
             {
                 var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionespaquetes");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                foreach (var file in ImageFile)
                 {
-                    await ImageFile.CopyToAsync(fileStream);
+                    if (file.Length > 0)
+                    {
+                        var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
+
+                        // Guardamos la ruta en el objeto (se usará para la tabla principal y luego para la tabla imagenes)
+                        promotion.ImageUrl = "/img/promocionespaquetes/" + uniqueFileName;
+                    }
                 }
-                promotion.ImageUrl = "/img/promocionespaquetes/" + uniqueFileName;
+
+                ModelState.Remove("ImageFile");
+                ModelState.Remove("ImageUrl");
+            }
+            else if (string.IsNullOrEmpty(promotion.ImageUrl))
+            {
+                // Solo marcamos error si no hay imagen nueva ni imagen previa (edición)
+                ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción.");
             }
             else
             {
-                if (promotion.ImageUrl != null)
-                {
-
-                    ModelState.Remove("ImageFile");
-                }
-                else
-                {
-                    ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción.");
-                }
+                ModelState.Remove("ImageFile");
             }
 
-
-
+            // 2. Validación y Guardado
             if (ModelState.IsValid)
             {
-                
-                // Se calcula el descuento si los precios son válidos.
+                // Buscamos el ID de la entidad para "PackagePromotions"
+                var entidad = await _dbContext.Entidades
+                    .FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
+
+                if (entidad != null)
+                {
+                    promotion.ServiceType = entidad.Id.ToString();
+                }
+
+                // Cálculo de descuento
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
 
-                // El tipo de servicio para los paquetes es "3".
-                promotion.ServiceType = "3";
+         
+         var promioncollection= await _dbContext.AbmPackagePromotionAsync(promotion, "INSERT");
 
-                // Se llama al método ABM del DbContext para insertar el nuevo paquete.
-                await _dbContext.AbmPackagePromotionAsync(promotion, "INSERT");
+
+                if (entidad != null && promotion.Id > 0 && !string.IsNullOrEmpty(promotion.ImageUrl))
+                {
+                    await _dbContext.InsertarImagenGenericaAsync(promotion.ImageUrl, entidad.Id, promotion.Id);
+                }
 
                 TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionPackages));
             }
-            var whatsappMessages = await _dbContext.WhatsappMessages
-         .Where(m => m.Is_Active)
-         .OrderBy(m => m.Title)
-         .ToListAsync();
 
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            // 3. Recarga de datos en caso de error
+            var whatsappMessages = await _dbContext.WhatsappMessages
+                .Where(m => m.Is_Active)
+                .OrderBy(m => m.Title)
+                .ToListAsync();
+
+            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
 
-            ViewBag.WhatsappMessages = whatsappList;
-
-            // Si el modelo no es válido, se regresa a la vista para mostrar los errores.
             ViewData["Title"] = "Alta de Promoción de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
