@@ -318,12 +318,19 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 serviceType = 3;
             }
 
+
+
             // 2. Ejecutar el procedimiento
             var connection = Database.GetDbConnection();
+            bool wasClosed = connection.State == System.Data.ConnectionState.Closed;
+
+            if (wasClosed) await connection.OpenAsync();
             if (connection.State != System.Data.ConnectionState.Open)
                 await connection.OpenAsync();
 
-            using (var command = connection.CreateCommand())
+            try
+            {
+                using (var command = connection.CreateCommand())
             {
                 command.CommandText = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id, @p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_hotelname, @p_isactive, @p_typeexecuted)";
 
@@ -364,7 +371,12 @@ namespace Web_Turismo_Triunvirato.DataAccess
                     await command.ExecuteNonQueryAsync();
                 }
             }
-
+           }
+            finally
+            {
+                // IMPORTANTE: Si tú la abriste, tú la cierras para que EF la tome limpia
+                if (wasClosed) await connection.CloseAsync();
+            }
             return idGenerado;
         }
 
@@ -372,14 +384,14 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public async Task InsertarImagenGenericaAsync(string url, int entidadId, int referenciaId)
         {
             // 1. Definimos la llamada al nuevo SP genérico
-            string sql = "CALL sp_InsertarImagenGenerica(@p_url, @p_entidad_id, @p_referencia_id)";
+            string sql = "CALL sp_InsertarImagenGenerica(@p_url, @p_entidad_id, @p_objeto_id)";
 
             // 2. Creamos los parámetros
             var parameters = new MySqlParameter[]
             {
         new MySqlParameter("p_url", url ?? (object)DBNull.Value),
         new MySqlParameter("p_entidad_id", entidadId),
-        new MySqlParameter("p_referencia_id", referenciaId)
+        new MySqlParameter("p_objeto_id", referenciaId)
             };
 
             // 3. Ejecutamos el procedimiento

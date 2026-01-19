@@ -891,7 +891,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
                 if (entidad != null && promotion.Id > 0 && !string.IsNullOrEmpty(promotion.ImageUrl))
                 {
-                    await _dbContext.InsertarImagenGenericaAsync(promotion.ImageUrl, entidad.Id, promotion.Id);
+                    await _dbContext.InsertarImagenGenericaAsync(promotion.ImageUrl, entidad.Id, promioncollection);
                 }
 
                 TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
