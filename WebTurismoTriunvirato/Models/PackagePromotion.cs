@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
-using System.Collections.Generic; // Agregado para List
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,17 +12,18 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
+        [ValidateNever]
         public int entidad { get; set; }
 
         [Display(Name = "Mensaje de Whatsapp")]
-        [Required(ErrorMessage = "No se especifico un tipo de mensaje")]
+        [Required(ErrorMessage = "No se especificó un tipo de mensaje")]
         public int Whatsapp_Id { get; set; }
 
         [Required]
         [Display(Name = "Tipo de servicio")]
         public string ServiceType { get; set; } = "3"; // '3' para paquetes
 
-        [Required]
+        [Required(ErrorMessage = "El tipo de paquete es requerido.")]
         [Display(Name = "Tipo de Paquete")]
         public string PackageType { get; set; }
 
@@ -88,8 +89,9 @@ namespace Web_Turismo_Triunvirato.Models
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }
 
-        // --- NUEVA PROPIEDAD PARA GALERÍA ---
-        // Aquí guardaremos las URLs que vienen de la tabla 'imagenes'
+        // --- PROPIEDAD PARA GALERÍA ---
+        // NotMapped: No existe en la tabla de paquetes.
+        // ValidateNever: No causa error si el formulario no la envía.
         [ValidateNever]
         [NotMapped]
         public List<string> ImagenesAdicionales { get; set; } = new List<string>();
