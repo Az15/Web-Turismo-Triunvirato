@@ -14,6 +14,7 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ServiceType" />
             <input type="hidden" asp-for="DiscountPercentage" />
+            <input type="hidden" asp-for="ImageUrl" /> <!-- Importante mantener la URL actual oculta -->
 
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -81,28 +82,40 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
-            <!-- SECCIÓN DINÁMICA DE IMÁGENES -->
+            <!-- SECCIÓN DE IMÁGENES ACTUALES (GALERÍA) -->
+            @if (Model.Id > 0 && Model.ImagenesAdicionales != null && Model.ImagenesAdicionales.Any())
+            {
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Imágenes actuales en galería:</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach (var imgUrl in Model.ImagenesAdicionales)
+                        {
+                            <div class="text-center">
+                                <img src="@imgUrl" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
+                                @if (imgUrl == Model.ImageUrl)
+                                {
+                                    <div class="badge bg-primary d-block mt-1">Portada</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- SECCIÓN DINÁMICA DE IMÁGENES NUEVAS -->
             <div class="form-group mb-3">
-                <label class="form-label d-block">Imágenes de la Promoción (Múltiples)</label>
+                <label class="form-label d-block fw-bold">Subir nuevas imágenes</label>
                 <div id="image-upload-container">
                     <div class="input-group mb-2 image-input-row">
                         <input type="file" name="ImageFile" class="form-control" accept="image/*" />
                         <button type="button" class="btn btn-success" onclick="addImageInput()">
-                            <i class="bi bi-plus-lg">+</i>
+                            <span>+</span>
                         </button>
                     </div>
                 </div>
                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                <small class="text-muted">La primera imagen seleccionada se guardará como la principal.</small>
+                <small class="text-muted">Si subes imágenes nuevas, la primera reemplazará la portada actual.</small>
             </div>
-
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <div class="mb-3">
-                    <label class="form-label">Imagen de Portada Actual:</label><br />
-                    <img src="@Model.ImageUrl" alt="Imagen actual" class="img-thumbnail" style="max-height: 150px;" />
-                </div>
-            }
 
             <div class="row">
                 <div class="col-md-4">
@@ -157,13 +170,13 @@
         function addImageInput() {
             const container = document.getElementById('image-upload-container');
             const row = document.createElement('div');
-            row.className = 'input-group mb-2 fade-in';
+            row.className = 'input-group mb-2';
             row.innerHTML = `
-                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
-                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
-                    <span>-</span>
-                </button>
-            `;
+                        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">
+                            <span>-</span>
+                        </button>
+                    `;
             container.appendChild(row);
         }
     </script>

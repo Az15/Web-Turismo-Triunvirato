@@ -40,39 +40,39 @@
         {
             foreach (var promotion in Model)
             {
-                              
-                    string tipoViaje = promotion.PackageType switch
-                    {
-                        "BusYHotel" => "Traslado",
-                        "VueloYHotel" => "Vuelo",
-                        _ => promotion.PackageType
-                    };
-                
+                string tipoViaje = promotion.PackageType switch
+                {
+                    "BusYHotel" => "Traslado",
+                    "VueloYHotel" => "Vuelo",
+                    _ => promotion.PackageType
+                };
 
                 var modalVM = new ModalContratoViewModel
-                {
-                    IdItem = promotion.Id,
-                    Title = $"Paquete a {promotion.DestinationName} ({promotion.PackageType})",
-                    ImageUrl = Url.Content(promotion.ImageUrl),
-                    Price = promotion.OfferPrice,
+                    {
+                        IdItem = promotion.Id,
+                        Title = $"Paquete a {promotion.DestinationName} ({promotion.PackageType})",
+                        ImageUrl = Url.Content(promotion.ImageUrl),
+                        Price = promotion.OfferPrice,
 
-                    LongDescription =
+                        // --- PASO CLAVE: Se pasan las imágenes recuperadas de la tabla 'imagenes' ---
+                        GaleriaImagenes = promotion.ImagenesAdicionales,
+
+                        LongDescription =
                     $"{promotion.OriginName} ⮂ {promotion.DestinationName}.<br><br><br>" +
                     $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
-                    // --- SOLUCIÓN: Serialización detallada para el paquete combinado ---
-                    PackageDetailsSerialized = $"PAQUETE: {promotion.DestinationName} | TIPO: {tipoViaje} + Hotel | ORIGEN: {promotion.OriginName} | PRECIO: {promotion.OfferPrice:C} | VALIDEZ: {promotion.EndDate:dd/MM/yyyy}",
 
-                    LongDescription2 = promotion.Description,
+                        PackageDetailsSerialized = $"PAQUETE: {promotion.DestinationName} | TIPO: {tipoViaje} + Hotel | ORIGEN: {promotion.OriginName} | PRECIO: {promotion.OfferPrice:C} | VALIDEZ: {promotion.EndDate:dd/MM/yyyy}",
 
-                    DetailText = $"{tipoViaje} + Hospedaje",
+                        LongDescription2 = promotion.Description,
 
-                    RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
-                };
+                        DetailText = $"{tipoViaje} + Hospedaje",
+
+                        RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
+                    };
 
                 var modalTargetId = $"packageModal-{modalVM.IdItem}";
 
                 <div class="destination-card">
-
                     @* BADGES *@
                     @if (promotion.IsHotWeek)
                     {
@@ -95,7 +95,7 @@
 
                         <p class="price">
                             @promotion.OfferPrice.ToString("C0",
-                                new CultureInfo("es-AR"))
+                                     new CultureInfo("es-AR"))
                         </p>
 
                         <p class="details-text">
@@ -122,3 +122,20 @@
         }
     </div>
 </section>
+
+<script>
+    function cambiarImagenModal(idItem, urlNueva) {
+        // Buscamos la imagen principal dentro del modal específico
+        const modalElement = document.getElementById('packageModal-' + idItem);
+        if (modalElement) {
+            const imgPrincipal = modalElement.querySelector('.img-principal-modal');
+            if (imgPrincipal) {
+                imgPrincipal.style.opacity = '0.5';
+                setTimeout(() => {
+                    imgPrincipal.src = urlNueva;
+                    imgPrincipal.style.opacity = '1';
+                }, 150);
+            }
+        }
+    }
+</script>

@@ -794,31 +794,39 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-       public async Task<IActionResult> EditPromotionPackage(int? id)
+        public async Task<IActionResult> EditPromotionPackage(int? id)
         {
-
+            // 1. Carga de mensajes de WhatsApp (esto ya lo hacías bien)
             var whatsappMessages = await _dbContext.WhatsappMessages
               .Where(m => m.Is_Active)
               .OrderBy(m => m.Title)
               .ToListAsync();
 
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
 
-            ViewBag.WhatsappMessages = whatsappList;
-            if (id == null)
+            if (id == null) return NotFound();
+
+            // 2. Obtener el paquete base
+            var promotion = await _dbContext.GetPackagePromotionByIdAsync(id.Value);
+            if (promotion == null) return NotFound();
+
+          
+            var entidad = await _dbContext.Entidades
+                .FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
+
+            if (entidad != null)
             {
-                return NotFound();
+                
+                promotion.ImagenesAdicionales = await _dbContext.Imagenes
+                    .Where(i => i.Entidad_Id == entidad.Id && i.Objeto_Id == promotion.Id)
+                    .Select(i => i.Url)
+                    .ToListAsync();
             }
 
-            var promotion = await _dbContext.GetPackagePromotionByIdAsync(id.Value);
-            if (promotion == null)
-            {
-                return NotFound();
-            }
             ViewData["Title"] = "Editar Promoción de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
@@ -826,16 +834,16 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionPackage(Collection<IFormFile> ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+        public async Task<IActionResult> SubmitPromotionPackage(List<IFormFile> ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
-            // 1. Procesamiento de Imágenes con foreach
+            // 1. Lista para las rutas físicas
+            List<string> rutasImagenesNuevas = new List<string>();
+
+            // IMPORTANTE: Cambié Collection por List en el parámetro para asegurar compatibilidad
             if (ImageFile != null && ImageFile.Count > 0)
             {
                 var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionespaquetes");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
                 foreach (var file in ImageFile)
                 {
@@ -849,28 +857,25 @@ namespace Web_Turismo_Triunvirato.Controllers
                             await file.CopyToAsync(fileStream);
                         }
 
-                        // Guardamos la ruta en el objeto (se usará para la tabla principal y luego para la tabla imagenes)
-                        promotion.ImageUrl = "/img/promocionespaquetes/" + uniqueFileName;
+                        string rutaRelativa = "/img/promocionespaquetes/" + uniqueFileName;
+                        rutasImagenesNuevas.Add(rutaRelativa);
                     }
+                }
+
+                // La primera imagen de la lista será la portada (ImageUrl principal)
+                if (rutasImagenesNuevas.Count > 0)
+                {
+                    promotion.ImageUrl = rutasImagenesNuevas[0];
                 }
 
                 ModelState.Remove("ImageFile");
                 ModelState.Remove("ImageUrl");
             }
-            else if (string.IsNullOrEmpty(promotion.ImageUrl))
-            {
-                // Solo marcamos error si no hay imagen nueva ni imagen previa (edición)
-                ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción.");
-            }
-            else
-            {
-                ModelState.Remove("ImageFile");
-            }
 
-            // 2. Validación y Guardado
             if (ModelState.IsValid)
             {
                 // Buscamos el ID de la entidad para "PackagePromotions"
+                // Esto asume que tienes la tabla 'entidades' en tu DB y un DbSet<Entidad> en tu DbContext
                 var entidad = await _dbContext.Entidades
                     .FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
 
@@ -879,38 +884,33 @@ namespace Web_Turismo_Triunvirato.Controllers
                     promotion.ServiceType = entidad.Id.ToString();
                 }
 
-                // Cálculo de descuento
+                // Lógica de precios
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
 
-         
-         var promioncollection= await _dbContext.AbmPackagePromotionAsync(promotion, "INSERT");
+                // A. GUARDAR PAQUETE: Llamamos al SP y obtenemos el ID generado
+                var idGenerado = await _dbContext.AbmPackagePromotionAsync(promotion, "INSERT");
 
-
-                if (entidad != null && promotion.Id > 0 && !string.IsNullOrEmpty(promotion.ImageUrl))
+                // B. GUARDAR GALERÍA: Si se generó el ID y hay fotos nuevas, las guardamos mediante el SP genérico
+                if (entidad != null && idGenerado > 0 && rutasImagenesNuevas.Count > 0)
                 {
-                    await _dbContext.InsertarImagenGenericaAsync(promotion.ImageUrl, entidad.Id, promioncollection);
+                    foreach (var ruta in rutasImagenesNuevas)
+                    {
+                        // Usamos el método que ya tienes en el DbContext que llama al SP
+                        await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, idGenerado);
+                    }
                 }
 
-                TempData["SuccessMessage"] = "¡Promoción de paquete agregada exitosamente!";
+                TempData["SuccessMessage"] = "¡Promoción de paquete agregada con éxito!";
                 return RedirectToAction(nameof(AdminPromotionPackages));
             }
 
-            // 3. Recarga de datos en caso de error
-            var whatsappMessages = await _dbContext.WhatsappMessages
-                .Where(m => m.Is_Active)
-                .OrderBy(m => m.Title)
-                .ToListAsync();
+            // Si hubo error de validación, recargamos los mensajes de Whatsapp para la vista
+            var whatsappMessages = await _dbContext.GetActiveWhatsappMessagesAsync();
+            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem { Value = m.Id.ToString(), Text = m.Title }).ToList();
 
-            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem
-            {
-                Value = m.Id.ToString(),
-                Text = m.Title
-            }).ToList();
-
-            ViewData["Title"] = "Alta de Promoción de Paquete";
             return View("AltaPromotionPackage", promotion);
         }
 

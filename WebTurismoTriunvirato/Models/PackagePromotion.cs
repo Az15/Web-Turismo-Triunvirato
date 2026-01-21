@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
+using System.Collections.Generic; // Agregado para List
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,34 +18,27 @@ namespace Web_Turismo_Triunvirato.Models
         [Required(ErrorMessage = "No se especifico un tipo de mensaje")]
         public int Whatsapp_Id { get; set; }
 
-
         [Required]
         [Display(Name = "Tipo de servicio")]
         public string ServiceType { get; set; } = "3"; // '3' para paquetes
 
         [Required]
         [Display(Name = "Tipo de Paquete")]
-        // Para diferenciar entre los paquetes: "VueloYHotel" o "BusYHotel"
         public string PackageType { get; set; }
-
 
         [Required(ErrorMessage = "Descripción es requerida.")]
         [StringLength(4000)]
         [Display(Name = "Descripción")]
         public string Description { get; set; }
 
-        //[Column("CompanyName")]
         [Display(Name = "Empresa")]
         [StringLength(100)]
         public string? CompanyName { get; set; }
-
 
         [Required(ErrorMessage = "Destino es requerido.")]
         [StringLength(100)]
         [Display(Name = "Destino")]
         public string DestinationName { get; set; }
-
-   
 
         [Required(ErrorMessage = "Origen es requerido.")]
         [StringLength(100)]
@@ -83,15 +77,21 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Fecha de Fin")]
         public DateTime EndDate { get; set; } = DateTime.Today.AddMonths(1);
 
- 
         [Display(Name = "Nombre Hotel")]
         [StringLength(100)]
         public string? HotelName { get; set; }
+
         public bool IsActive { get; set; } = true;
-        
+
         [ValidateNever]
         [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }
+
+        // --- NUEVA PROPIEDAD PARA GALERÍA ---
+        // Aquí guardaremos las URLs que vienen de la tabla 'imagenes'
+        [ValidateNever]
+        [NotMapped]
+        public List<string> ImagenesAdicionales { get; set; } = new List<string>();
     }
 }

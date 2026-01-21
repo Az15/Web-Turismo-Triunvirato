@@ -50,6 +50,20 @@ namespace Web_Turismo_Triunvirato.DataAccess
             base.OnModelCreating(modelBuilder);
         }
 
+
+        // Asegúrate de tener la clase ImagenGenerica definida o usa una si ya la tienes.
+        public class ImagenGenerica
+        {
+            public int Id { get; set; }
+            public string Url { get; set; }
+            public int Entidad_Id { get; set; }
+            public int Objeto_Id { get; set; }
+        }
+
+        // DENTRO DE TU DBContext agrega:
+        public DbSet<ImagenGenerica> Imagenes { get; set; }
+
+
         // --- Métodos para obtener datos (Stored Procedures) ---
 
         public async Task<List<FlightPromotion>> GetImageAllItemsAsync()
