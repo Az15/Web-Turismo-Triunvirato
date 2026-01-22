@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,40 +12,34 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
+        [ValidateNever]
         public int entidad { get; set; }
 
         [Display(Name = "Mensaje de Whatsapp")]
-        [Required(ErrorMessage = "No se especifico un tipo de mensaje")]
+        [Required(ErrorMessage = "No se especificó un tipo de mensaje")]
         public int Whatsapp_Id { get; set; }
-
 
         [Required]
         [Display(Name = "Tipo de servicio")]
         public string ServiceType { get; set; } = "3"; // '3' para paquetes
 
-        [Required]
+        [Required(ErrorMessage = "El tipo de paquete es requerido.")]
         [Display(Name = "Tipo de Paquete")]
-        // Para diferenciar entre los paquetes: "VueloYHotel" o "BusYHotel"
         public string PackageType { get; set; }
-
 
         [Required(ErrorMessage = "Descripción es requerida.")]
         [StringLength(4000)]
         [Display(Name = "Descripción")]
         public string Description { get; set; }
 
-        //[Column("CompanyName")]
         [Display(Name = "Empresa")]
         [StringLength(100)]
         public string? CompanyName { get; set; }
-
 
         [Required(ErrorMessage = "Destino es requerido.")]
         [StringLength(100)]
         [Display(Name = "Destino")]
         public string DestinationName { get; set; }
-
-   
 
         [Required(ErrorMessage = "Origen es requerido.")]
         [StringLength(100)]
@@ -83,15 +78,22 @@ namespace Web_Turismo_Triunvirato.Models
         [Display(Name = "Fecha de Fin")]
         public DateTime EndDate { get; set; } = DateTime.Today.AddMonths(1);
 
- 
         [Display(Name = "Nombre Hotel")]
         [StringLength(100)]
         public string? HotelName { get; set; }
+
         public bool IsActive { get; set; } = true;
-        
+
         [ValidateNever]
         [BindNever]
         [NotMapped]
         public string RenderedWhatsappMessage { get; set; }
+
+        // --- PROPIEDAD PARA GALERÍA ---
+        // NotMapped: No existe en la tabla de paquetes.
+        // ValidateNever: No causa error si el formulario no la envía.
+        [ValidateNever]
+        [NotMapped]
+        public List<string> ImagenesAdicionales { get; set; } = new List<string>();
     }
 }

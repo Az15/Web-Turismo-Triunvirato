@@ -4,7 +4,7 @@
 
 @{
     var modalTargetId = $"packageModal-{Model.IdItem}";
-    var modalMailId = $"mailModal-{Model.IdItem}"; // Nuevo ID para el segundo modal
+    var modalMailId = $"mailModal-{Model.IdItem}";
 
 
     var cleanTitle = Regex.Replace(Model.Title ?? "", @"\s*\(.*?\)\s*", "").Trim();
@@ -18,7 +18,6 @@
         <div class="modal-content">
 
             <div class="modal-header">
-              
                 <h5 class="modal-title" id="@($"title-{modalTargetId}")">@cleanTitle</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -26,7 +25,28 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6 mb-3 mb-md-0">
-                        <img src="@Model.ImageUrl" class="img-fluid rounded shadow-sm" alt="@Model.Title" />
+                        <!-- IMAGEN PRINCIPAL: Se añadió la clase img-principal-modal para el script -->
+                        <div class="main-image-wrapper mb-3">
+                            <img src="@Model.ImageUrl" 
+                                 class="img-fluid rounded shadow-sm img-principal-modal" 
+                                 alt="@Model.Title" 
+                                 style="transition: opacity 0.2s ease-in-out; width: 100%; height: auto;"/>
+                        </div>
+
+                        <!-- GALERÍA DE MINIATURAS (COLLECTION) -->
+                        @if (Model.GaleriaImagenes != null && Model.GaleriaImagenes.Count > 0)
+                        {
+                            <div class="d-flex flex-wrap gap-2 justify-content-start mt-2">
+                                @foreach (var imgPath in Model.GaleriaImagenes)
+                                {
+                                    <img src="@Url.Content(imgPath)" 
+                                         class="img-thumbnail" 
+                                         style="width: 70px; height: 50px; cursor: pointer; object-fit: cover;" 
+                                         onclick="cambiarImagenModal('@Model.IdItem', '@Url.Content(imgPath)')" 
+                                         alt="Miniatura" />
+                                }
+                            </div>
+                        }
                     </div>
 
                     <div class="col-md-6">
@@ -42,7 +62,6 @@
             </div>
 
             <div class="modal-footer d-flex justify-content-between">
-
                 <a href="@whatsappLink" target="_blank" class="btn btn-success flex-fill me-2">
                     <i class="fab fa-whatsapp"></i> Consultar
                 </a>
@@ -67,7 +86,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @* INYECCIÓN DEL FORMULARIO *@
                 @await Html.PartialAsync("_FormularioConsultaMail", Model)
             </div>
         </div>
