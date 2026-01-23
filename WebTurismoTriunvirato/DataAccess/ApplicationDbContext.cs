@@ -38,6 +38,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public DbSet<EncomiendaCompany> EncomiendaCompanies { get; set; }
         public DbSet<ActivitiesPromotion> Activities { get; set; }
         public DbSet<Entidad> Entidades { get; set; }
+
+         public DbSet<Imagen> Imagen { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Mapeo de entidades a tablas/vistas
@@ -45,23 +47,26 @@ namespace Web_Turismo_Triunvirato.DataAccess
             modelBuilder.Entity<BusPromotion>().ToTable("BusPromotions");
             modelBuilder.Entity<HotelPromotion>().ToTable("HotelPromotions");
             modelBuilder.Entity<FlightPromotion>().ToTable("FlightPromotions");
-            modelBuilder.Entity<PackagePromotion>().ToTable("PackagePromotions"); // NUEVO: Mapeo de PackagePromotion
+            modelBuilder.Entity<PackagePromotion>().ToTable("PackagePromotions");
+            modelBuilder.Entity<Imagen>().ToTable("imagenes");
+
 
             base.OnModelCreating(modelBuilder);
         }
 
 
-        // Asegúrate de tener la clase ImagenGenerica definida o usa una si ya la tienes.
-        public class ImagenGenerica
-        {
-            public int Id { get; set; }
-            public string Url { get; set; }
-            public int Entidad_Id { get; set; }
-            public int Objeto_Id { get; set; }
-        }
 
-        // DENTRO DE TU DBContext agrega:
-        public DbSet<ImagenGenerica> Imagenes { get; set; }
+
+
+
+        public async Task<List<Imagen>> GetImagenesByEntidadAsync(int idEntidad, int idObjeto)
+        {
+            // Usando EF Core nativo (asegúrate de que el SP devuelva todas las columnas de la tabla 'imagenes')
+            return await this.Imagen
+                .FromSqlRaw("CALL sp_imagenes_get({0}, {1})", idEntidad, idObjeto)
+                .ToListAsync();
+        }
+                            
 
 
         // --- Métodos para obtener datos (Stored Procedures) ---
@@ -611,7 +616,21 @@ namespace Web_Turismo_Triunvirato.DataAccess
             await Database.ExecuteSqlInterpolatedAsync($"CALL update_user({user.Id}, {user.Name}, {user.Surname}, {user.Country}, {user.Password})");
         }
 
+        //------------------------------------------------------------------------------------------------------------????????????????????????????????
+        // Asegúrate de tener la clase ImagenGenerica definida o usa una si ya la tienes.
+        //public class ImagenGenerica
+        //{
+        //    public int Id { get; set; }
+        //    public string Url { get; set; }
+        //    public int Entidad_Id { get; set; }
+        //    public int Objeto_Id { get; set; }
+        //}
 
+        //// DENTRO DE TU DBContext agrega:
+        //public DbSet<ImagenGenerica> Imagenes { get; set; }
+
+
+        //-------------------------------------------------------------------------------------------------------------??????????????????????????????
 
 
     }

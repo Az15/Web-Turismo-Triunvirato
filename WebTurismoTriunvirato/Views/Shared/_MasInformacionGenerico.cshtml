@@ -34,16 +34,16 @@
                         </div>
 
                         <!-- GALERÍA DE MINIATURAS (COLLECTION) -->
-                        @if (Model.GaleriaImagenes != null && Model.GaleriaImagenes.Count > 0)
+                        @if (Model.GaleriaImagenes != null && Model.GaleriaImagenes.Any())
                         {
                             <div class="d-flex flex-wrap gap-2 justify-content-start mt-2">
-                                @foreach (var imgPath in Model.GaleriaImagenes)
+                                @foreach (var img in Model.GaleriaImagenes)
                                 {
-                                    <img src="@Url.Content(imgPath)" 
-                                         class="img-thumbnail" 
-                                         style="width: 70px; height: 50px; cursor: pointer; object-fit: cover;" 
-                                         onclick="cambiarImagenModal('@Model.IdItem', '@Url.Content(imgPath)')" 
-                                         alt="Miniatura" />
+                                    <img src="@Url.Content(img.Url)"
+                                         class="img-thumbnail"
+                                         style="width: 70px; height: 50px; cursor: pointer; object-fit: cover;"
+                                         onclick="cambiarImagenModal('@Model.IdItem', '@Url.Content(img.Url)')"
+                                         alt="Imagen @img.Id" />
                                 }
                             </div>
                         }

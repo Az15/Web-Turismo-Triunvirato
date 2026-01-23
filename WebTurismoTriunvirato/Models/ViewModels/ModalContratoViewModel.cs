@@ -13,7 +13,7 @@ namespace Web_Turismo_Triunvirato.Models.ViewModels
 
         // --- NUEVA PROPIEDAD PARA LA GALERÍA ---
         // Aquí guardaremos todas las rutas de la colección de imágenes que se subieron
-        public List<string> GaleriaImagenes { get; set; } = new List<string>();
+        public List<Imagen> GaleriaImagenes { get; set; }
 
         public string LongDescription { get; set; }
         public string LongDescription2 { get; set; }
@@ -36,5 +36,7 @@ namespace Web_Turismo_Triunvirato.Models.ViewModels
         public string DocumentoResponsable { get; set; }
 
         public List<PasajeroViewModel> Pasajeros { get; set; } = new List<PasajeroViewModel>();
+
+
     }
 }

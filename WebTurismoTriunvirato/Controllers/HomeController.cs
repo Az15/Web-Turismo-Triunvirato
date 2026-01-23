@@ -29,6 +29,9 @@ namespace Web_Turismo_Triunvirato.Controllers
             _promotionService = promotionService;
         }
 
+
+
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -266,27 +269,41 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             var packagePromotions = await _dbContext.GetActivePromotionPackagesItemsAsync();
 
+            // Obtener el template de WhatsApp una sola vez
             int whatsappMessageId = packagePromotions.FirstOrDefault()?.Whatsapp_Id ?? 1;
-
             var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
 
             foreach (var promotion in packagePromotions)
             {
+                // 1. Llamar al SP. Pasamos los valores del objeto actual.
+                // Asumo que promotion.entidad ya viene cargado con el ID de entidad de "Paquetes"
+                var todasLasImagenes = await _dbContext.GetImagenesByEntidadAsync(promotion.entidad, promotion.Id);
+
+                if (todasLasImagenes != null && todasLasImagenes.Any())
+                {
+                    // Ordenamos por ID para que el orden sea predecible
+                    var imagenesOrdenadas = todasLasImagenes.OrderBy(i => i.Id).ToList();
+
+                    // La primera imagen (posición 0) es la destacada
+                    promotion.ImageUrl = imagenesOrdenadas.First().Url;
+
+                    // El resto (a partir de la posición 1) van a la galería
+                    promotion.ImagenesAdicionales = imagenesOrdenadas.ToList();
+                }
+
+                // 2. Lógica de WhatsApp...
                 var dataObject = new
                 {
-                    Description = promotion.Description,
-                    DestinationName = promotion.DestinationName,
+                    promotion.Description,
+                    promotion.DestinationName,
                     OfferPrice = promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")),
-                    PackageType = promotion.PackageType
+                    promotion.PackageType
                 };
-
-                // Renderizar el mensaje y asignarlo a la propiedad del modelo
                 promotion.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
             }
 
             return View(packagePromotions);
         }
-
         [HttpGet]
         public IActionResult Offers()
         {

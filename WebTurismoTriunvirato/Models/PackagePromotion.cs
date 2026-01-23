@@ -94,6 +94,6 @@ namespace Web_Turismo_Triunvirato.Models
         // ValidateNever: No causa error si el formulario no la envía.
         [ValidateNever]
         [NotMapped]
-        public List<string> ImagenesAdicionales { get; set; } = new List<string>();
+        public List<Imagen> ImagenesAdicionales { get; set; } = new List<Imagen>();
     }
 }

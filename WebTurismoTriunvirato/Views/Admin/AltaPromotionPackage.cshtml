@@ -88,16 +88,20 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold">Imágenes actuales en galería:</label>
                     <div class="d-flex flex-wrap gap-3">
-                        @foreach (var imgUrl in Model.ImagenesAdicionales)
+                        @foreach (var img in Model.ImagenesAdicionales)
                         {
                             <div class="text-center">
-                                <img src="@imgUrl" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" />
-                                @if (imgUrl == Model.ImageUrl)
+                                @* Accedemos a img.Url para el src *@
+                                <img src="@Url.Content(img.Url)" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;">
+
+                                @* Comparamos la propiedad Url del objeto con la ImageUrl del modelo *@
+                                @if (img.Url == Model.ImageUrl)
                                 {
                                     <div class="badge bg-primary d-block mt-1">Portada</div>
                                 }
                             </div>
                         }
+
                     </div>
                 </div>
             }

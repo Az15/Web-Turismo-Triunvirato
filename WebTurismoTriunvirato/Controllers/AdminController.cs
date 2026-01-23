@@ -813,10 +813,13 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (entidad != null)
             {
-                promotion.ImagenesAdicionales = await _dbContext.Imagenes
-                    .Where(i => i.Entidad_Id == entidad.Id && i.Objeto_Id == promotion.Id)
-                    .Select(i => i.Url)
+
+
+                // Por esta línea correcta:
+                promotion.ImagenesAdicionales = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id)
                     .ToListAsync();
+
             }
 
             ViewData["Title"] = "Editar Promoción de Paquete";
