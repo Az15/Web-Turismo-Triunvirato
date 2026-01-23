@@ -81,25 +81,24 @@
 
             @foreach (var promotion in Model)
             {
-             
+
                 var modalVM = new ModalContratoViewModel
                 {
                     IdItem = promotion.Id,
                     Title = $"Micro a {promotion.DestinationName}",
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
+
+                    // ASIGNACIÓN DE GALERÍA
+                    GaleriaImagenes = promotion.ImagenesAdicionales,
+
                     PackageDetailsSerialized = $"Bus: {promotion.BusCompanyName} | Trayecto: {promotion.OriginName} a {promotion.DestinationName} | Categoría: {promotion.Category} | Precio: {promotion.OfferPrice:C} | Validez: {promotion.EndDate:dd/MM/yyyy}",
-                    // Descripción larga para el cuerpo del modal
-                        LongDescription = $"Viaja con {promotion.BusCompanyName}.<br> Categoría: {promotion.Category}.<br><br> <strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
-                    $"{promotion.Description}<br /><br />" +
-                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
 
-                    // Texto de detalle corto para la parte superior del modal
-                    
+                    LongDescription = $"Viaja con {promotion.BusCompanyName}.<br> Categoría: {promotion.Category}.<br><br> <strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
+                $"{promotion.Description}<br /><br />" +
+                $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
 
-                    // Datos para el formulario de Mail/WhatsApp
-                    RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
-                    // (Otros campos como WhatsappNumber si aplican)
+                    RenderedWhatsappMessage = promotion.RenderedWhatsappMessage
                 };
 
                 var modalTargetId = $"packageModal-{modalVM.IdItem}"; // ID ÚNICO

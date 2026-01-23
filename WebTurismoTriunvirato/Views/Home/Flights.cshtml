@@ -60,27 +60,25 @@
         {
             @foreach (var promotion in Model)
             {
-             
+
                 var modalVM = new ModalContratoViewModel
                 {
                     IdItem = promotion.Id,
-                    Title = $"Vola a {promotion.DestinationName}", 
+                    Title = $"Vuela a {promotion.DestinationName}",
                     ImageUrl = Url.Content(promotion.ImageUrl),
                     Price = promotion.OfferPrice,
 
-                    // Descripción que aparecerá dentro del modal
-                        LongDescription =
-                    $"<strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
-                    $"{promotion.Description}<br /><br />" +
-                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
-                    PackageDetailsSerialized = $"Vuelo: {promotion.OriginName} a {promotion.DestinationName} | Precio: {promotion.OfferPrice:C} | Validez: {promotion.EndDate:dd/MM/yyyy} | ID: {promotion.Id}",
-                   
-                    // Texto de detalle corto
-                    @* DetailText = $"Desde {promotion.OriginName} | Servicio: {promotion.ServiceType}", *@
+                    // PASO IMPORTANTE: Enviamos la galería al ViewModel
+                    GaleriaImagenes = promotion.ImagenesAdicionales,
 
-                    // Datos para el formulario de Mail/WhatsApp
+                    LongDescription =
+                $"<strong>{promotion.OriginName} ⮂ {promotion.DestinationName}</strong>.<br /><br />" +
+                $"{promotion.Description}<br /><br />" +
+                $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
+
+                    PackageDetailsSerialized = $"Vuelo: {promotion.OriginName} a {promotion.DestinationName} | Precio: {promotion.OfferPrice:C} | Validez: {promotion.EndDate:dd/MM/yyyy} | ID: {promotion.Id}",
+
                     RenderedWhatsappMessage = promotion.RenderedWhatsappMessage,
-                    // (Otros campos como WhatsappNumber si aplican)
                 };
 
                 var modalTargetId = $"packageModal-{modalVM.IdItem}"; // ID ÚNICO

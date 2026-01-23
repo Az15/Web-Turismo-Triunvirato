@@ -15,6 +15,8 @@ namespace Web_Turismo_Triunvirato.Models
         [Key]
         public int Id { get; set; }
 
+        public int entidad { get; set; }
+
         [DisplayName("Mensaje de Whatsapp")]
         public int Whatsapp_Id { get; set; } // El ID que agregaste
 
@@ -50,5 +52,14 @@ namespace Web_Turismo_Triunvirato.Models
         [NotMapped]
         [ValidateNever]
         public string RenderedWhatsappMessage { get; set; }
+
+
+
+        // --- PROPIEDAD PARA GALERÍA ---
+        // NotMapped: No existe en la tabla de paquetes.
+        // ValidateNever: No causa error si el formulario no la envía.
+        [ValidateNever]
+        [NotMapped]
+        public List<Imagen> ImagenesAdicionales { get; set; } = new List<Imagen>();
     }
 }

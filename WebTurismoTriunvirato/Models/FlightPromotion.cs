@@ -81,7 +81,14 @@ namespace Web_Turismo_Triunvirato.Models
         [NotMapped]
         [BindNever]
         [ValidateNever]
-        public string? RenderedWhatsappMessage { get; set; } 
+        public string? RenderedWhatsappMessage { get; set; }
+
+        // --- PROPIEDAD PARA GALERÍA ---
+        // NotMapped: No existe en la tabla de paquetes.
+        // ValidateNever: No causa error si el formulario no la envía.
+        [ValidateNever]
+        [NotMapped]
+        public List<Imagen> ImagenesAdicionales { get; set; } = new List<Imagen>();
 
 
     }

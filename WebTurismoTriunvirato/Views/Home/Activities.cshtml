@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Web_Turismo_Triunvirato.Models.ActivitiesPromotion>
+﻿@using Web_Turismo_Triunvirato.Models.ViewModels
+@model IEnumerable<Web_Turismo_Triunvirato.Models.ActivitiesPromotion>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -46,17 +47,33 @@
         {
             @foreach (var activity in Model)
             {
+                var modalVM = new ModalContratoViewModel
+                {
+                    IdItem = activity.Id,
+                    Title = activity.Title,
+                    ImageUrl = Url.Content(activity.ImageUrl),
+                    GaleriaImagenes = activity.ImagenesAdicionales, // Pasamos la galería
+                    LongDescription = $"<strong>📍 {activity.Location}</strong><br/><br/>{activity.Description}",
+                    RenderedWhatsappMessage = activity.RenderedWhatsappMessage
+                };
+
+                var modalTargetId = $"packageModal-{activity.Id}";
+
                 <div class="col activity-card" data-location="@activity.Location.ToLower()">
-                    <a href="@($"https://wa.me/+541122296405?text={System.Web.HttpUtility.UrlEncode(activity.RenderedWhatsappMessage)}")" target="_blank">
-                        <div class="card h-100">
-                            <img src="@Url.Content(activity.ImageUrl)" class="card-img-top" alt="@activity.Title" />
-                            <div class="card-body">
-                                <h5 class="card-title">@activity.Title</h5>
-                                <p class="card-text">@activity.Description</p>
-                            </div>
+                    <div class="card h-100 shadow-sm">
+                        <img src="@Url.Content(activity.ImageUrl)" class="card-img-top" alt="@activity.Title" />
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@activity.Title</h5>
+                            <button type="button" class="btn btn-outline-primary mt-2"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#@modalTargetId">
+                                Ver Galería y Detalles
+                            </button>
                         </div>
-                    </a>
+                    </div>
                 </div>
+
+                @await Html.PartialAsync("_MasInformacionGenerico", modalVM)
             }
         }
         else

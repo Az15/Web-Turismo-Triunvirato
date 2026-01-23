@@ -68,20 +68,24 @@
                 }
 
                 var modalVM = new ModalContratoViewModel
-             {
-                        IdItem = promotion.Id,
-                        Title = promotion.DestinationName,
-                        ImageUrl = Url.Content(promotion.ImageUrl),
-                        Price = promotion.OfferPrice,
-                    PackageDetailsSerialized = $"Hotel: {promotion.HotelName} ({promotion.Stars} estrellas) | Destino: {promotion.DestinationName} | Precio: {promotion.OfferPrice:C} | Validez hasta: {promotion.EndDate:dd/MM/yyyy}",
-                        // REORGANIZADO: Primero el Hotel, luego las Estrellas y al final la Descripción
-                        LongDescription = $"<strong> 🏨 Hotel  {promotion.HotelName}</strong><br />" +
-                    $"<span style='color: #FFD700; font-size: 1.2em;'>{estrellasVisuales}</span><br /><br />" +
-                    $"{promotion.Description}<br /><br />" +
-                    $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
+                {
+                    IdItem = promotion.Id,
+                    Title = promotion.DestinationName,
+                    ImageUrl = Url.Content(promotion.ImageUrl),
+                    Price = promotion.OfferPrice,
 
-           RenderedWhatsappMessage = promotion.RenderedWhatsappMessage
-                    };
+                    // --- PASO CLAVE: Pasamos la colección de imágenes ---
+                    GaleriaImagenes = promotion.ImagenesAdicionales,
+
+                    PackageDetailsSerialized = $"Hotel: {promotion.HotelName} ({promotion.Stars} estrellas) | Destino: {promotion.DestinationName} | Precio: {promotion.OfferPrice:C} | Validez hasta: {promotion.EndDate:dd/MM/yyyy}",
+
+                    LongDescription = $"<strong> 🏨 Hotel  {promotion.HotelName}</strong><br />" +
+                $"<span style='color: #FFD700; font-size: 1.2em;'>{estrellasVisuales}</span><br /><br />" +
+                $"{promotion.Description}<br /><br />" +
+                $"Promoción válida hasta el <span class='promo-fecha'>{promotion.EndDate:dd/MM/yyyy}</span>.",
+
+                    RenderedWhatsappMessage = promotion.RenderedWhatsappMessage
+                };
 
                 var modalTargetId = $"packageModal-{modalVM.IdItem}";
 

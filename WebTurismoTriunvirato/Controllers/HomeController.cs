@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using Web_Turismo_Triunvirato.Models;
-using Web_Turismo_Triunvirato.ViewModels; // Asegúrate de tenerlo si usas otros ViewModels, si no, puedes quitarlo
-using Web_Turismo_Triunvirato.Services;
+using Microsoft.EntityFrameworkCore;
+using System; // Para DateTime
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using System; // Para DateTime
-
 using Web_Turismo_Triunvirato.DataAccess;
-using Microsoft.EntityFrameworkCore;
+using Web_Turismo_Triunvirato.Models;
 using Web_Turismo_Triunvirato.Models.ViewModels;
 using Web_Turismo_Triunvirato.Services;
+using Web_Turismo_Triunvirato.Services;
+using Web_Turismo_Triunvirato.ViewModels; // Asegúrate de tenerlo si usas otros ViewModels, si no, puedes quitarlo
 
 namespace Web_Turismo_Triunvirato.Controllers
 {
@@ -135,16 +135,28 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public async Task<IActionResult> Flights()
         {
-
             var flightPromotions = await _dbContext.GetViewFlightpromotionsItemsAsync();
 
             int whatsappMessageId = flightPromotions.FirstOrDefault()?.Whatsapp_Id ?? 1;
-
             var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
 
             foreach (var promotion in flightPromotions)
             {
+                // --- LÓGICA DE IMÁGENES PARA VUELOS ---
+                var todasLasImagenes = await _dbContext.GetImagenesByEntidadAsync(promotion.entidad, promotion.Id);
 
+                if (todasLasImagenes != null && todasLasImagenes.Any())
+                {
+                    var imagenesOrdenadas = todasLasImagenes.OrderBy(i => i.Id).ToList();
+
+                    // Portada (Card exterior)
+                    promotion.ImageUrl = imagenesOrdenadas[0].Url;
+
+                    // Lista completa para el Modal (incluye la primera)
+                    promotion.ImagenesAdicionales = imagenesOrdenadas;
+                }
+
+                // --- LÓGICA DE WHATSAPP ---
                 var dataObject = new
                 {
                     origin = promotion.OriginName,
@@ -156,13 +168,11 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             ViewData["Title"] = "Vuelos";
-
             return View(flightPromotions);
-
         }
 
 
-		[HttpGet]
+        [HttpGet]
         public  IActionResult RutaAtlantica() 
         {
             return View(); 
@@ -213,24 +223,36 @@ namespace Web_Turismo_Triunvirato.Controllers
             var hotelPromotions = await _dbContext.GetViewHotelspromotionsItemsAsync();
 
             int whatsappMessageId = hotelPromotions.FirstOrDefault()?.Whatsapp_Id ?? 1;
-
             var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
 
             foreach (var promotion in hotelPromotions)
             {
-                // Crear un objeto anónimo con las propiedades a reemplazar
+                // --- NUEVA LÓGICA DE IMÁGENES ---
+                // Llamamos al SP de MySQL pasándole la entidad y el ID del hotel
+                var todasLasImagenes = await _dbContext.GetImagenesByEntidadAsync(promotion.entidad, promotion.Id);
+
+                if (todasLasImagenes != null && todasLasImagenes.Any())
+                {
+                    var imagenesOrdenadas = todasLasImagenes.OrderBy(i => i.Id).ToList();
+
+                    // La primera imagen es la de portada (index 0)
+                    promotion.ImageUrl = imagenesOrdenadas[0].Url;
+
+                    // Guardamos todas para la galería del modal (incluyendo la principal)
+                    promotion.ImagenesAdicionales = imagenesOrdenadas;
+                }
+
+                // --- LÓGICA DE WHATSAPP ---
                 var dataObject = new
                 {
-                    HotelName = promotion.Description,
+                    HotelName = promotion.HotelName, // Corregido: Usamos el nombre del hotel real
                     DestinationName = promotion.DestinationName,
-                    OfferPrice = promotion.OfferPrice.ToString("C0", new System.Globalization.CultureInfo("es-AR")),
+                    OfferPrice = promotion.OfferPrice.ToString("C0", new CultureInfo("es-AR")),
                 };
 
-                // Renderizar el mensaje y asignarlo a la propiedad del modelo
                 promotion.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
             }
 
-            // Devolver la vista con la lista de promociones modificada
             return View(hotelPromotions);
         }
 
@@ -239,18 +261,28 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
             var busPromotions = await _dbContext.GetViewBusspromotionsItemsAsync();
 
-            // Obtener el Whatsapp_Id de la primera promoción
             var firstBusPromotion = busPromotions.FirstOrDefault();
+            int whatsappMessageId = firstBusPromotion?.Whatsapp_Id ?? 1;
 
-            // Verificar que exista al menos una promoción y obtener el ID
-            int whatsappMessageId = firstBusPromotion?.Whatsapp_Id ?? 1; // Usar null-coalescing para un valor por defecto
-
-            // Obtener la plantilla de mensaje de WhatsApp una sola vez.
             var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
 
-            // Iterar y renderizar el mensaje para cada promoción
             foreach (var promotion in busPromotions)
             {
+                // --- LÓGICA DE GALERÍA PARA BUSES ---
+                var todasLasImagenes = await _dbContext.GetImagenesByEntidadAsync(promotion.entidad, promotion.Id);
+
+                if (todasLasImagenes != null && todasLasImagenes.Any())
+                {
+                    var imagenesOrdenadas = todasLasImagenes.OrderBy(i => i.Id).ToList();
+
+                    // Imagen principal de la Card
+                    promotion.ImageUrl = imagenesOrdenadas[0].Url;
+
+                    // Galería completa para el modal
+                    promotion.ImagenesAdicionales = imagenesOrdenadas;
+                }
+
+                // --- LÓGICA DE WHATSAPP ---
                 var dataObject = new
                 {
                     originName = promotion.OriginName,
@@ -324,26 +356,35 @@ namespace Web_Turismo_Triunvirato.Controllers
         [HttpGet]
         public async Task<IActionResult> Activities()
         {
+            var activeActivities = await _dbContext.GetActiveActivitiesAsync();
 
-                    var activeActivities = await _dbContext.GetActiveActivitiesAsync();
+            int whatsappMessageId = activeActivities.FirstOrDefault()?.Whatsapp_Id ?? 1;
+            var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
 
-                    int whatsappMessageId = activeActivities.FirstOrDefault()?.Whatsapp_Id ?? 1;
+            foreach (var activity in activeActivities)
+            {
+                // --- CARGA DE GALERÍA ---
+                var todasLasImagenes = await _dbContext.GetImagenesByEntidadAsync(activity.entidad, activity.Id);
 
-                    var whatsappTemplate = await _dbContext.GetWhatsappMessageByIdAsync(whatsappMessageId);
-
-                    foreach (var activity in activeActivities)
-                    {
-                        var dataObject = new
-                        {
-                            Title = activity.Title,
-                            Location = activity.Location,
-                            Description = activity.Description
-                        };
-                        activity.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
-                    }
-
-                    return View(activeActivities);
+                if (todasLasImagenes != null && todasLasImagenes.Any())
+                {
+                    var imagenesOrdenadas = todasLasImagenes.OrderBy(i => i.Id).ToList();
+                    activity.ImageUrl = imagenesOrdenadas[0].Url; // Portada
+                    activity.ImagenesAdicionales = imagenesOrdenadas; // Galería completa
                 }
+
+                // --- RENDERIZADO WHATSAPP ---
+                var dataObject = new
+                {
+                    Title = activity.Title,
+                    Location = activity.Location,
+                    Description = activity.Description
+                };
+                activity.RenderedWhatsappMessage = WhatsappMessage.RenderWts(whatsappTemplate.Message_Template, dataObject);
+            }
+
+            return View(activeActivities);
+        }
 
         [HttpGet]
         public IActionResult TravelAssistance()
