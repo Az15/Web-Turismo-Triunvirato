@@ -54,10 +54,15 @@ namespace Web_Turismo_Triunvirato.DataAccess
             base.OnModelCreating(modelBuilder);
         }
 
-
-
-
-
+        public async Task EliminarImagenAsync(int idImagen)
+        {
+            var imagen = await Imagen.FindAsync(idImagen);
+            if (imagen != null)
+            {
+                Imagen.Remove(imagen);
+                await SaveChangesAsync();
+            }
+        }
 
         public async Task<List<Imagen>> GetImagenesByEntidadAsync(int idEntidad, int idObjeto)
         {
@@ -65,10 +70,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
             return await this.Imagen
                 .FromSqlRaw("CALL sp_imagenes_get({0}, {1})", idEntidad, idObjeto)
                 .ToListAsync();
-        }
-                            
-
-
+        }                  
         // --- Métodos para obtener datos (Stored Procedures) ---
 
         public async Task<List<FlightPromotion>> GetImageAllItemsAsync()
@@ -288,45 +290,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
-        // NUEVO: Método para gestionar el ABM de PackagePromotion
-        //public async Task AbmPackagePromotionAsync(PackagePromotion promotion, string typeExecuted)
-        //{
-        //    // 1. Validamos que el ServiceType (que ahora es el ID de la tabla Entidades) sea un número válido
-        //    if (!int.TryParse(promotion.ServiceType, out int entityId))
-        //    {
-        //        throw new ArgumentException("El ID de entidad (ServiceType) debe ser un valor numérico válido proveniente de la tabla Entidades.", nameof(promotion.ServiceType));
-        //    }
-
-        //    // 2. Definimos la cadena de llamada al Stored Procedure
-        //    // Asegúrate de que el nombre del parámetro p_servicetype o p_entityid coincida con tu SP
-        //    string sql = "CALL SetActivePromotionPackages(@p_id, @p_servicetype, @p_packagetype, @p_description, @p_whatsapp_id, @p_companyname, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_hotelname, @p_isactive, @p_typeexecuted)";
-
-        //    var parameters = new MySqlParameter[]
-        //    {
-        //new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-        //new MySqlParameter("p_servicetype", entityId), // Enviamos el ID de la tabla Entidades
-        //new MySqlParameter("p_packagetype", promotion.PackageType),
-        //new MySqlParameter("p_description", promotion.Description),
-        //new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id),
-        //new MySqlParameter("p_companyname", promotion.CompanyName ?? (object)DBNull.Value),
-        //new MySqlParameter("p_destinationname", promotion.DestinationName),
-        //new MySqlParameter("p_originname", promotion.OriginName),
-        //new MySqlParameter("p_imageurl", promotion.ImageUrl ?? (object)DBNull.Value),
-        //new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
-        //new MySqlParameter("p_originalprice", promotion.OriginalPrice),
-        //new MySqlParameter("p_offerprice", promotion.OfferPrice),
-        //new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
-        //new MySqlParameter("p_startdate", promotion.StartDate),
-        //new MySqlParameter("p_enddate", promotion.EndDate),
-        //new MySqlParameter("p_hotelname", promotion.HotelName ?? (object)DBNull.Value),
-        //new MySqlParameter("p_isactive", promotion.IsActive),
-        //new MySqlParameter("p_typeexecuted", typeExecuted)
-        //    };
-
-        //    // 3. Ejecutamos el comando
-        //    await Database.ExecuteSqlRawAsync(sql, parameters);
-        //}
-
+        
         public async Task<int> AbmPackagePromotionAsync(PackagePromotion promotion, string typeExecuted)
         {
             int idGenerado = 0;
@@ -418,10 +382,6 @@ namespace Web_Turismo_Triunvirato.DataAccess
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
-
-
-
-
         public async Task AbmPackagePromotionAsync(int id, string typeExecuted)
         {
             string sql = "CALL DeleteActivePackagePromotions(@p_id)";
@@ -433,9 +393,6 @@ namespace Web_Turismo_Triunvirato.DataAccess
             };
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
-
-
-
         public async Task AbmEncomiendaCompanyAsync(EncomiendaCompany company, string type)
         {
             await Database.ExecuteSqlRawAsync(
@@ -482,20 +439,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
         }
 
 
-        //public async Task AbmActivityAsync(int id, string typeExecuted)
-        //{
-        //    string sql = "CALL DeleteActiveActivitiesPromotion(@p_id)";
-
-        //    var parameters = new MySqlParameter[]
-        //    {
-        //        new MySqlParameter("p_id", id),
-        //        //new MySqlParameter("p_typeexecuted", typeExecuted)
-        //    };
-        //    await Database.ExecuteSqlRawAsync(sql, parameters);
-        //}
-
-
-        // NUEVO MÉTODO para obtener una promoción de bus por ID
+                // NUEVO MÉTODO para obtener una promoción de bus por ID
         public async Task<BusPromotion> GetBusPromotionByIdAsync(int id)
         {
             return await BusPromotions.FirstOrDefaultAsync(p => p.Id == id);
@@ -519,9 +463,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 $"CALL create_whatsapp_message({title}, {messageTemplate}, {isActive})"
             );
         }
-        /// <summary>
-        /// Obtiene todos los mensajes de WhatsApp activos e inactivos.
-        /// </summary>
+ 
         public async Task<List<WhatsappMessage>> GetAllWhatsappMessagesAsync()
         {
             // Usa FromSqlRaw para ejecutar el SP y mapear el resultado a la entidad.
@@ -530,9 +472,6 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Obtiene los mensajes de WhatsApp que están marcados como activos.
-        /// </summary>
         public async Task<List<WhatsappMessage>> GetActiveWhatsappMessagesAsync()
         {
             // Llama al SP que filtra por mensajes activos.
@@ -540,10 +479,6 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 .FromSqlRaw("CALL get_active_whatsapp_messages()")
                 .ToListAsync();
         }
-
-        /// <summary>
-        /// Obtiene un mensaje de WhatsApp específico por su ID.
-        /// </summary>
 
         public async Task<WhatsappMessage> GetWhatsappMessageByIdAsync(int id)
         {
@@ -571,19 +506,12 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 .ToListAsync();
         }
 
-
-        /// <summary>
-        /// Crea un nuevo usuario en la base de datos.
-        /// </summary>
         public async Task CreateUserAsync(User user)
         {
             await Database.ExecuteSqlInterpolatedAsync($"CALL create_user({user.Email}, {user.Password}, {user.Name}, {user.Surname}, {user.Country}, {user.Rol})");
         }
 
-        /// <summary>
-        /// Intenta logear un usuario por email y contraseña.
-        /// </summary>
-        /// <returns>El objeto User si el login es exitoso, de lo contrario, null.</returns>
+      
         public async Task<User> LoginUserAsync(string email, string password)
         {
             // Solución: Convierte el resultado a una lista y usa FirstOrDefault()
@@ -593,10 +521,6 @@ namespace Web_Turismo_Triunvirato.DataAccess
                 .FirstOrDefault();
         }
 
-        /// <summary>
-        /// Lista todos los usuarios de la base de datos.
-        /// </summary>
-        /// <returns>Una lista de objetos User.</returns>
         public async Task<List<User>> ListUsersAsync()
         {
             return await Users
@@ -616,21 +540,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
             await Database.ExecuteSqlInterpolatedAsync($"CALL update_user({user.Id}, {user.Name}, {user.Surname}, {user.Country}, {user.Password})");
         }
 
-        //------------------------------------------------------------------------------------------------------------????????????????????????????????
-        // Asegúrate de tener la clase ImagenGenerica definida o usa una si ya la tienes.
-        //public class ImagenGenerica
-        //{
-        //    public int Id { get; set; }
-        //    public string Url { get; set; }
-        //    public int Entidad_Id { get; set; }
-        //    public int Objeto_Id { get; set; }
-        //}
-
-        //// DENTRO DE TU DBContext agrega:
-        //public DbSet<ImagenGenerica> Imagenes { get; set; }
-
-
-        //-------------------------------------------------------------------------------------------------------------??????????????????????????????
+      
 
 
     }

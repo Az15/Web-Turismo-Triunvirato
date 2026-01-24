@@ -47,6 +47,12 @@
                     _ => promotion.PackageType
                 };
 
+                // --- FILTRO PARA EVITAR DUPLICADOS EN LA GALERÍA ---
+                // Solo incluimos las imágenes adicionales si su URL es distinta a la de portada
+                var galeriaFiltrada = promotion.ImagenesAdicionales?
+                .Where(img => img.Url != promotion.ImageUrl)
+                .ToList();
+
                 var modalVM = new ModalContratoViewModel
                     {
                         IdItem = promotion.Id,
@@ -54,8 +60,8 @@
                         ImageUrl = Url.Content(promotion.ImageUrl),
                         Price = promotion.OfferPrice,
 
-                        // --- PASO CLAVE: Se pasan las imágenes recuperadas de la tabla 'imagenes' ---
-                        GaleriaImagenes = promotion.ImagenesAdicionales,
+                        // Usamos la galería filtrada aquí
+                        GaleriaImagenes = galeriaFiltrada,
 
                         LongDescription =
                     $"{promotion.OriginName} ⮂ {promotion.DestinationName}.<br><br><br>" +
@@ -125,7 +131,6 @@
 
 <script>
     function cambiarImagenModal(idItem, urlNueva) {
-        // Buscamos la imagen principal dentro del modal específico
         const modalElement = document.getElementById('packageModal-' + idItem);
         if (modalElement) {
             const imgPrincipal = modalElement.querySelector('.img-principal-modal');
