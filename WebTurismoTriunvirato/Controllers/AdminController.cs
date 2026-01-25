@@ -869,19 +869,76 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionPackage(int id, List<IFormFile> ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+        public async Task<IActionResult> EditPromotionPackage(
+    int id,
+    List<IFormFile> ImageFile,      // Imágenes nuevas (galería)
+    List<IFormFile> ReplacedFiles,  // Archivos que reemplazan a otros
+    List<string> DeletedImagesUrls, // URLs de imágenes a borrar
+    List<string> ReplacedImagesUrls,// URLs de imágenes viejas que serán reemplazadas
+    [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
             if (id != promotion.Id) return NotFound();
 
-            // TUTORÍA: Ahora aceptamos List<IFormFile> para poder subir varias fotos al editar
-            List<string> rutasImagenesNuevas = await ProcesarImagenes(ImageFile);
+            // 1. OBTENER ENTIDAD PARA REFERENCIA
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
+            if (entidad == null) return BadRequest("No se encontró la configuración de entidad.");
 
-            if (rutasImagenesNuevas.Count > 0)
+            // 2. PROCESAR BORRADOS (Imágenes marcadas con la X)
+            if (DeletedImagesUrls != null && DeletedImagesUrls.Any())
             {
-                promotion.ImageUrl = rutasImagenesNuevas[0]; // La primera nueva es la portada
+                foreach (var url in DeletedImagesUrls)
+                {
+                    await EliminarImagenPorUrl(url, entidad.Id, promotion.Id);
+                    // Si la que borramos era la portada, limpiamos el campo
+                    if (promotion.ImageUrl == url) promotion.ImageUrl = null;
+                }
+            }
+
+            // 3. PROCESAR REEMPLAZOS (Imágenes editadas con el lápiz)
+            if (ReplacedFiles != null && ReplacedFiles.Count > 0 && ReplacedImagesUrls != null)
+            {
+                for (int i = 0; i < ReplacedFiles.Count; i++)
+                {
+                    // Borrar la vieja
+                    string urlVieja = ReplacedImagesUrls[i];
+                    await EliminarImagenPorUrl(urlVieja, entidad.Id, promotion.Id);
+
+                    // Subir la nueva (usamos el método que ya tienes pero pasando el archivo individual en una lista)
+                    var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] });
+                    if (nuevaRutaLista.Any())
+                    {
+                        string nuevaRuta = nuevaRutaLista[0];
+                        await _dbContext.InsertarImagenGenericaAsync(nuevaRuta, entidad.Id, promotion.Id);
+
+                        // Si la reemplazada era la portada, actualizamos el puntero de portada
+                        if (promotion.ImageUrl == urlVieja) promotion.ImageUrl = nuevaRuta;
+                    }
+                }
+            }
+
+            // 4. PROCESAR NUEVAS ADICIONES (El contenedor de abajo con el botón +)
+            List<string> rutasNuevas = await ProcesarImagenes(ImageFile);
+            foreach (var ruta in rutasNuevas)
+            {
+                await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, promotion.Id);
+            }
+
+            // 5. LÓGICA DE PORTADA: Si nos quedamos sin portada, asignar la primera disponible
+            if (string.IsNullOrEmpty(promotion.ImageUrl))
+            {
+                // Intentamos buscar la primera de las nuevas subidas ahora
+                if (rutasNuevas.Any()) promotion.ImageUrl = rutasNuevas[0];
+                else
+                {
+                    // O buscamos en la base de datos lo que queda
+                    var restante = await _dbContext.Imagen
+                        .FirstOrDefaultAsync(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id);
+                    if (restante != null) promotion.ImageUrl = restante.Url;
+                }
             }
 
             ModelState.Remove("ImageFile");
+            ModelState.Remove("ReplacedFiles");
             if (promotion.ImageUrl != null) ModelState.Remove("ImageUrl");
 
             if (ModelState.IsValid)
@@ -896,23 +953,12 @@ namespace Web_Turismo_Triunvirato.Controllers
 
                     await _dbContext.AbmPackagePromotionAsync(promotion, "UPDATE");
 
-                    // Guardar las fotos adicionales en la tabla genérica si hay nuevas
-                    var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
-                    if (entidad != null && rutasImagenesNuevas.Count > 0)
-                    {
-                        foreach (var ruta in rutasImagenesNuevas)
-                        {
-                            await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, promotion.Id);
-                        }
-                    }
-
-                    TempData["SuccessMessage"] = "¡Promoción de paquete actualizada exitosamente!";
+                    TempData["SuccessMessage"] = "¡Promoción actualizada con éxito!";
                     return RedirectToAction(nameof(AdminPromotionPackages));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!await _dbContext.PackagePromotions.AnyAsync(e => e.Id == promotion.Id)) return NotFound();
-                    else throw;
+                    // Manejar error
                 }
             }
 
@@ -920,14 +966,62 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionPackage", promotion);
         }
 
+        // NUEVO MÉTODO: Para borrar una imagen específica de la galería vía AJAX o Post
+        [HttpPost]
+        private async Task EliminarImagenPorUrl(string url, int entidadId, int objetoId)
+        {
+            var registro = await _dbContext.Imagen
+                .FirstOrDefaultAsync(i => i.Url == url && i.Id_Entidad == entidadId && i.Id_Objeto == objetoId);
+
+            if (registro != null)
+            {
+                // Borrar archivo físico
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, url.TrimStart('/'));
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+
+                // Borrar registro DB
+                _dbContext.Imagen.Remove(registro);
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        //----------------
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> DeletePromotionPackage(int id)
         {
+            // 1. Obtener la entidad de referencia
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
+
+            if (entidad != null)
+            {
+                // 2. Buscar imágenes asociadas para borrar archivos físicos
+                var imagenes = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == id)
+                    .ToListAsync();
+
+                foreach (var img in imagenes)
+                {
+                    var path = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
+                    if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+                }
+            }
+
+            // 3. Ejecutar el SP de borrado (debería borrar en cascada o tendrías que borrar la galería antes en la DB)
             await _dbContext.AbmPackagePromotionAsync(id, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción eliminada exitosamente!";
+
+            TempData["SuccessMessage"] = "¡Promoción y sus imágenes eliminadas exitosamente!";
             return RedirectToAction(nameof(AdminPromotionPackages));
         }
+        //public async Task<IActionResult> DeletePromotionPackage(int id)
+        //{
+        //    await _dbContext.AbmPackagePromotionAsync(id, "DELETE");
+        //    TempData["SuccessMessage"] = "¡Promoción eliminada exitosamente!";
+        //    return RedirectToAction(nameof(AdminPromotionPackages));
+        //}
 
         // TUTORÍA: Métodos privados para no repetir código (DRY - Don't Repeat Yourself)
         private async Task<List<string>> ProcesarImagenes(List<IFormFile> files)

@@ -1,0 +1,104 @@
+﻿/* Contenedor de la galería */
+.img-card-container {
+    position: relative;
+    width: 180px; /* Aumentado para mejor visualización */
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 5px;
+    background: #fff;
+}
+
+    /* Efecto al marcar para borrar */
+    .img-card-container.marked-deleted {
+        opacity: 0.3;
+        filter: grayscale(1);
+        border-color: #dc3545;
+    }
+
+/* Imagen principal */
+.img-thumbnail-gallery {
+    width: 100%;
+    height: 160px; /* Más alta */
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: zoom-in;
+    display: block;
+}
+
+/* Acciones al pasar el mouse */
+.img-actions-overlay {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.img-card-container:hover .img-actions-overlay {
+    opacity: 1;
+}
+
+/* Botones de acción */
+.btn-img-x {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn-img-edit {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Sección de reemplazo (Input File) */
+.replace-input-area {
+    margin-top: 8px;
+    padding: 5px;
+    border-top: 1px dashed #ccc;
+}
+
+    .replace-input-area input {
+        font-size: 11px;
+    }
+
+/* Modal de Zoom */
+.image-zoom-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+}
+
+    .image-zoom-overlay img {
+        max-width: 85%;
+        max-height: 85%;
+        border: 5px solid white;
+        box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    }
