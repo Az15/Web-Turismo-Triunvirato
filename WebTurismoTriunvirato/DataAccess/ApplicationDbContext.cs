@@ -40,6 +40,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
         public DbSet<Entidad> Entidades { get; set; }
 
          public DbSet<Imagen> Imagen { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Mapeo de entidades a tablas/vistas

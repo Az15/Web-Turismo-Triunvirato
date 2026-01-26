@@ -826,16 +826,12 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionPackage", promotion);
         }
 
+        //------------------------------------------------------------------------------------------???????????????????????????????????????
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitPromotionPackage(List<IFormFile> ImageFile, [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
         {
-            List<string> rutasImagenesNuevas = await ProcesarImagenes(ImageFile);
-
-            if (rutasImagenesNuevas.Count > 0)
-            {
-                promotion.ImageUrl = rutasImagenesNuevas[0];
-            }
 
             ModelState.Remove("ImageFile");
             ModelState.Remove("ImageUrl");
@@ -843,6 +839,13 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (ModelState.IsValid)
             {
                 var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "PackagePromotions");
+
+                List<string> rutasImagenesNuevas = await ProcesarImagenes(ImageFile,entidad.Id);
+
+                if (rutasImagenesNuevas.Count > 0)
+                {
+                    promotion.ImageUrl = rutasImagenesNuevas[0];
+                }
 
                 if (promotion.OriginalPrice > 0)
                 {
@@ -867,15 +870,17 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View("AltaPromotionPackage", promotion);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPromotionPackage(
-    int id,
-    List<IFormFile> ImageFile,      // Imágenes nuevas (galería)
-    List<IFormFile> ReplacedFiles,  // Archivos que reemplazan a otros
-    List<string> DeletedImagesUrls, // URLs de imágenes a borrar
-    List<string> ReplacedImagesUrls,// URLs de imágenes viejas que serán reemplazadas
-    [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion)
+                int id,
+                List<IFormFile> ImageFile,      // Imágenes nuevas (galería)
+                List<IFormFile> ReplacedFiles,  // Archivos que reemplazan a otros
+                List<string> DeletedImagesUrls, // URLs de imágenes a borrar
+                List<string> ReplacedImagesUrls,// URLs de imágenes viejas que serán reemplazadas
+                [Bind("Id,ServiceType,PackageType,Description,Whatsapp_Id,CompanyName,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,HotelName,IsActive")] PackagePromotion promotion
+        )
         {
             if (id != promotion.Id) return NotFound();
 
@@ -904,7 +909,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     await EliminarImagenPorUrl(urlVieja, entidad.Id, promotion.Id);
 
                     // Subir la nueva (usamos el método que ya tienes pero pasando el archivo individual en una lista)
-                    var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] });
+                    var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, entidad.Id);
                     if (nuevaRutaLista.Any())
                     {
                         string nuevaRuta = nuevaRutaLista[0];
@@ -917,7 +922,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             }
 
             // 4. PROCESAR NUEVAS ADICIONES (El contenedor de abajo con el botón +)
-            List<string> rutasNuevas = await ProcesarImagenes(ImageFile);
+            List<string> rutasNuevas = await ProcesarImagenes(ImageFile, entidad.Id);
             foreach (var ruta in rutasNuevas)
             {
                 await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, promotion.Id);
@@ -1016,18 +1021,23 @@ namespace Web_Turismo_Triunvirato.Controllers
             TempData["SuccessMessage"] = "¡Promoción y sus imágenes eliminadas exitosamente!";
             return RedirectToAction(nameof(AdminPromotionPackages));
         }
-        //public async Task<IActionResult> DeletePromotionPackage(int id)
-        //{
-        //    await _dbContext.AbmPackagePromotionAsync(id, "DELETE");
-        //    TempData["SuccessMessage"] = "¡Promoción eliminada exitosamente!";
-        //    return RedirectToAction(nameof(AdminPromotionPackages));
-        //}
-
-        // TUTORÍA: Métodos privados para no repetir código (DRY - Don't Repeat Yourself)
-        private async Task<List<string>> ProcesarImagenes(List<IFormFile> files)
+        // Reemplaza el bloque incorrecto en el método ProcesarImagenes
+        private async Task<List<string>> ProcesarImagenes(List<IFormFile> files, int value)
         {
             List<string> rutas = new List<string>();
             if (files == null || files.Count == 0) return rutas;
+            string rutaA = null;        
+
+            switch (value)
+            {
+                case 1: rutaA = "/img/Actividades/"; break;
+                case 2: rutaA = "/img/promocionebuses/"; break;
+                case 3: rutaA = "/img/promocionesvuelos/"; break;
+                case 4: rutaA = "/img/promocioneshoteles/"; break;
+                case 5: rutaA = "/img/promocionespaquetes/"; break;
+
+            }
+
 
             var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionespaquetes");
             if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
@@ -1042,7 +1052,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     {
                         await file.CopyToAsync(fileStream);
                     }
-                    rutas.Add("/img/promocionespaquetes/" + uniqueFileName);
+                    rutas.Add(rutaA + uniqueFileName);
                 }
             }
             return rutas;
