@@ -98,106 +98,119 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> AltaPromotionFlight()
         {
             ViewData["Title"] = "Alta de Promoción de Vuelo";
-            // Obtener la lista de mensajes de WhatsApp activos
-            var whatsappMessages = await _dbContext.WhatsappMessages
+
+            // Cargar mensajes de WhatsApp
+            ViewBag.WhatsappMessages = await GetWhatsappMessagesAsync();
+
+            // Importante: ServiceType 3 para Vuelos
+            return View("AltaPromotionFlight", new FlightPromotion
+            {
+                ServiceType = "3",
+                IsActive = true
+            });
+        }
+
+        // Método auxiliar para no repetir código de WhatsApp
+        private async Task<List<SelectListItem>> GetWhatsappMessagesAsync()
+        {
+            return await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
-                .ToListAsync();
-
-            // Crear una lista de SelectListItem para el dropdown
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
-            {
-                Value = m.Id.ToString(),
-                Text = m.Title
-            }).ToList();
-
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
-            ViewBag.WhatsappMessages = whatsappList;
-
-            return View("AltaPromotionFlight", new FlightPromotion { ServiceType = "0"});
+                .Select(m => new SelectListItem
+                {
+                    Value = m.Id.ToString(),
+                    Text = m.Title
+                }).ToListAsync();
         }
 
         [HttpGet]
         public async Task<IActionResult> EditPromotionFlight(int id)
         {
             ViewData["Title"] = "Editar Promoción de Vuelo";
-            var promotion = await _dbContext.FlightPromotions.FindAsync(id);
 
-            if (promotion == null)
+            // 1. Buscamos el vuelo
+            var promotion = await _dbContext.FlightPromotions.FindAsync(id);
+            if (promotion == null) return NotFound();
+
+            // 2. Buscamos la entidad para saber el ID de Vuelos (ej: 3)
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "FlightPromotions");
+
+            if (entidad != null)
             {
-                return NotFound();
+                // 3. Cargamos la galería manualmente desde la tabla 'imagenes'
+                promotion.ImagenesAdicionales = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == id)
+                    .ToListAsync();
             }
 
-            // Obtener la lista de mensajes de WhatsApp activos
-            var whatsappMessages = await _dbContext.WhatsappMessages
-                .Where(m => m.Is_Active)
-                .OrderBy(m => m.Title)
-                .ToListAsync();
-
-            // Crear una lista de SelectListItem para el dropdown
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
-            {
-                Value = m.Id.ToString(),
-                Text = m.Title
-            }).ToList();
-
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
-            ViewBag.WhatsappMessages = whatsappList;
-
+            ViewBag.WhatsappMessages = await GetWhatsappMessagesAsync();
             return View("AltaPromotionFlight", promotion);
         }
 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionFlight(IFormFile ImageFile,[Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionFlight(
+            List<IFormFile> ImageFile, // Cambiado a List para recibir la galería
+            [Bind("Id,Whatsapp_Id,ServiceType,Description,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
         {
-            // === Lógica de Subida de Imagen ===
-            if (ImageFile != null && ImageFile.Length > 0)
+            // 1. OBTENER ENTIDAD PARA REFERENCIA
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "FlightPromotions");
+            if (entidad == null) return BadRequest("No se encontró la configuración de entidad para Vuelos.");
+
+            // 2. PROCESAR IMÁGENES (Subida física)
+            List<string> rutasGuardadas = await ProcesarImagenes(ImageFile, entidad.Id);
+
+            if (rutasGuardadas.Any())
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
-
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(fileStream); 
-                    }
-
-                promotion.ImageUrl = "/img/promocionesvuelos/" + uniqueFileName;
+                // La primera imagen de la lista se asigna como portada principal
+                promotion.ImageUrl = rutasGuardadas[0];
                 ModelState.Remove("ImageUrl");
             }
             else
             {
-                
+                // Si es alta nueva y no hay fotos, error
                 if (promotion.Id == 0)
                 {
                     ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción de Vuelo.");
                 }
             }
-            
 
             if (ModelState.IsValid)
             {
+                // Cálculo de descuento
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
 
-                promotion.ServiceType = "0";
+                promotion.ServiceType = "3"; // Cambiado a 3 que es Vuelos
 
-                await _dbContext.AbmFlightPromotionAsync(promotion, "INSERT");
+                // 3. EJECUTAR SP Y CAPTURAR EL ID GENERADO
+                // Es vital que AbmFlightPromotionAsync devuelva el ID (int) como vimos antes
+                int newId = await _dbContext.AbmFlightPromotionAsync(promotion, "INSERT");
 
-                TempData["SuccessMessage"] = "¡Promoción de vuelo creada exitosamente!";
+                // 4. INSERTAR EN TABLA 'imagenes' PARA LA GALERÍA
+                foreach (var ruta in rutasGuardadas)
+                {
+                    await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, newId);
+                }
+
+                TempData["SuccessMessage"] = "¡Promoción de vuelo y galería creadas exitosamente!";
                 return RedirectToAction(nameof(AdminPromotionFlights));
             }
 
-            
+            // Si falló el modelstate, recargamos mensajes de WhatsApp para la vista
+            var whatsappMessages = await _dbContext.WhatsappMessages
+                .Where(m => m.Is_Active)
+                .OrderBy(m => m.Title)
+                .ToListAsync();
+            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem
+            {
+                Value = m.Id.ToString(),
+                Text = m.Title
+            }).ToList();
+
             ViewData["Title"] = "Alta de Promoción de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
@@ -205,84 +218,117 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionFlight(int id, IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion)
+        public async Task<IActionResult> EditPromotionFlight(
+         int id,
+         List<IFormFile> ImageFile,      // Imágenes nuevas (galería)
+         List<IFormFile> ReplacedFiles,  // Archivos que reemplazan a otros
+         List<string> DeletedImagesUrls, // URLs de imágenes a borrar
+         List<string> ReplacedImagesUrls,// URLs de imágenes viejas que serán reemplazadas
+         [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,Stars")] FlightPromotion promotion
+ )
         {
-            if (id != promotion.Id)
+            if (id != promotion.Id) return NotFound();
+
+            // 1. OBTENER ENTIDAD PARA REFERENCIA (Vuelos suele ser Id 3 o buscamos por nombre de tabla)
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "FlightPromotions");
+            if (entidad == null) return BadRequest("No se encontró la configuración de entidad para Vuelos.");
+
+            // 2. PROCESAR BORRADOS
+            if (DeletedImagesUrls != null && DeletedImagesUrls.Any())
             {
-                return NotFound();
-            }
-
-
-            if (promotion.ImageUrl == null && ImageFile == null) { }
-            else
-            {              
-                if (promotion.ImageUrl == null)
+                foreach (var url in DeletedImagesUrls)
                 {
-                    ModelState.Remove("ImageUrl");
-                }
-                if (ImageFile == null)
-                {
-                    ModelState.Remove("ImageFile");
+                    // Usamos el método que ya tienes definido para borrar físicamente y en DB
+                    await EliminarImagenPorUrl(url, entidad.Id, promotion.Id);
+
+                    // Si la que borramos era la portada, limpiamos el campo para reasignar luego
+                    if (promotion.ImageUrl == url) promotion.ImageUrl = null;
                 }
             }
+
+            // 3. PROCESAR REEMPLAZOS (Lápiz)
+            if (ReplacedFiles != null && ReplacedFiles.Count > 0 && ReplacedImagesUrls != null)
+            {
+                for (int i = 0; i < ReplacedFiles.Count; i++)
+                {
+                    string urlVieja = ReplacedImagesUrls[i];
+                    await EliminarImagenPorUrl(urlVieja, entidad.Id, promotion.Id);
+
+                    // Subir la nueva usando tu método ProcesarImagenes (ajusta la carpeta si es necesario)
+                    var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, entidad.Id);
+                    if (nuevaRutaLista.Any())
+                    {
+                        string nuevaRuta = nuevaRutaLista[0];
+                        await _dbContext.InsertarImagenGenericaAsync(nuevaRuta, entidad.Id, promotion.Id);
+
+                        // Si la reemplazada era la portada, actualizamos el puntero
+                        if (promotion.ImageUrl == urlVieja) promotion.ImageUrl = nuevaRuta;
+                    }
+                }
+            }
+
+            // 4. PROCESAR NUEVAS ADICIONES (Botón +)
+            List<string> rutasNuevas = await ProcesarImagenes(ImageFile, entidad.Id);
+            foreach (var ruta in rutasNuevas)
+            {
+                await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, promotion.Id);
+            }
+
+            // 5. LÓGICA DE SEGURIDAD PARA PORTADA
+            if (string.IsNullOrEmpty(promotion.ImageUrl))
+            {
+                if (rutasNuevas.Any()) promotion.ImageUrl = rutasNuevas[0];
+                else
+                {
+                    // Buscamos en la tabla 'imagenes' qué quedó disponible para este vuelo
+                    var restante = await _dbContext.Imagen
+                        .FirstOrDefaultAsync(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id);
+                    if (restante != null) promotion.ImageUrl = restante.Url;
+                }
+            }
+
+            // Limpieza de validaciones para archivos que no son parte del modelo persistente
+            ModelState.Remove("ImageFile");
+            ModelState.Remove("ReplacedFiles");
+            if (promotion.ImageUrl != null) ModelState.Remove("ImageUrl");
 
             if (ModelState.IsValid)
             {
- 
-                if (ImageFile != null && ImageFile.Length > 0)
-                {
-                                       
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocionesvuelos");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(fileStream);
-                    }
-
-                    promotion.ImageUrl = "/img/promocionesvuelos/" + uniqueFileName;
-                }
-
                 try
                 {
+                    // Cálculo de descuento
                     if (promotion.OriginalPrice > 0)
                     {
                         promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                     }
-                    promotion.ServiceType = "0";
+
+                    // Mantenemos el ServiceType coherente para Vuelos
+                    promotion.ServiceType = "3";
+
+                    // Llamada al SP de Vuelos
                     await _dbContext.AbmFlightPromotionAsync(promotion, "UPDATE");
-                    TempData["SuccessMessage"] = "¡Promoción de vuelo actualizada exitosamente!";
+
+                    TempData["SuccessMessage"] = "¡Promoción de vuelo actualizada con éxito!";
                     return RedirectToAction(nameof(AdminPromotionFlights));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!await _dbContext.FlightPromotions.AnyAsync(e => e.Id == promotion.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    // Aquí podrías loguear el error ex
+                    ModelState.AddModelError("", "Ocurrió un error al actualizar la base de datos.");
                 }
             }
 
-
+            // Si falló el ModelState, recargamos los datos necesarios para la vista
             var whatsappMessages = await _dbContext.WhatsappMessages
                 .Where(m => m.Is_Active)
                 .OrderBy(m => m.Title)
                 .ToListAsync();
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
-            ViewBag.WhatsappMessages = whatsappList;
+
             ViewData["Title"] = "Editar Promoción de Vuelo";
             return View("AltaPromotionFlight", promotion);
         }
@@ -293,9 +339,36 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionFlight(int id)
         {
+            // 1. Obtener la entidad de referencia para Vuelos
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "FlightPromotions");
 
-            await _dbContext.AbmFlightPromotionAsync(id, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de vuelo eliminada exitosamente!";
+            if (entidad != null)
+            {
+                // 2. Buscar todas las imágenes de la galería asociadas en la tabla 'imagenes'
+                var imagenes = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == id)
+                    .ToListAsync();
+
+                // Borrar archivos físicos del servidor
+                foreach (var img in imagenes)
+                {
+                    var path = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
+                    if (System.IO.File.Exists(path))
+                    {
+                        try { System.IO.File.Delete(path); } catch { /* Loguear si falla el borrado físico */ }
+                    }
+                }
+
+                // Opcional: Si el SP no borra en cascada la tabla 'imagenes', 
+                // podrías hacer un _dbContext.Imagen.RemoveRange(imagenes) aquí.
+            }
+
+            // 3. Ejecutar el SP de borrado para el Vuelo
+            // Nota: Pasamos el objeto con el ID y el tipo DELETE
+            var flightToDelete = new FlightPromotion { Id = id };
+            await _dbContext.AbmFlightPromotionAsync(flightToDelete, "DELETE");
+
+            TempData["SuccessMessage"] = "¡Promoción de vuelo y sus imágenes eliminadas exitosamente!";
             return RedirectToAction(nameof(AdminPromotionFlights));
         }
 
@@ -339,173 +412,179 @@ namespace Web_Turismo_Triunvirato.Controllers
                .OrderBy(m => m.Title)
                .ToListAsync();
 
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
+            ViewBag.WhatsappMessages = whatsappMessages.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
                 Text = m.Title
             }).ToList();
 
-            // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
-            ViewBag.WhatsappMessages = whatsappList;
             ViewData["Title"] = "Editar Promoción de Hotel";
+
+            // Cambiamos FindAsync por una búsqueda que nos permita asegurar que el objeto existe
             var promotion = await _dbContext.HotelPromotions.FindAsync(id);
-            if (promotion == null)
+            if (promotion == null) return NotFound();
+
+            // --- TUTORÍA: Cargamos la galería para Hoteles ---
+            // Buscamos el ID de la entidad "HotelPromotions" (que debería ser 4 según tu switch)
+            var entidad = await _dbContext.Entidades
+                .FirstOrDefaultAsync(e => e.Nombre_Tabla == "HotelPromotions");
+
+            if (entidad != null)
             {
-                return NotFound();
+                promotion.ImagenesAdicionales = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id)
+                    .ToListAsync();
             }
+
             return View("AltaPromotionHotel", promotion);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionHotel(IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,Stars,IsActive")] HotelPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionHotel(List<IFormFile> ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,Stars,IsActive")] HotelPromotion promotion)
         {
+            // 1. Limpieza de validaciones
+            ModelState.Remove("ImageFile");
+            ModelState.Remove("ImageUrl");
             ModelState.Remove("RenderedWhatsappMessage");
 
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", "promocioneshoteles");
-                
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(fileStream);
-                }
-                
-                promotion.ImageUrl = "/img/promocioneshoteles/" + uniqueFileName;
-
-                
-                ModelState.Remove("ImageUrl");
-            }
-            else
-            {
-                
-                if (string.IsNullOrEmpty(promotion.ImageUrl))
-                {
-                    ModelState.AddModelError("ImageUrl", "La imagen es requerida para dar de alta una nueva promoción.");
-                }
-            }
-
-          
-            if (ImageFile == null)
-            {
-                ModelState.Remove("ImageFile");
-            }
-
-            
             if (ModelState.IsValid)
             {
+                // 2. Obtener Entidad Hoteles (ID: 4)
+                var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "HotelPromotions");
+
+                // 3. Procesar colección de imágenes
+                List<string> rutas = await ProcesarImagenes(ImageFile, entidad?.Id ?? 4);
+
+                if (rutas.Any())
+                {
+                    promotion.ImageUrl = rutas[0]; // La primera es la portada
+                }
+                else
+                {
+                    ModelState.AddModelError("ImageUrl", "Debe subir al menos una imagen.");
+                    await CargarWhatsappMessages();
+                    return View("AltaPromotionHotel", promotion);
+                }
+
+                // 4. Lógica de Negocio
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
-                promotion.ServiceType = "1";
+                promotion.ServiceType = "4"; // Asegúrate que este sea el ID de Hoteles
 
-                // ERROR DE SINTAXIS CORREGIDO: se eliminó la coma
-                await _dbContext.AbmHotelPromotionAsync(promotion, "INSERT");
+                // 5. Guardar y obtener ID
+                var idGenerado = await _dbContext.AbmHotelPromotionAsync(promotion, "INSERT");
 
-                TempData["SuccessMessage"] = "¡Promoción creada exitosamente!";
+                // 6. Vincular galería en tabla imágenes
+                if (entidad != null && idGenerado > 0)
+                {
+                    foreach (var ruta in rutas)
+                    {
+                        await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, idGenerado);
+                    }
+                }
+
+                TempData["SuccessMessage"] = "¡Hotel creado con éxito!";
                 return RedirectToAction(nameof(AdminPromotionHotels));
             }
 
             await CargarWhatsappMessages();
-            ViewData["Title"] = "Alta de Promoción de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionHotel(int id, IFormFile ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,Stars,IsActive")] HotelPromotion promotion)
+        public async Task<IActionResult> EditPromotionHotel(
+            int id,
+            List<IFormFile> ImageFile,           // Nuevas imágenes
+            List<IFormFile> ReplacedFiles,       // Archivos que reemplazan a otros
+            List<string> DeletedImagesUrls,      // URLs marcadas con la "X"
+            List<string> ReplacedImagesUrls,     // URLs marcadas con el "Lápiz"
+            [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,HotelName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,Stars,IsActive")] HotelPromotion promotion)
         {
-            if (id != promotion.Id)
-            {
-                return NotFound();
-            }
-            if (promotion.ImageUrl == null && ImageFile == null) 
-            { }
-            else
-            {
+            if (id != promotion.Id) return NotFound();
 
-                if (promotion.ImageUrl == null)
-                {
-                    ModelState.Remove("ImageUrl");
-                }
-                if (ImageFile == null)
-                {
-                    ModelState.Remove("ImageFile");
-                }
-            }
+            // 1. Obtener ID de Entidad (4 para Hoteles)
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "HotelPromotions");
+            int idEntidad = entidad?.Id ?? 4;
+
+
+            ModelState.Remove("ImageFile");
+            ModelState.Remove("ImageUrl");
 
             if (ModelState.IsValid)
             {
-  
-                if (ImageFile != null && ImageFile.Length > 0)
+                // --- A. GESTIÓN DE BORRADO ---
+                if (DeletedImagesUrls != null && DeletedImagesUrls.Any())
                 {
-        
-                    var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img","promocioneshoteles");
-                    if (!Directory.Exists(uploadsFolder))
+                    foreach (var url in DeletedImagesUrls)
                     {
-                        Directory.CreateDirectory(uploadsFolder);
+                        // Borrar registro en BD
+                        var imgDb = await _dbContext.Imagen.FirstOrDefaultAsync(i => i.Url == url && i.Id_Entidad == idEntidad);
+                        if (imgDb != null) _dbContext.Imagen.Remove(imgDb);
+
+                        // Borrar archivo físico
+                        var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, url.TrimStart('/'));
+                        if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
                     }
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(ImageFile.FileName);
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await ImageFile.CopyToAsync(fileStream);
-                    }
-
-                    promotion.ImageUrl = "/img/promocioneshoteles/" + uniqueFileName;
                 }
 
-                try
+                // --- B. GESTIÓN DE REEMPLAZO ---
+                if (ReplacedFiles != null && ReplacedFiles.Count > 0 && ReplacedImagesUrls != null)
                 {
-                    if (promotion.OriginalPrice > 0)
+                    for (int i = 0; i < ReplacedFiles.Count; i++)
                     {
-                        promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+                        // Procesar el nuevo archivo (value 4 para carpeta hoteles)
+                        var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, idEntidad);
+                        if (nuevaRutaLista.Any())
+                        {
+                            string antiguaUrl = ReplacedImagesUrls[i];
+                            string nuevaUrl = nuevaRutaLista[0];
+
+                            // Actualizar en BD
+                            var imgDb = await _dbContext.Imagen.FirstOrDefaultAsync(i => i.Url == antiguaUrl && i.Id_Entidad == idEntidad);
+                            if (imgDb != null) imgDb.Url = nuevaUrl;
+
+                            // Si la imagen reemplazada era la portada, actualizar el objeto promotion
+                            if (promotion.ImageUrl == antiguaUrl) promotion.ImageUrl = nuevaUrl;
+
+                            // Borrar archivo físico viejo
+                            var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, antiguaUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
+                        }
                     }
-                    promotion.ServiceType = "1";
-
-
-                    await _dbContext.AbmHotelPromotionAsync(promotion, "UPDATE");
-                    TempData["SuccessMessage"] = "¡Promoción de hotel actualizada exitosamente!";
-                    return RedirectToAction(nameof(AdminPromotionHotels));
                 }
-                catch (DbUpdateConcurrencyException)
+
+                // --- C. NUEVAS IMÁGENES ---
+                var nuevasRutas = await ProcesarImagenes(ImageFile, idEntidad);
+                foreach (var ruta in nuevasRutas)
                 {
-                    if (!await _dbContext.HotelPromotions.AnyAsync(e => e.Id == promotion.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    await _dbContext.InsertarImagenGenericaAsync(ruta, idEntidad, promotion.Id);
                 }
+
+                // Si no había portada y subió imágenes nuevas, la primera es portada
+                if (string.IsNullOrEmpty(promotion.ImageUrl) && nuevasRutas.Any())
+                {
+                    promotion.ImageUrl = nuevasRutas[0];
+                }
+
+                // 2. Lógica de negocio y SP
+                if (promotion.OriginalPrice > 0)
+                    promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
+
+                promotion.ServiceType = "4";
+
+                await _dbContext.AbmHotelPromotionAsync(promotion, "UPDATE");
+                await _dbContext.SaveChangesAsync(); // Guardar cambios de la tabla Imagen
+
+                TempData["SuccessMessage"] = "¡Hotel actualizado con éxito!";
+                return RedirectToAction(nameof(AdminPromotionHotels));
             }
 
-
-            var whatsappMessages = await _dbContext.WhatsappMessages
-         .Where(m => m.Is_Active)
-         .OrderBy(m => m.Title)
-         .ToListAsync();
-            var whatsappList = whatsappMessages.Select(m => new SelectListItem
-            {
-                Value = m.Id.ToString(),
-                Text = m.Title
-            }).ToList();
-            ViewBag.WhatsappMessages = whatsappList;
-
-
             await CargarWhatsappMessages();
-            ViewData["Title"] = "Editar Promoción de Hotel";
             return View("AltaPromotionHotel", promotion);
         }
 
@@ -529,10 +608,26 @@ namespace Web_Turismo_Triunvirato.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePromotionHotel(int id)
         {
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "HotelPromotions");
+            int idEntidad = entidad?.Id ?? 4;
 
+            // 1. Buscar todas las imágenes asociadas en la galería
+            var imagenes = await _dbContext.Imagen
+                .Where(i => i.Id_Entidad == idEntidad && i.Id_Objeto == id)
+                .ToListAsync();
 
-            await _dbContext.AbmHotelPromotionAsync(id, "DELETE");
-            TempData["SuccessMessage"] = "¡Promoción de hotel eliminada exitosamente!";
+            // 2. Borrar archivos físicos
+            foreach (var img in imagenes)
+            {
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+            }
+
+            // 3. Llamar al SP (Asegúrate que el SP soporte DELETE o usa ExecuteSqlRaw directamente)
+            // Nota: Tu método Abm recibe el objeto, puedes pasar uno nuevo solo con el ID
+            await _dbContext.AbmHotelPromotionAsync(new HotelPromotion { Id = id, ServiceType = "4" }, "DELETE");
+
+            TempData["SuccessMessage"] = "¡Promoción y sus imágenes eliminadas!";
             return RedirectToAction(nameof(AdminPromotionHotels));
         }
 
@@ -771,6 +866,7 @@ namespace Web_Turismo_Triunvirato.Controllers
             return View(promotions);
         }
 
+        [HttpGet]
         public async Task<IActionResult> AltaPromotionPackage()
         {
             var whatsappMessages = await _dbContext.WhatsappMessages
@@ -1021,25 +1117,28 @@ namespace Web_Turismo_Triunvirato.Controllers
             TempData["SuccessMessage"] = "¡Promoción y sus imágenes eliminadas exitosamente!";
             return RedirectToAction(nameof(AdminPromotionPackages));
         }
+
+
+
         // Reemplaza el bloque incorrecto en el método ProcesarImagenes
         private async Task<List<string>> ProcesarImagenes(List<IFormFile> files, int value)
         {
             List<string> rutas = new List<string>();
             if (files == null || files.Count == 0) return rutas;
-            string rutaA = null;        
 
-            switch (value)
+            string subCarpeta = value switch
             {
-                case 1: rutaA = "/img/Actividades/"; break;
-                case 2: rutaA = "/img/promocionebuses/"; break;
-                case 3: rutaA = "/img/promocionesvuelos/"; break;
-                case 4: rutaA = "/img/promocioneshoteles/"; break;
-                case 5: rutaA = "/img/promocionespaquetes/"; break;
+                1 => "Actividades",
+                2 => "promocionebuses",
+                3 => "promocionesvuelos",
+                4 => "promocioneshoteles",
+                5 => "promocionespaquetes",
+                _ => "otros"
+            };
 
-            }
+            string rutaRelativaBase = $"/img/{subCarpeta}/";
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img", subCarpeta);
 
-
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "img/promocionespaquetes");
             if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
             foreach (var file in files)
@@ -1052,11 +1151,13 @@ namespace Web_Turismo_Triunvirato.Controllers
                     {
                         await file.CopyToAsync(fileStream);
                     }
-                    rutas.Add(rutaA + uniqueFileName);
+                    rutas.Add(rutaRelativaBase + uniqueFileName);
                 }
             }
             return rutas;
         }
+
+
 
         private async Task CargarViewBagWhatsapp()
         {

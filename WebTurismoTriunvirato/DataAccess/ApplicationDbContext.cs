@@ -147,38 +147,47 @@ namespace Web_Turismo_Triunvirato.DataAccess
         // --- Métodos para el ABM (Stored Procedures) ---
 
         // Método para gestionar el ABM de FlightPromotion
-        public async Task AbmFlightPromotionAsync(FlightPromotion promotionFlight, string typeExecuted)
+        public async Task<int> AbmFlightPromotionAsync(FlightPromotion promotionFlight, string typeExecuted)
         {
-            // CORREGIDO: Conversión segura del ServiceType a un entero
-            int serviceType;
-            if (!int.TryParse(promotionFlight.ServiceType, out serviceType))
+            int serviceType = 3; // Forzado para Vuelos
+            int returnedId = promotionFlight.Id;
+
+            using (var command = this.Database.GetDbConnection().CreateCommand())
             {
-                throw new ArgumentException("El ServiceType del vuelo debe ser un valor numérico.", nameof(promotionFlight.ServiceType));
+                command.CommandText = "SetActivePromotionFlights";
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                // Agregar parámetros
+                command.Parameters.Add(new MySqlParameter("p_id", promotionFlight.Id > 0 ? (object)promotionFlight.Id : DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_servicetype", serviceType));
+                command.Parameters.Add(new MySqlParameter("p_description", (object)promotionFlight.Description ?? DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_whatsapp_id", promotionFlight.Whatsapp_Id));
+                command.Parameters.Add(new MySqlParameter("p_destinationname", (object)promotionFlight.DestinationName ?? DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_originname", (object)promotionFlight.OriginName ?? DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_imageurl", (object)promotionFlight.ImageUrl ?? DBNull.Value));
+                command.Parameters.Add(new MySqlParameter("p_ishotweek", promotionFlight.IsHotWeek));
+                command.Parameters.Add(new MySqlParameter("p_originalprice", promotionFlight.OriginalPrice));
+                command.Parameters.Add(new MySqlParameter("p_offerprice", promotionFlight.OfferPrice));
+                command.Parameters.Add(new MySqlParameter("p_discountpercentage", promotionFlight.DiscountPercentage));
+                command.Parameters.Add(new MySqlParameter("p_startdate", promotionFlight.StartDate));
+                command.Parameters.Add(new MySqlParameter("p_enddate", promotionFlight.EndDate));
+                command.Parameters.Add(new MySqlParameter("p_isactive", promotionFlight.IsActive));
+                command.Parameters.Add(new MySqlParameter("p_stars", (object)promotionFlight.Stars ?? 0));
+                command.Parameters.Add(new MySqlParameter("p_typeexecuted", typeExecuted));
+
+                if (this.Database.GetDbConnection().State != System.Data.ConnectionState.Open)
+                    await this.Database.GetDbConnection().OpenAsync();
+
+                // Ejecutamos y leemos el SELECT que arroja el SP
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        returnedId = reader.GetInt32(0); // Captura el "SELECT id" del SP
+                    }
+                }
             }
-
-
-            string sql = "CALL SetActivePromotionFlights(@p_id, @p_servicetype, @p_description,@p_whatsapp_id, @p_destinationname, @p_originname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_stars, @p_typeexecuted)";
-
-            var parameters = new MySqlParameter[]
-            {
-                new MySqlParameter("p_id", promotionFlight.Id > 0 ? (object)promotionFlight.Id : DBNull.Value),
-                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
-                new MySqlParameter("p_description", promotionFlight.Description),
-                new MySqlParameter("p_whatsapp_id", promotionFlight.Whatsapp_Id),
-                new MySqlParameter("p_destinationname", promotionFlight.DestinationName),
-                new MySqlParameter("p_originname", promotionFlight.OriginName),
-                new MySqlParameter("p_imageurl", promotionFlight.ImageUrl),
-                new MySqlParameter("p_ishotweek", promotionFlight.IsHotWeek),
-                new MySqlParameter("p_originalprice", promotionFlight.OriginalPrice),
-                new MySqlParameter("p_offerprice", promotionFlight.OfferPrice),
-                new MySqlParameter("p_discountpercentage", promotionFlight.DiscountPercentage),
-                new MySqlParameter("p_startdate", promotionFlight.StartDate),
-                new MySqlParameter("p_enddate", promotionFlight.EndDate),
-                new MySqlParameter("p_isactive", promotionFlight.IsActive),
-                new MySqlParameter("p_stars", promotionFlight.Stars),
-                new MySqlParameter("p_typeexecuted", typeExecuted)
-            };
-            await Database.ExecuteSqlRawAsync(sql, parameters);
+            return returnedId;
         }
 
         public async Task AbmFlightPromotionAsync(int id, string typeExecuted)
@@ -194,38 +203,61 @@ namespace Web_Turismo_Triunvirato.DataAccess
         }
 
         // Método para gestionar el alta, la baja y la modificación de promociones de hoteles
-        public async Task AbmHotelPromotionAsync(HotelPromotion promotion, string typeExecuted)
+        public async Task<int> AbmHotelPromotionAsync(HotelPromotion promotion, string typeExecuted)
         {
-            // CORREGIDO: Conversión segura del ServiceType a un entero
-            int serviceType;
-            if (!int.TryParse(promotion.ServiceType, out serviceType))
+            int idGenerado = 0;
+            if (!int.TryParse(promotion.ServiceType, out int serviceType)) serviceType = 4; // Asumiendo 4 para Hoteles
+
+            var connection = Database.GetDbConnection();
+            bool wasClosed = connection.State == System.Data.ConnectionState.Closed;
+
+            if (wasClosed) await connection.OpenAsync();
+
+            try
             {
-                throw new ArgumentException("El ServiceType del hotel debe ser un valor numérico.", nameof(promotion.ServiceType));
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_whatsapp_Id, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_stars , @p_isactive, @p_typeexecuted)";
+
+                    command.Parameters.Add(new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_servicetype", serviceType));
+                    command.Parameters.Add(new MySqlParameter("p_description", promotion.Description));
+                    command.Parameters.Add(new MySqlParameter("p_whatsapp_Id", promotion.Whatsapp_Id));
+                    command.Parameters.Add(new MySqlParameter("p_destinationname", promotion.DestinationName));
+                    command.Parameters.Add(new MySqlParameter("p_hotelname", promotion.HotelName));
+                    command.Parameters.Add(new MySqlParameter("p_imageurl", promotion.ImageUrl ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_ishotweek", promotion.IsHotWeek));
+                    command.Parameters.Add(new MySqlParameter("p_originalprice", promotion.OriginalPrice));
+                    command.Parameters.Add(new MySqlParameter("p_offerprice", promotion.OfferPrice));
+                    command.Parameters.Add(new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage));
+                    command.Parameters.Add(new MySqlParameter("p_startdate", promotion.StartDate));
+                    command.Parameters.Add(new MySqlParameter("p_enddate", promotion.EndDate));
+                    command.Parameters.Add(new MySqlParameter("p_stars", promotion.Stars));
+                    command.Parameters.Add(new MySqlParameter("p_isactive", promotion.IsActive));
+                    command.Parameters.Add(new MySqlParameter("p_typeexecuted", typeExecuted));
+
+                    if (typeExecuted == "INSERT")
+                    {
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                idGenerado = reader.GetInt32(0);
+                                promotion.Id = idGenerado;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
             }
-
-            string sql = "CALL SetActivePromotionHotels(@p_id, @p_servicetype, @p_description, @p_whatsapp_Id, @p_destinationname, @p_hotelname, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_stars , @p_isactive, @p_typeexecuted)";
-                               
-            var parameters = new MySqlParameter[]
+            finally
             {
-                new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-                new MySqlParameter("p_servicetype", MySqlDbType.Int32) { Value = serviceType },
-                new MySqlParameter("p_description", promotion.Description),
-                new MySqlParameter("p_whatsapp_Id", promotion.Whatsapp_Id),
-                new MySqlParameter("p_destinationname",promotion.DestinationName),
-                new MySqlParameter("p_hotelname",promotion.HotelName),
-                new MySqlParameter("p_imageurl", promotion.ImageUrl),
-                new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
-                new MySqlParameter("p_originalprice", promotion.OriginalPrice),
-                new MySqlParameter("p_offerprice", promotion.OfferPrice),
-                new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
-                new MySqlParameter("p_startdate", promotion.StartDate),
-                new MySqlParameter("p_enddate", promotion.EndDate),
-                new MySqlParameter("p_stars", promotion.Stars),
-                new MySqlParameter("p_isactive", promotion.IsActive),                
-                new MySqlParameter("p_typeexecuted", typeExecuted)
-            };
-
-            await Database.ExecuteSqlRawAsync(sql, parameters);
+                if (wasClosed) await connection.CloseAsync();
+            }
+            return idGenerado;
         }
 
 

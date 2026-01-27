@@ -1,98 +1,257 @@
 @model Web_Turismo_Triunvirato.Models.FlightPromotion
 
 @{
-    ViewData["Title"] = "Crear o Editar Promoción de Vuelo";
+    ViewData["Title"] = (Model.Id > 0) ? "Editar Promoción de Vuelo" : "Alta de Promoción de Vuelo";
+    string actionName = (Model.Id > 0) ? "EditPromotionFlight" : "SubmitPromotionFlight";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">@ViewData["Title"]</h2>
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="AdminPromotionFlights" class="btn btn-outline-secondary">Volver al listado</a>
+    </div>
 
-    @* <form asp-action="EditPromotionFlight" enctype="multipart/form-data" method="post"> *@
-    @{
-      string actionName = (Model.Id > 0) ? "EditPromotionFlight" : "SubmitPromotionFlight";
-    }
-
-   <form asp-action="@actionName" enctype="multipart/form-data" method="post">
-      
+    <form asp-action="@actionName" enctype="multipart/form-data" method="post" id="flightForm">
+        @Html.AntiForgeryToken()
         @if (Model.Id > 0)
         {
             <input type="hidden" asp-for="Id" />
         }
 
-        @* Campo oculto para la URL de la imagen existente, si no se sube una nueva *@
-        <input type="hidden" asp-for="ImageUrl" />
+        @* Campo crítico: Aquí se guarda la URL de la imagen que es PORTADA *@
+        <input type="hidden" asp-for="ImageUrl" id="mainImageUrl" />
 
-        <div class="form-group mb-3">
-            <label asp-for="Description" class="form-label"></label>
-            <input asp-for="Description" class="form-control" />
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
-            <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
-                <option value="">-- Seleccione un mensaje --</option>
-            </select>
-            <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
-        </div>
-        <div class="form-group mb-3">
-            <label asp-for="DestinationName" class="form-label"></label>
-            <input asp-for="DestinationName" class="form-control" />
-            <span asp-validation-for="DestinationName" class="text-danger"></span>
-        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">Información del Vuelo</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label font-weight-bold"></label>
+                            <input asp-for="Description" class="form-control" placeholder="Ej: Vuelo Directo a Madrid - Cupos Limitados" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="OriginName" class="form-label"></label>
-            <input asp-for="OriginName" class="form-control" />
-            <span asp-validation-for="OriginName" class="text-danger"></span>
-        </div>
-        <div class="form-group mb-3">
-            <label asp-for="OriginalPrice" class="form-label"></label>
-            <input asp-for="OriginalPrice" class="form-control" />
-            <span asp-validation-for="OriginalPrice" class="text-danger"></span>
-        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OriginName" class="form-label"></label>
+                                <input asp-for="OriginName" class="form-control" placeholder="Origen" />
+                                <span asp-validation-for="OriginName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DestinationName" class="form-label"></label>
+                                <input asp-for="DestinationName" class="form-control" placeholder="Destino" />
+                                <span asp-validation-for="DestinationName" class="text-danger"></span>
+                            </div>
+                        </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="OfferPrice" class="form-label"></label>
-            <input asp-for="OfferPrice" class="form-control" />
-            <span asp-validation-for="OfferPrice" class="text-danger"></span>
-        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OriginalPrice" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="OriginalPrice" class="form-control" type="number" step="0.01" />
+                                </div>
+                                <span asp-validation-for="OriginalPrice" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="OfferPrice" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="OfferPrice" class="form-control" type="number" step="0.01" />
+                                </div>
+                                <span asp-validation-for="OfferPrice" class="text-danger"></span>
+                            </div>
+                        </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="StartDate" class="form-label"></label>
-            <input asp-for="StartDate" class="form-control" />
-            <span asp-validation-for="StartDate" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="EndDate" class="form-label"></label>
-            <input asp-for="EndDate" class="form-control" />
-            <span asp-validation-for="EndDate" class="text-danger"></span>
-        </div>
-
-        <div class="form-check mb-3">
-            <input asp-for="IsHotWeek" class="form-check-input" />
-            <label asp-for="IsHotWeek" class="form-check-label"></label>
-        </div>
-
-        <div class="form-group mb-3">
-            <label for="ImageFile" class="form-label">Seleccionar Imagen</label>
-            <input type="file" id="ImageFile" name="ImageFile" class="form-control" accept="image/*" />
-            <span asp-validation-for="ImageUrl" class="text-danger"></span>
-        </div>
-
-        @if (!string.IsNullOrEmpty(Model.ImageUrl))
-        {
-            <div class="mb-3">
-                <img src="@Model.ImageUrl" alt="Imagen actual" class="img-thumbnail" style="max-height: 200px;" />
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartDate" class="form-label"></label>
+                                <input asp-for="StartDate" class="form-control" type="date" />
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EndDate" class="form-label"></label>
+                                <input asp-for="EndDate" class="form-control" type="date" />
+                                <span asp-validation-for="EndDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        }
 
-        <div class="form-check mb-3">
-            <input asp-for="IsActive" class="form-check-input" />
-            <label asp-for="IsActive" class="form-check-label"></label>
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">Configuración</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Whatsapp_Id" class="form-label">Campaña WhatsApp</label>
+                            <select asp-for="Whatsapp_Id" class="form-select" asp-items="ViewBag.WhatsappMessages">
+                                <option value="">-- Seleccione --</option>
+                            </select>
+                            <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-check form-switch mb-2">
+                            <input asp-for="IsHotWeek" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsHotWeek" class="form-check-label">¿Es Oferta Hot?</label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label">Publicado / Activo</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Galería de Imágenes</h5>
+                <button type="button" class="btn btn-light btn-sm" onclick="addNewImageSlot()">
+                    <i class="bi bi-plus-circle"></i> Agregar Imagen
+                </button>
+            </div>
+            <div class="card-body">
+                @* Contenedor para subidas nuevas *@
+                <div id="new-images-container" class="row mb-3">
+                    <div class="col-md-4 mb-2 image-slot">
+                        <label class="small text-muted">Nueva imagen (Portada por defecto si es la primera)</label>
+                        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                    </div>
+                </div>
 
-        <button type="submit" class="btn btn-primary">Guardar</button>
+                <hr />
+                <h6>Imágenes actuales en la galería:</h6>
+                <div class="row" id="existing-gallery">
+                    @if (Model.ImagenesAdicionales != null && Model.ImagenesAdicionales.Any())
+                    {
+                        @foreach (var img in Model.ImagenesAdicionales)
+                        {
+                            bool isMain = (img.Url == Model.ImageUrl);
+                            <div class="col-6 col-md-3 mb-4 text-center existing-image-card" data-url="@img.Url">
+                                <div class="card h-100 @(isMain ? "border-primary shadow" : "")">
+                                    <div class="position-relative">
+                                        <img src="@img.Url" class="card-img-top p-2" style="height: 150px; object-fit: cover;" />
+                                        @if (isMain)
+                                        {
+                                            <span class="badge bg-primary position-absolute top-0 start-0 m-2">PORTADA</span>
+                                        }
+                                    </div>
+                                    <div class="card-footer bg-transparent border-0 btn-group p-1">
+                                        @* Botón Portada *@
+                                        <button type="button" class="btn btn-sm @(isMain ? "btn-primary" : "btn-outline-primary")"
+                                                onclick="setMainImage('@img.Url', this)" title="Marcar como portada">
+                                            <i class="bi bi-star-fill"></i>
+                                        </button>
+
+                                        @* Botón Reemplazar *@
+                                        <label class="btn btn-sm btn-outline-info mb-0" title="Reemplazar esta imagen">
+                                            <i class="bi bi-pencil"></i>
+                                            <input type="file" name="ReplacedFiles" style="display:none"
+                                                   onchange="handleReplace(this, '@img.Url')" />
+                                        </label>
+
+                                        @* Botón Eliminar *@
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                onclick="removeExistingImage('@img.Url', this)" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else if (Model.Id > 0)
+                    {
+                        <div class="col-12 text-center py-3">
+                            <p class="text-muted italic">No hay imágenes en la galería adicional.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Inputs ocultos para sincronizar con el controlador (Igual que en Paquetes) *@
+        <div id="hidden-inputs-area"></div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                <i class="bi bi-save"></i> Guardar Cambios
+            </button>
+        </div>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        // Agregar slots de subida nuevos
+        function addNewImageSlot() {
+            const container = document.getElementById('new-images-container');
+            const div = document.createElement('div');
+            div.className = 'col-md-4 mb-2 image-slot';
+            div.innerHTML = `
+                <div class="input-group">
+                    <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                    <button type="button" class="btn btn-outline-danger" onclick="this.closest('.image-slot').remove()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>`;
+            container.appendChild(div);
+        }
+
+        // Marcar imagen como portada
+        function setMainImage(url, btn) {
+            document.getElementById('mainImageUrl').value = url;
+            // Estética: quitar bordes a todos y poner al seleccionado
+            document.querySelectorAll('.existing-image-card .card').forEach(c => c.classList.remove('border-primary', 'shadow'));
+            document.querySelectorAll('.existing-image-card .badge').forEach(b => b.remove());
+
+            const card = btn.closest('.card');
+            card.classList.add('border-primary', 'shadow');
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-primary position-absolute top-0 start-0 m-2';
+            badge.innerText = 'PORTADA';
+            card.querySelector('.position-relative').appendChild(badge);
+        }
+
+        // Manejar reemplazo
+        function handleReplace(input, oldUrl) {
+            if (input.files && input.files[0]) {
+                const hiddenArea = document.getElementById('hidden-inputs-area');
+
+                // Input para la URL vieja que vamos a reemplazar
+                const urlInput = document.createElement('input');
+                urlInput.type = 'hidden';
+                urlInput.name = 'ReplacedImagesUrls';
+                urlInput.value = oldUrl;
+                hiddenArea.appendChild(urlInput);
+
+                // Visualmente marcar que está pendiente de cambio
+                input.closest('.card').style.opacity = '0.5';
+                input.closest('.card').classList.add('border-info');
+            }
+        }
+
+        // Manejar eliminación
+        function removeExistingImage(url, btn) {
+            if(confirm('¿Seguro que quieres eliminar esta imagen de la galería?')) {
+                const hiddenArea = document.getElementById('hidden-inputs-area');
+                const delInput = document.createElement('input');
+                delInput.type = 'hidden';
+                delInput.name = 'DeletedImagesUrls';
+                delInput.value = url;
+                hiddenArea.appendChild(delInput);
+
+                // Si borramos la que era portada, avisar o resetear
+                if (document.getElementById('mainImageUrl').value === url) {
+                    document.getElementById('mainImageUrl').value = "";
+                }
+
+                btn.closest('.existing-image-card').remove();
+            }
+        }
+    </script>
+}
