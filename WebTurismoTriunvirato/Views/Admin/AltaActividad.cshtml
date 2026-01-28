@@ -8,9 +8,11 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
+        @* Aumenté un poco el ancho para que la galería se vea mejor *@
         <form asp-action="@(Model.Id == 0 ? "AltaActividad" : "EditActividad")" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             @if (Model.Id != 0)
             {
                 <input type="hidden" asp-for="Id" />
@@ -18,17 +20,19 @@
             }
 
             <div class="mb-3">
-                <label asp-for="Title" class="form-label"></label>
+                <label asp-for="Title" class="form-label">Título</label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
+
             <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
+                <label asp-for="Description" class="form-label">Descripción</label>
                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
             <div class="mb-3">
-                <label asp-for="Location" class="form-label"></label>
+                <label asp-for="Location" class="form-label">Ubicación / Destino</label>
                 <input asp-for="Location" class="form-control" />
                 <span asp-validation-for="Location" class="text-danger"></span>
             </div>
@@ -38,40 +42,157 @@
                 <select id="Whatsapp_Id" name="Whatsapp_Id" class="form-select" asp-items="ViewBag.WhatsappMessages">
                     <option value="">-- Seleccionar un mensaje --</option>
                 </select>
-                <span class="text-danger"></span>
+                <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <label for="ImageFile" class="form-label">Subir Imagen</label>
-                <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" @(Model.Id == 0 ? "required" : "") />
-                <span class="text-danger"></span>
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <div class="mt-2">
-                        <p>Imagen actual:</p>
-                        <img src="@Model.ImageUrl" alt="Current Image" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+            <!-- Galería de Imágenes -->
+            <div class="card bg-light mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Galería de Imágenes</h5>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addImageInput()">
+                        <i class="fas fa-plus"></i> Agregar otra foto
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="image-upload-container" class="mb-3">
+                        <div class="input-group mb-2">
+                            <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                            <span class="input-group-text"><i class="fas fa-image"></i></span>
+                        </div>
                     </div>
-                }
+
+                    @if (Model.ImagenesAdicionales != null && Model.ImagenesAdicionales.Any())
+                    {
+                        <div class="row">
+                            @foreach (var img in Model.ImagenesAdicionales)
+                            {
+                                var uid = "img-" + img.Id;
+                                bool esPortada = img.Url == Model.ImageUrl;
+
+                                <div class="col-md-4 mb-3 text-center" id="card-@uid">
+                                    <div class="card h-100 shadow-sm @(esPortada ? "border-warning" : "")">
+                                        @if (esPortada)
+                                        {
+                                            <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-warning text-dark" style="z-index: 10;">
+                                                PORTADA
+                                            </span>
+                                        }
+
+                                        <img src="@img.Url" class="card-img-top img-thumbnail"
+                                             style="height: 120px; object-fit: cover; cursor:pointer;"
+                                             onclick="window.open(this.src)" />
+
+                                        <div class="card-footer d-flex justify-content-around p-1">
+                                            @if (!esPortada)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="markForDelete('@uid', '@img.Url')" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-sm btn-secondary disabled" title="La portada no se puede borrar directamente">
+                                                    <i class="fas fa-lock"></i>
+                                                </button>
+                                            }
+
+                                            <label class="btn btn-sm @(esPortada ? "btn-warning" : "btn-outline-info") mb-0" title="Reemplazar">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                <input type="file" name="ReplacedFiles" style="display:none" onchange="previewReplace(this, '@uid', '@img.Url')" />
+                                                @* IMPORTANTE: Campo oculto para vincular el archivo con la URL vieja *@
+                                                <input type="hidden" name="ReplacedImagesUrls" value="@img.Url" />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
+
+            <!-- Contenedor para inputs de borrado dinámico -->
+            <div id="hidden-delete-data"></div>
+
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" asp-for="IsActive" />
-                <label class="form-check-label" asp-for="IsActive"></label>
+                <label class="form-check-label" asp-for="IsActive">Actividad Publicada / Activa</label>
             </div>
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">
+
+            <div class="d-grid gap-2 mb-5">
+                <button type="submit" class="btn btn-success btn-lg">
                     <i class="fas fa-save me-2"></i>
-                    @((Model.Id == 0) ? "Guardar" : "Actualizar")
+                    @((Model.Id == 0) ? "Guardar Nueva Actividad" : "Actualizar Actividad")
                 </button>
-                <a asp-action="AdminActivities" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>
-                    Volver a la Lista
+                <a asp-action="AdminActivities" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Volver al Listado
                 </a>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Overlay para Zoom -->
+<div id="zoomOverlay" onclick="closeZoom()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; cursor:zoom-out;">
+    <img id="zoomImg" style="max-width:90%; max-height:90%; border:3px solid white; border-radius: 8px;" />
+</div>
+
 @section Scripts {
+    <script>
+        function openZoom(src) {
+            document.getElementById('zoomImg').src = src;
+            document.getElementById('zoomOverlay').style.display = 'flex';
+        }
+        function closeZoom() {
+            document.getElementById('zoomOverlay').style.display = 'none';
+        }
+
+        function markForDelete(uid, url) {
+            if (!confirm("¿Deseas marcar esta imagen para eliminar?")) return;
+            const card = document.getElementById('card-' + uid);
+            card.style.opacity = '0.3';
+            card.style.filter = 'grayscale(1)';
+            card.style.pointerEvents = 'none';
+
+            const hiddenArea = document.getElementById('hidden-delete-data');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'DeletedImagesUrls';
+            input.value = url;
+            hiddenArea.appendChild(input);
+        }
+
+        function previewReplace(input, uid, oldUrl) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const card = document.getElementById(`card-${uid}`);
+                    const imgElement = card.querySelector(`.img-thumbnail-gallery`);
+                    imgElement.src = e.target.result;
+                    imgElement.style.border = "3px solid #0d6efd";
+                };
+                reader.readAsDataURL(input.files[0]);
+
+                const hiddenArea = document.getElementById('hidden-delete-data');
+                const hInput = document.createElement('input');
+                hInput.type = 'hidden';
+                hInput.name = 'ReplacedImagesUrls';
+                hInput.value = oldUrl;
+                hiddenArea.appendChild(hInput);
+            }
+        }
+
+        function addImageInput() {
+            const container = document.getElementById('image-upload-container');
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()"><i class="fas fa-minus"></i></button>
+                            `;
+            container.appendChild(div);
+        }
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
