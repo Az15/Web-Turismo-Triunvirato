@@ -488,58 +488,63 @@ namespace Web_Turismo_Triunvirato.DataAccess
 
         public async Task<int> AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
         {
-            int idGenerado = 0;
+            int idGenerado = activity.Id;
 
-            // 1. Obtener la conexión y asegurar que esté abierta
             var connection = Database.GetDbConnection();
             bool wasClosed = connection.State == System.Data.ConnectionState.Closed;
-
             if (wasClosed) await connection.OpenAsync();
 
             try
             {
                 using (var command = connection.CreateCommand())
                 {
-                    // Cambiamos el nombre del SP según tu definición
+                    // Nota: Agregué @p_isactive al final por si tu SP lo requiere
                     command.CommandText = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_whatsapp_id, @p_location, @p_imageurl, @p_typeexecuted, @p_isactive)";
 
-                    // Agregamos los parámetros uno a uno
                     command.Parameters.Add(new MySqlParameter("p_id", activity.Id > 0 ? (object)activity.Id : DBNull.Value));
                     command.Parameters.Add(new MySqlParameter("p_title", activity.Title ?? (object)DBNull.Value));
                     command.Parameters.Add(new MySqlParameter("p_description", activity.Description ?? (object)DBNull.Value));
                     command.Parameters.Add(new MySqlParameter("p_whatsapp_id", activity.Whatsapp_Id));
                     command.Parameters.Add(new MySqlParameter("p_location", activity.Location ?? (object)DBNull.Value));
                     command.Parameters.Add(new MySqlParameter("p_imageurl", activity.ImageUrl ?? (object)DBNull.Value));
-                    command.Parameters.Add(new MySqlParameter("p_isactive", activity.IsActive));
                     command.Parameters.Add(new MySqlParameter("p_typeexecuted", typeExecuted));
+                    command.Parameters.Add(new MySqlParameter("p_isactive", activity.IsActive));
 
                     if (typeExecuted == "INSERT")
                     {
-                        // Ejecutamos y leemos el ID generado (suponiendo que el SP hace un SELECT LAST_INSERT_ID())
                         using (var reader = await command.ExecuteReaderAsync())
                         {
                             if (await reader.ReadAsync())
                             {
-                                idGenerado = reader.GetInt32(0);
-                                activity.Id = idGenerado; // Asignamos el ID al objeto para las imágenes
+                                idGenerado = Convert.ToInt32(reader[0]);
                             }
                         }
                     }
                     else
                     {
-                        // Para UPDATE o DELETE
                         await command.ExecuteNonQueryAsync();
-                        idGenerado = activity.Id;
                     }
                 }
             }
             finally
             {
-                // Cerramos la conexión solo si este método fue el que la abrió
                 if (wasClosed) await connection.CloseAsync();
             }
-
             return idGenerado;
+        }
+
+        // Método específico para el borrado (como en Packages)
+        public async Task DeleteActivityAsync(int id, string typeExecuted)
+        {
+            string sql = "CALL DeleteActiveActivitiesPromotion(@p_id)";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("p_id", id),
+        
+            };
+            await Database.ExecuteSqlRawAsync(sql, parameters);
+
         }
 
 

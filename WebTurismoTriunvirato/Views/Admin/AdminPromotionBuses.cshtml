@@ -2,14 +2,14 @@
 @model IEnumerable<BusPromotion>
 
 @{
-    ViewData["Title"] = "Gestionar Promociones de Buses";
+    ViewData["Title"] = "Gestionar Promociones de Micros";
 }
 
 <div class="container mt-4">
     <h2 class="mb-4">@ViewData["Title"]</h2>
 
     <p>
-        <a asp-action="AltaPromotionBus" class="btn btn-success">Crear Nueva Promoción de Bus</a>
+        <a asp-action="AltaPromotionBus" class="btn btn-success">Crear Nueva Promoción de Micros</a>
     </p>
 
     @if (TempData["SuccessMessage"] != null)

@@ -4,15 +4,22 @@
     var action = Model.Id == 0 ? "SubmitPromotionBus" : "EditPromotionBus";
     ViewData["Title"] = Model.Id == 0 ? "Alta de Promoción de Bus" : "Editar Promoción de Bus";
 }
+<link rel="stylesheet" href="~/css/imagenDetail.css" />
 
 <div class="container mt-4">
     <h1>@ViewData["Title"]</h1>
 
     <div class="card p-4 shadow">
-        <form asp-controller="Admin" asp-action="@action" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+        <form asp-controller="Admin" asp-action="@action" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" id="packageForm">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="ImageUrl" id="ImageUrl" />
+            <input type="hidden" asp-for="ServiceType" />
+            <input type="hidden" asp-for="DiscountPercentage" />
+            <input type="hidden" asp-for="ImageUrl" />
+
+            <!-- Inputs ocultos para enviar info de borrado al controlador -->
+            <div id="hidden-delete-data"></div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
@@ -33,79 +40,72 @@
                     <input asp-for="BusCompanyName" class="form-control" placeholder="Ej: Chevallier" />
                     <span asp-validation-for="BusCompanyName" class="text-danger"></span>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="mb-3">
                     <label asp-for="Whatsapp_Id" class="form-label">Mensaje de WhatsApp:</label>
                     <select asp-for="Whatsapp_Id" class="form-control" asp-items="ViewBag.WhatsappMessages">
                         <option value="">-- Seleccione un mensaje --</option>
                     </select>
+                    <span asp-validation-for="Whatsapp_Id" class="text-danger"></span>
                 </div>
             </div>
 
             <!-- Galería de Imágenes (Lógica del Hotel adaptada) -->
-            <div class="card bg-light mb-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
+            
+             @*    <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Galería de Imágenes</h5>
                     <button type="button" class="btn btn-primary btn-sm" onclick="addImageInput()">
                         <i class="fas fa-plus"></i> Agregar otra foto
                     </button>
                 </div>
-                <div class="card-body">
-                    <div id="image-upload-container" class="mb-3">
-                        <div class="input-group mb-2">
-                            <input type="file" name="ImageFile" class="form-control" accept="image/*" />
-                            <span class="input-group-text"><i class="fas fa-image"></i></span>
-                        </div>
-                    </div>
+ *@
 
-                    @if (Model.ImagenesAdicionales != null && Model.ImagenesAdicionales.Any())
+                    <!-- GALERÍA MEJORADA -->
+                    @if (Model.Id > 0 && Model.ImagenesAdicionales != null && Model.ImagenesAdicionales.Any())
                     {
-                        <div class="row">
-                            @foreach (var img in Model.ImagenesAdicionales)
-                            {
-                                var uid = "img-" + img.Id;
-                                bool esPortada = img.Url == Model.ImageUrl;
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Imágenes actuales (Click para ampliar):</label>
+                            <div class="d-flex flex-wrap gap-4">
+                                @foreach (var img in Model.ImagenesAdicionales)
+                                {
+                                    var uniqueId = Guid.NewGuid().ToString().Substring(0, 5);
+                                    <div class="img-card-container" id="card-@uniqueId">
+                                        <div class="img-actions-overlay">
+                                            <button type="button" class="btn-img-edit" title="Reemplazar" onclick="showReplaceInput('@uniqueId', '@img.Url')">✎</button>
+                                            <button type="button" class="btn-img-x" title="Eliminar" onclick="markForDelete('@uniqueId', '@img.Url')">×</button>
+                                        </div>
 
-                                <div class="col-md-3 mb-3 text-center" id="card-@uid">
-                                    <div class="card h-100 shadow-sm @(esPortada ? "border-warning" : "")">
-                                        @if (esPortada)
+                                        <img src="@Url.Content(img.Url)" class="img-thumbnail-gallery" onclick="openZoom(this.src)">
+
+                                        @if (img.Url == Model.ImageUrl)
                                         {
-                                            <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-warning text-dark" style="z-index: 10;">
-                                                PORTADA
-                                            </span>
+                                            <div class="badge bg-primary d-block mt-1">Portada</div>
                                         }
 
-                                        <img src="@img.Url" class="card-img-top img-thumbnail-gallery"
-                                             style="height: 120px; object-fit: cover; cursor:pointer; @(esPortada ? "border: 3px solid #ffc107;" : "")"
-                                             onclick="openZoom(this.src)" />
-
-                                        <div class="card-footer d-flex justify-content-between p-1">
-                                            @if (!esPortada)
-                                            {
-                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="markForDelete('@uid', '@img.Url')" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <button type="button" class="btn btn-sm btn-secondary disabled">
-                                                    <i class="fas fa-lock"></i>
-                                                </button>
-                                            }
-
-                                            <label class="btn btn-sm @(esPortada ? "btn-warning" : "btn-outline-info") mb-0" title="Reemplazar">
-                                                <i class="fas fa-pencil-alt"></i>
-                                                <input type="file" name="ReplacedFiles" style="display:none" onchange="previewReplace(this, '@uid', '@img.Url')" />
-                                            </label>
+                                        <div id="replace-box-@uniqueId" class="replace-input-area" style="display:none;">
+                                            <label class="small fw-bold">Nueva imagen:</label>
+                                            <input type="file" name="ReplacedFiles" class="form-control form-control-sm" onchange="previewReplace(this, '@uniqueId')" />
                                         </div>
                                     </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                     }
-                </div>
-            </div>
 
-            <div id="hidden-delete-data"></div>
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block fw-bold">Subir nuevas imágenes</label>
+                        <div id="image-upload-container">
+                            <div class="input-group mb-2">
+                                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                                <button type="button" class="btn btn-success" onclick="addImageInput()">+</button>
+                            </div>
+                        </div>
+                        <small class="text-muted">Si subes imágenes nuevas, la primera reemplazará la portada actual.</small>
+                    </div>
+
+                
+           
+
+      
 
             <div class="row">
                 <div class="col-md-4 mb-3">
@@ -151,13 +151,14 @@
     </div>
 </div>
 
-<!-- Overlay para Zoom -->
-<div id="zoomOverlay" onclick="closeZoom()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; cursor:zoom-out;">
-    <img id="zoomImg" style="max-width:90%; max-height:90%; border:3px solid white; border-radius: 8px;" />
+<!-- MODAL ZOOM -->
+<div id="zoomOverlay" class="image-zoom-overlay" onclick="closeZoom()">
+    <img id="zoomImg" src="" />
 </div>
 
 @section Scripts {
     <script>
+        // --- ZOOM ---
         function openZoom(src) {
             document.getElementById('zoomImg').src = src;
             document.getElementById('zoomOverlay').style.display = 'flex';
@@ -166,12 +167,10 @@
             document.getElementById('zoomOverlay').style.display = 'none';
         }
 
+        // --- BORRAR ---
         function markForDelete(uid, url) {
             if (!confirm("¿Deseas marcar esta imagen para eliminar?")) return;
-            const card = document.getElementById('card-' + uid);
-            card.style.opacity = '0.3';
-            card.style.filter = 'grayscale(1)';
-            card.style.pointerEvents = 'none';
+            document.getElementById('card-' + uid).classList.add('marked-deleted');
 
             const hiddenArea = document.getElementById('hidden-delete-data');
             const input = document.createElement('input');
@@ -181,35 +180,49 @@
             hiddenArea.appendChild(input);
         }
 
-        function previewReplace(input, uid, oldUrl) {
+        // --- REEMPLAZAR ---
+        function showReplaceInput(uid, oldUrl) {
+            document.getElementById('replace-box-' + uid).style.display = 'block';
+
+            const hiddenArea = document.getElementById('hidden-delete-data');
+
+            // Evitar duplicados si hacen clic varias veces
+            if (!hiddenArea.querySelector(`input[value="${oldUrl}"][name="ReplacedImagesUrls"]`)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ReplacedImagesUrls';
+                input.value = oldUrl;
+                hiddenArea.appendChild(input);
+            }
+        }
+
+        function previewReplace(input, uid) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const card = document.getElementById(`card-${uid}`);
-                    const imgElement = card.querySelector(`.img-thumbnail-gallery`);
+                    const imgElement = document.querySelector(`#card-${uid} .img-thumbnail-gallery`);
+                    const oldUrl = imgElement.getAttribute('src').replace(/^.*[\\\/]/, '/img/promocionespaquetes/');
+                    // Nota: La lógica de arriba es simplificada, mejor capturamos la URL real antes de cambiar el src
+
+                    const currentPortada = document.getElementById('ImageUrl').value;
+
                     imgElement.src = e.target.result;
                     imgElement.style.border = "3px solid #0d6efd";
                 };
                 reader.readAsDataURL(input.files[0]);
-
-                const hiddenArea = document.getElementById('hidden-delete-data');
-                const hInput = document.createElement('input');
-                hInput.type = 'hidden';
-                hInput.name = 'ReplacedImagesUrls';
-                hInput.value = oldUrl;
-                hiddenArea.appendChild(hInput);
             }
         }
 
+        // --- AGREGAR NUEVAS ---
         function addImageInput() {
             const container = document.getElementById('image-upload-container');
-            const div = document.createElement('div');
-            div.className = 'input-group mb-2';
-            div.innerHTML = `
-                        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
-                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()"><i class="fas fa-minus"></i></button>
-                    `;
-            container.appendChild(div);
+            const row = document.createElement('div');
+            row.className = 'input-group mb-2';
+            row.innerHTML = `
+                                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">-</button>
+                            `;
+            container.appendChild(row);
         }
     </script>
     @{

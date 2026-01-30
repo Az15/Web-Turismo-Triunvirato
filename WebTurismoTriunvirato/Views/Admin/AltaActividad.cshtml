@@ -9,8 +9,8 @@
 
 <div class="row">
     <div class="col-md-8">
-        @* Aumenté un poco el ancho para que la galería se vea mejor *@
         <form asp-action="@(Model.Id == 0 ? "AltaActividad" : "EditActividad")" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             @if (Model.Id != 0)
@@ -78,9 +78,9 @@
                                             </span>
                                         }
 
-                                        <img src="@img.Url" class="card-img-top img-thumbnail"
+                                        <img src="@img.Url" class="card-img-top img-thumbnail img-thumbnail-gallery"
                                              style="height: 120px; object-fit: cover; cursor:pointer;"
-                                             onclick="window.open(this.src)" />
+                                             onclick="openZoom(this.src)" />
 
                                         <div class="card-footer d-flex justify-content-around p-1">
                                             @if (!esPortada)
@@ -91,16 +91,15 @@
                                             }
                                             else
                                             {
-                                                <button type="button" class="btn btn-sm btn-secondary disabled" title="La portada no se puede borrar directamente">
+                                                <button type="button" class="btn btn-sm btn-secondary disabled">
                                                     <i class="fas fa-lock"></i>
                                                 </button>
                                             }
 
                                             <label class="btn btn-sm @(esPortada ? "btn-warning" : "btn-outline-info") mb-0" title="Reemplazar">
                                                 <i class="fas fa-pencil-alt"></i>
+                                                @* Al cambiar el archivo, llamamos a previewReplace *@
                                                 <input type="file" name="ReplacedFiles" style="display:none" onchange="previewReplace(this, '@uid', '@img.Url')" />
-                                                @* IMPORTANTE: Campo oculto para vincular el archivo con la URL vieja *@
-                                                <input type="hidden" name="ReplacedImagesUrls" value="@img.Url" />
                                             </label>
                                         </div>
                                     </div>
@@ -111,7 +110,7 @@
                 </div>
             </div>
 
-            <!-- Contenedor para inputs de borrado dinámico -->
+            <!-- Contenedor ÚNICO para inputs de borrado y reemplazo -->
             <div id="hidden-delete-data"></div>
 
             <div class="form-check mb-3">
@@ -157,7 +156,7 @@
             const hiddenArea = document.getElementById('hidden-delete-data');
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = 'DeletedImagesUrls';
+            input.name = 'DeletedImagesUrls'; // Debe coincidir con el parámetro en el Controller
             input.value = url;
             hiddenArea.appendChild(input);
         }
@@ -174,9 +173,10 @@
                 reader.readAsDataURL(input.files[0]);
 
                 const hiddenArea = document.getElementById('hidden-delete-data');
+                // IMPORTANTE: Solo creamos el input de reemplazo si no existe ya para esta imagen
                 const hInput = document.createElement('input');
                 hInput.type = 'hidden';
-                hInput.name = 'ReplacedImagesUrls';
+                hInput.name = 'ReplacedImagesUrls'; // Debe coincidir con el parámetro en el Controller
                 hInput.value = oldUrl;
                 hiddenArea.appendChild(hInput);
             }
@@ -187,9 +187,9 @@
             const div = document.createElement('div');
             div.className = 'input-group mb-2';
             div.innerHTML = `
-                                <input type="file" name="ImageFile" class="form-control" accept="image/*" />
-                                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()"><i class="fas fa-minus"></i></button>
-                            `;
+                        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()"><i class="fas fa-minus"></i></button>
+                    `;
             container.appendChild(div);
         }
     </script>

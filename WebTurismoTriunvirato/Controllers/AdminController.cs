@@ -400,7 +400,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
 
             ViewBag.WhatsappMessages = whatsappList;
-            return View("AltaPromotionHotel", new HotelPromotion { ServiceType = "1" });
+            return View("AltaPromotionHotel", new HotelPromotion { ServiceType = "4" });
         }
 
 
@@ -665,7 +665,7 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         // GET: Admin/EditPromotionBus/{id}
         [HttpGet]
-        public async Task<IActionResult> EditPromotionBus(int id)
+        public async Task<IActionResult> EditPromotionBus(int? id)
         {
             var whatsappMessages = await _dbContext.WhatsappMessages
               .Where(m => m.Is_Active)
@@ -680,18 +680,20 @@ namespace Web_Turismo_Triunvirato.Controllers
             }).ToList();
 
             // Pasar la lista al ViewBag. El nombre de la variable de ViewBag puede ser cualquiera.
-            ViewBag.WhatsappMessages = whatsappList;
+            //ViewBag.WhatsappMessages = whatsappList;
 
-            ViewData["Title"] = "Editar Promoción de Bus";
-            var promotion = await _dbContext.BusPromotions.FindAsync(id); // Asumiendo que BusPromotions es una propiedad en tu DbContext
+            if (id == null) return NotFound();
+
+           
+            var promotion = await _dbContext.GetBusPromotionByIdAsync(id.Value);
+            
+
             if (promotion == null)
             {
                 return NotFound();
             }
 
-
-            var entidad = await _dbContext.Entidades
-         .FirstOrDefaultAsync(e => e.Nombre_Tabla == "BusPromotions");
+            var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "BusPromotions");
 
             if (entidad != null)
             {
@@ -699,51 +701,49 @@ namespace Web_Turismo_Triunvirato.Controllers
                     .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id)
                     .ToListAsync();
             }
-
+            ViewBag.WhatsappMessages = whatsappList;
+            ViewData["Title"] = "Editar Promoción de Bus";
             return View("AltaPromotionBus", promotion);
         }
 
         // POST: Admin/SubmitPromotionBus (Creación)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitPromotionBus(List<IFormFile> ImageFile, [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
+        public async Task<IActionResult> SubmitPromotionBus(List<IFormFile> ImageFile, 
+            [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice," +
+            "DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
         {
             // 1. Limpieza de validaciones
             ModelState.Remove("ImageFile");
             ModelState.Remove("ImageUrl");
-            ModelState.Remove("RenderedWhatsappMessage");
+            //ModelState.Remove("RenderedWhatsappMessage");
 
             if (ModelState.IsValid)
             {
 
                 var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "BusPromotions");
-                List<string> rutas = await ProcesarImagenes(ImageFile, entidad?.Id ?? 2);
+                List<string> rutasImagenesNuevas = await ProcesarImagenes(ImageFile, entidad.Id);
 
 
-                if (rutas.Any())
+                if (rutasImagenesNuevas.Count > 0)
                 {
-                    promotion.ImageUrl = rutas[0]; // La primera es la portada
+                    promotion.ImageUrl = rutasImagenesNuevas[0];
                 }
-                else
-                {
-                    ModelState.AddModelError("ImageUrl", "Debe subir al menos una imagen.");
-                    await CargarWhatsappMessages();
-                    return View("AltaPromotionBus", promotion);
-                }
-
-
 
                 if (promotion.OriginalPrice > 0)
                 {
                     promotion.DiscountPercentage = Math.Round(((promotion.OriginalPrice - promotion.OfferPrice) / promotion.OriginalPrice) * 100, 2);
                 }
-                promotion.ServiceType = "2";
-
                 var idGenerado = await _dbContext.AbmBusPromotionAsync(promotion, "INSERT");
 
-                if (entidad != null && idGenerado > 0)
+
+                promotion.ServiceType = "2";
+
+
+
+                if (entidad != null && idGenerado > 0 && rutasImagenesNuevas.Count > 0)
                 {
-                    foreach (var ruta in rutas)
+                    foreach (var ruta in rutasImagenesNuevas)
                     {
                         await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, idGenerado);
                     }
@@ -763,88 +763,82 @@ namespace Web_Turismo_Triunvirato.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPromotionBus(int id,
-
+        public async Task<IActionResult> EditPromotionBus(
+            int id,
             List<IFormFile> ImageFile,           // Nuevas imágenes
             List<IFormFile> ReplacedFiles,       // Archivos que reemplazan a otros
             List<string> DeletedImagesUrls,      // URLs marcadas con la "X"
             List<string> ReplacedImagesUrls,     // URLs marcadas con el "Lápiz"
 
-            [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice,DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
+            [Bind("Id,ServiceType,Description,Whatsapp_Id,DestinationName,OriginName,ImageUrl,IsHotWeek,OriginalPrice,OfferPrice," +
+            "DiscountPercentage,StartDate,EndDate,IsActive,BusCompanyName,Category")] BusPromotion promotion)
         {
-            if (id != promotion.Id)
-            {
-                return NotFound();
-            }
 
+            if (id != promotion.Id) return NotFound();
             var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "BusPromotions");
-            int idEntidad = entidad?.Id ?? 2;
+            if (entidad == null) return BadRequest("No se encontró la configuración de entidad.");
 
 
-            // Paso 1: Si no se sube un nuevo archivo, elimina el error de validación para ImageUrl.
-            if (promotion.ImageUrl == null)
+            if (DeletedImagesUrls != null && DeletedImagesUrls.Any())
             {
-                ModelState.Remove("ImageFile");
-                ModelState.Remove("ImageUrl");
+                foreach (var url in DeletedImagesUrls)
+                {
+                    await EliminarImagenPorUrl(url, entidad.Id, promotion.Id);
+                    // Si la que borramos era la portada, limpiamos el campo
+                    if (promotion.ImageUrl == url) promotion.ImageUrl = null;
+                }
             }
+
+            // 3. PROCESAR REEMPLAZOS (Imágenes editadas con el lápiz)
+            if (ReplacedFiles != null && ReplacedFiles.Count > 0 && ReplacedImagesUrls != null)
+            {
+                for (int i = 0; i < ReplacedFiles.Count; i++)
+                {
+                    // Borrar la vieja
+                    string urlVieja = ReplacedImagesUrls[i];
+                    await EliminarImagenPorUrl(urlVieja, entidad.Id, promotion.Id);
+
+                    // Subir la nueva (usamos el método que ya tienes pero pasando el archivo individual en una lista)
+                    var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, entidad.Id);
+                    if (nuevaRutaLista.Any())
+                    {
+                        string nuevaRuta = nuevaRutaLista[0];
+                        await _dbContext.InsertarImagenGenericaAsync(nuevaRuta, entidad.Id, promotion.Id);
+
+                        // Si la reemplazada era la portada, actualizamos el puntero de portada
+                        if (promotion.ImageUrl == urlVieja) promotion.ImageUrl = nuevaRuta;
+                    }
+                }
+            }
+
+            // 4. PROCESAR NUEVAS ADICIONES (El contenedor de abajo con el botón +)
+            List<string> rutasNuevas = await ProcesarImagenes(ImageFile, entidad.Id);
+            foreach (var ruta in rutasNuevas)
+            {
+                await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, promotion.Id);
+            }
+
+            // 5. LÓGICA DE PORTADA: Si nos quedamos sin portada, asignar la primera disponible
+            if (string.IsNullOrEmpty(promotion.ImageUrl))
+            {
+                // Intentamos buscar la primera de las nuevas subidas ahora
+                if (rutasNuevas.Any()) promotion.ImageUrl = rutasNuevas[0];
+                else
+                {
+                    // O buscamos en la base de datos lo que queda
+                    var restante = await _dbContext.Imagen
+                        .FirstOrDefaultAsync(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id);
+                    if (restante != null) promotion.ImageUrl = restante.Url;
+                }
+            }
+
+            ModelState.Remove("ImageFile");
+            ModelState.Remove("ReplacedFiles");
+            if (promotion.ImageUrl != null) ModelState.Remove("ImageUrl");
 
 
             if (ModelState.IsValid)
             {
-
-                if (DeletedImagesUrls != null && DeletedImagesUrls.Any())
-                {
-                    foreach (var url in DeletedImagesUrls)
-                    {
-                        // Borrar registro en BD
-                        var imgDb = await _dbContext.Imagen.FirstOrDefaultAsync(i => i.Url == url && i.Id_Entidad == idEntidad);
-                        if (imgDb != null) _dbContext.Imagen.Remove(imgDb);
-
-                        // Borrar archivo físico
-                        var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, url.TrimStart('/'));
-                        if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
-                    }
-                }
-
-                // --- B. GESTIÓN DE REEMPLAZO ---
-                if (ReplacedFiles != null && ReplacedFiles.Count > 0 && ReplacedImagesUrls != null)
-                {
-                    for (int i = 0; i < ReplacedFiles.Count; i++)
-                    {
-                        // Procesar el nuevo archivo (value 4 para carpeta hoteles)
-                        var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, idEntidad);
-                        if (nuevaRutaLista.Any())
-                        {
-                            string antiguaUrl = ReplacedImagesUrls[i];
-                            string nuevaUrl = nuevaRutaLista[0];
-
-                            // Actualizar en BD
-                            var imgDb = await _dbContext.Imagen.FirstOrDefaultAsync(i => i.Url == antiguaUrl && i.Id_Entidad == idEntidad);
-                            if (imgDb != null) imgDb.Url = nuevaUrl;
-
-                            // Si la imagen reemplazada era la portada, actualizar el objeto promotion
-                            if (promotion.ImageUrl == antiguaUrl) promotion.ImageUrl = nuevaUrl;
-
-                            // Borrar archivo físico viejo
-                            var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, antiguaUrl.TrimStart('/'));
-                            if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
-                        }
-                    }
-                }
-
-                // --- C. NUEVAS IMÁGENES ---
-                var nuevasRutas = await ProcesarImagenes(ImageFile, idEntidad);
-                foreach (var ruta in nuevasRutas)
-                {
-                    await _dbContext.InsertarImagenGenericaAsync(ruta, idEntidad, promotion.Id);
-                }
-
-                // Si no había portada y subió imágenes nuevas, la primera es portada
-                if (string.IsNullOrEmpty(promotion.ImageUrl) && nuevasRutas.Any())
-                {
-                    promotion.ImageUrl = nuevasRutas[0];
-                }
-
 
                 try
                 {
@@ -855,6 +849,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     promotion.ServiceType = "2";
                     await _dbContext.AbmBusPromotionAsync(promotion, "UPDATE");
                     TempData["SuccessMessage"] = "¡Promoción de bus actualizada exitosamente!";
+                    await CargarWhatsappMessages();
                     return RedirectToAction(nameof(AdminPromotionBuses));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -867,24 +862,50 @@ namespace Web_Turismo_Triunvirato.Controllers
                     {
                         throw;
                     }
-                }
-
-                promotion.ServiceType = "2";
-
-                await _dbContext.AbmBusPromotionAsync(promotion, "UPDATE");
-                await _dbContext.SaveChangesAsync(); // Guardar cambios de la tabla Imagen
-
-                TempData["SuccessMessage"] = "¡Micro actualizado con éxito!";
-                return RedirectToAction(nameof(AdminPromotionBuses));
+                }           
 
 
             }
-            await CargarWhatsappMessages();
+            await CargarViewBagWhatsapp();
             return View("AltaPromotionBus", promotion);
+            //promotion.ServiceType = "2";
+
+            //await _dbContext.AbmBusPromotionAsync(promotion, "UPDATE");
+            //await _dbContext.SaveChangesAsync(); // Guardar cambios de la tabla Imagen
+
+            //TempData["SuccessMessage"] = "¡Micro actualizado con éxito!";
+            //return RedirectToAction(nameof(AdminPromotionBuses));
+
+            //await CargarWhatsappMessages();
+            //return View("AltaPromotionBus", promotion);
 
         }
-       
-     
+
+
+        /// <summary>
+        /// ES NECESARIO///////////////
+        
+        
+        //[HttpPost]
+        //private async Task EliminarImagenPorUrl(string url, int entidadId, int objetoId)
+        //{
+        //    var registro = await _dbContext.Imagen
+        //        .FirstOrDefaultAsync(i => i.Url == url && i.Id_Entidad == entidadId && i.Id_Objeto == objetoId);
+
+        //    if (registro != null)
+        //    {
+        //        // Borrar archivo físico
+        //        var filePath = Path.Combine(_webHostEnvironment.WebRootPath, url.TrimStart('/'));
+        //        if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+
+        //        // Borrar registro DB
+        //        _dbContext.Imagen.Remove(registro);
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+        //}
+        /// ES NECESARIO///////////////
+
+
         // POST: Admin/DeletePromotionBus
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -892,28 +913,49 @@ namespace Web_Turismo_Triunvirato.Controllers
         {
 
             var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "BusPromotions");
-            int idEntidad = entidad?.Id ?? 2;
 
-            var imagenes = await _dbContext.Imagen
-         .Where(i => i.Id_Entidad == idEntidad && i.Id_Objeto == id)
-         .ToListAsync();
-
-            // 2. Borrar archivos físicos
-            foreach (var img in imagenes)
+            if (entidad != null)
             {
-                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                // 2. Buscar imágenes asociadas para borrar archivos físicos
+                var imagenes = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == id)
+                    .ToListAsync();
+
+                foreach (var img in imagenes)
+                {
+                    var path = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
+                    if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+                }
             }
 
-            // 3. Llamar al SP (Asegúrate que el SP soporte DELETE o usa ExecuteSqlRaw directamente)
-            // Nota: Tu método Abm recibe el objeto, puedes pasar uno nuevo solo con el ID
-            await _dbContext.AbmBusPromotionAsync(new BusPromotion { Id = id, ServiceType = "2" }, "DELETE");
-
-
+            await _dbContext.AbmBusPromotionAsync(id, "DELETE");
 
 
             TempData["SuccessMessage"] = "¡Promoción de bus eliminada exitosamente!";
             return RedirectToAction(nameof(AdminPromotionBuses));
+
+
+            //   //int idEntidad = entidad?.Id ?? 2;
+
+            //   var imagenes = await _dbContext.Imagen
+            //.Where(i => i.Id_Entidad == idEntidad && i.Id_Objeto == id)
+            //.ToListAsync();
+
+            //   // 2. Borrar archivos físicos
+            //   foreach (var img in imagenes)
+            //   {
+            //       var filePath = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
+            //       if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+            //   }
+
+            //   // 3. Llamar al SP (Asegúrate que el SP soporte DELETE o usa ExecuteSqlRaw directamente)
+            //   // Nota: Tu método Abm recibe el objeto, puedes pasar uno nuevo solo con el ID
+            //   await _dbContext.AbmBusPromotionAsync(new BusPromotion { Id = id, ServiceType = "2" }, "DELETE");
+
+
+
+
+
         }
 
 
@@ -969,9 +1011,6 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (entidad != null)
             {
-
-
-                // Por esta línea correcta:
                 promotion.ImagenesAdicionales = await _dbContext.Imagen
                     .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == promotion.Id)
                     .ToListAsync();
@@ -1377,14 +1416,13 @@ namespace Web_Turismo_Triunvirato.Controllers
         TempData["SuccessMessage"] = "¡Empresa de encomiendas eliminada exitosamente!";
         return RedirectToAction(nameof(AdminEncomiendas));
     }
-
-        /////////////////////////////////////// ACTIVIDADES ////////////////////////////////////////////////////////////
-
+        
+        /// ////////////////////////////////////////actividades ///////////////////////////
+        
         [HttpGet]
         public async Task<IActionResult> AdminActivities()
         {
             ViewData["Title"] = "Administrar Actividades";
-            // Asegúrate de que la tabla en el DbContext sea 'Activities'
             var activitiesAdmin = await _dbContext.Activities.ToListAsync();
             return View("AdminActivities", activitiesAdmin);
         }
@@ -1398,12 +1436,9 @@ namespace Web_Turismo_Triunvirato.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditActividad(int id) // Corregido el nombre a 'EditActividad'
+        public async Task<IActionResult> EditActividad(int id)
         {
-            await CargarWhatsappMessages();
             ViewData["Title"] = "Editar Actividad";
-
-            // IMPORTANTE: Verifica que estés buscando en la tabla correcta
             var activity = await _dbContext.Activities.FindAsync(id);
             if (activity == null) return NotFound();
 
@@ -1417,7 +1452,7 @@ namespace Web_Turismo_Triunvirato.Controllers
                     .ToListAsync();
             }
 
-            // Usamos la misma vista 'AltaActividad' para editar
+            await CargarWhatsappMessages();
             return View("AltaActividad", activity);
         }
 
@@ -1433,7 +1468,10 @@ namespace Web_Turismo_Triunvirato.Controllers
             if (ModelState.IsValid)
             {
                 var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "ActivitiesPromotion");
-                List<string> rutas = await ProcesarImagenes(ImageFile, entidad?.Id ?? 1);
+                int idEntidad = entidad?.Id ?? 1;
+
+                // 1. Procesar archivos físicos
+                List<string> rutas = await ProcesarImagenes(ImageFile, idEntidad);
 
                 if (rutas.Any())
                 {
@@ -1446,27 +1484,35 @@ namespace Web_Turismo_Triunvirato.Controllers
                     return View("AltaActividad", Actividad);
                 }
 
-                // Guardar mediante Procedimiento Almacenado
-                var idGenerado = await _dbContext.AbmActivityAsync(Actividad, "INSERT");
+                // 2. Ejecutar INSERT y obtener el ID real generado por la DB
+                // Usamos el método que corregimos en el DbContext
+                int idGenerado = await _dbContext.AbmActivityAsync(Actividad, "INSERT");
 
-                if (entidad != null && idGenerado > 0)
+                if (idGenerado > 0)
                 {
+                    // 3. Vincular las imágenes al ID real de la actividad
                     foreach (var ruta in rutas)
                     {
-                        await _dbContext.InsertarImagenGenericaAsync(ruta, entidad.Id, idGenerado);
+                        await _dbContext.InsertarImagenGenericaAsync(ruta, idEntidad, idGenerado);
                     }
-                }
 
-                TempData["SuccessMessage"] = "¡Actividad creada con éxito!";
-                return RedirectToAction(nameof(AdminActivities));
+                    await _dbContext.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "¡Actividad creada con éxito!";
+                    return RedirectToAction(nameof(AdminActivities));
+                }
+                else
+                {
+                    ModelState.AddModelError("", "No se pudo obtener el ID de la actividad creada.");
+                }
             }
             await CargarWhatsappMessages();
-            return View(Actividad);
+            return View("AltaActividad", Actividad);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditActividad(int id,
+        public async Task<IActionResult> EditActividad(
+            int id,
             List<IFormFile> ImageFile,
             List<IFormFile> ReplacedFiles,
             List<string> DeletedImagesUrls,
@@ -1483,41 +1529,34 @@ namespace Web_Turismo_Triunvirato.Controllers
 
             if (ModelState.IsValid)
             {
-                // A. GESTIÓN DE BORRADO (Corregido para evitar NullReferenceException)
+                // Borrado de imágenes seleccionadas
                 if (DeletedImagesUrls != null)
                 {
-                    // Limpiamos la lista de posibles nulos o vacíos antes de iterar
-                    var urlsToProcess = DeletedImagesUrls.Where(u => !string.IsNullOrEmpty(u)).ToList();
-                    foreach (var url in urlsToProcess)
+                    foreach (var url in DeletedImagesUrls.Where(u => !string.IsNullOrEmpty(u)))
                     {
                         var imgDb = await _dbContext.Imagen.FirstOrDefaultAsync(i => i.Url == url && i.Id_Entidad == idEntidad);
                         if (imgDb != null)
                         {
                             _dbContext.Imagen.Remove(imgDb);
-                            // Solo borramos el archivo físico si estaba en la BD
                             var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, url.TrimStart('/'));
                             if (System.IO.File.Exists(fullPath)) System.IO.File.Delete(fullPath);
                         }
                     }
                 }
 
-                // B. GESTIÓN DE REEMPLAZO
-                if (ReplacedFiles != null && ReplacedFiles.Count > 0 && ReplacedImagesUrls != null)
+                // Reemplazo de imágenes
+                if (ReplacedFiles != null && ReplacedImagesUrls != null)
                 {
                     for (int i = 0; i < ReplacedFiles.Count; i++)
                     {
                         if (ReplacedFiles[i] == null) continue;
-
-                        var nuevaRutaLista = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, idEntidad);
-                        if (nuevaRutaLista.Any())
+                        var nuevaRuta = await ProcesarImagenes(new List<IFormFile> { ReplacedFiles[i] }, idEntidad);
+                        if (nuevaRuta.Any())
                         {
                             string antiguaUrl = ReplacedImagesUrls[i];
-                            string nuevaUrl = nuevaRutaLista[0];
-
                             var imgDb = await _dbContext.Imagen.FirstOrDefaultAsync(i => i.Url == antiguaUrl && i.Id_Entidad == idEntidad);
-                            if (imgDb != null) imgDb.Url = nuevaUrl;
-
-                            if (Actividad.ImageUrl == antiguaUrl) Actividad.ImageUrl = nuevaUrl;
+                            if (imgDb != null) imgDb.Url = nuevaRuta[0];
+                            if (Actividad.ImageUrl == antiguaUrl) Actividad.ImageUrl = nuevaRuta[0];
 
                             var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, antiguaUrl.TrimStart('/'));
                             if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
@@ -1525,20 +1564,17 @@ namespace Web_Turismo_Triunvirato.Controllers
                     }
                 }
 
-                // C. NUEVAS IMÁGENES
+                // Nuevas imágenes
                 var nuevasRutas = await ProcesarImagenes(ImageFile, idEntidad);
-                if (nuevasRutas != null)
+                foreach (var ruta in nuevasRutas)
                 {
-                    foreach (var ruta in nuevasRutas)
-                    {
-                        await _dbContext.InsertarImagenGenericaAsync(ruta, idEntidad, Actividad.Id);
-                    }
+                    await _dbContext.InsertarImagenGenericaAsync(ruta, idEntidad, Actividad.Id);
                 }
 
-                // Actualizar mediante Procedimiento Almacenado
-                await _dbContext.AbmActivityAsync(Actividad, "UPDATE");
+                if (string.IsNullOrEmpty(Actividad.ImageUrl) && nuevasRutas.Any())
+                    Actividad.ImageUrl = nuevasRutas[0];
 
-                // Guardar cambios pendientes en la tabla Imagen (EF Core)
+                await _dbContext.AbmActivityAsync(Actividad, "UPDATE");
                 await _dbContext.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "¡Actividad actualizada exitosamente!";
@@ -1554,34 +1590,32 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> DeleteActividad(int id)
         {
             var entidad = await _dbContext.Entidades.FirstOrDefaultAsync(e => e.Nombre_Tabla == "ActivitiesPromotion");
-            int idEntidad = entidad?.Id ?? 1;
 
-            // 1. Galería de imágenes
-            var imagenes = await _dbContext.Imagen
-                .Where(i => i.Id_Entidad == idEntidad && i.Id_Objeto == id)
-                .ToListAsync();
 
-            foreach (var img in imagenes)
+            if (entidad != null)
             {
-                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-                _dbContext.Imagen.Remove(img);
+                // 2. Buscar imágenes asociadas para borrar archivos físicos
+                var imagenes = await _dbContext.Imagen
+                    .Where(i => i.Id_Entidad == entidad.Id && i.Id_Objeto == id)
+                    .ToListAsync();
+
+                foreach (var img in imagenes)
+                {
+                    var path = Path.Combine(_webHostEnvironment.WebRootPath, img.Url.TrimStart('/'));
+                    if (System.IO.File.Exists(path))
+                    {
+                        try { System.IO.File.Delete(path); } catch { /* Loguear si falla el borrado físico */ }
+                    }
+                }
             }
 
-            // 2. Ejecutar SP de eliminación
-            // IMPORTANTE: Verifica que tu SP acepte "DELETE" y el ID correctamente
-            await _dbContext.AbmActivityAsync(new ActivitiesPromotion { Id = id }, "DELETE");
 
-            await _dbContext.SaveChangesAsync();
-
+            await _dbContext.DeleteActivityAsync(id, "DELETE");
+            
             TempData["SuccessMessage"] = "¡Actividad eliminada exitosamente!";
             return RedirectToAction(nameof(AdminActivities));
+
         }
-
-        
-    
-
-
 
     /// <summary>
     /// /////////////////////////////////////////////////////////
