@@ -274,41 +274,76 @@ namespace Web_Turismo_Triunvirato.DataAccess
         }
 
         // Método para gestionar el ABM de BusPromotion
-        public async Task AbmBusPromotionAsync(BusPromotion promotion, string typeExecuted)
+        // Método para gestionar el ABM de BusPromotion
+        public async Task<int> AbmBusPromotionAsync(BusPromotion promotion, string typeExecuted)
         {
-            // Asegúrate de que los nombres de las variables en tu string SQL
-            // coincidan exactamente con los nombres de los parámetros definidos abajo.
-            string sql = "CALL SetActivePromotionBuses(@p_id, @p_servicetype, @p_description, @p_whatsapp_id, @p_destinationname, @p_originname, @p_buscompanyname, @p_category, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_typeexecuted)";
+            int idGenerado = 0;
 
-            // Valida y convierte ServiceType a un valor entero
+            // 1. Validar ServiceType (Buses suele ser 2)
             if (!int.TryParse(promotion.ServiceType, out int serviceType))
             {
-                throw new ArgumentException("El ServiceType del bus debe ser un valor numérico.", nameof(promotion.ServiceType));
+                serviceType = 2;
             }
 
-            var parameters = new MySqlParameter[]
-            {
-        // Usa una expresión ternaria para manejar Id y que sea compatible con INSERT y UPDATE
-        new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value),
-        new MySqlParameter("p_servicetype", serviceType), // Usamos la variable convertida
-        new MySqlParameter("p_description", string.IsNullOrEmpty(promotion.Description) ? DBNull.Value : (object)promotion.Description),
-        new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id > 0 ? (object)promotion.Whatsapp_Id : DBNull.Value),
-        new MySqlParameter("p_destinationname", promotion.DestinationName),
-        new MySqlParameter("p_originname", promotion.OriginName),
-        new MySqlParameter("p_buscompanyname", promotion.BusCompanyName),
-        new MySqlParameter("p_category", string.IsNullOrEmpty(promotion.Category) ? DBNull.Value : (object)promotion.Category),
-        new MySqlParameter("p_imageurl", promotion.ImageUrl),
-        new MySqlParameter("p_ishotweek", promotion.IsHotWeek),
-        new MySqlParameter("p_originalprice", promotion.OriginalPrice),
-        new MySqlParameter("p_offerprice", promotion.OfferPrice),
-        new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage),
-        new MySqlParameter("p_startdate", promotion.StartDate),
-        new MySqlParameter("p_enddate", promotion.EndDate),
-        new MySqlParameter("p_isactive", promotion.IsActive),
-        new MySqlParameter("p_typeexecuted", typeExecuted)
-            };
+            // 2. Ejecutar el procedimiento usando Command para recuperar el ID
+            var connection = Database.GetDbConnection();
+            bool wasClosed = connection.State == System.Data.ConnectionState.Closed;
 
-            await Database.ExecuteSqlRawAsync(sql, parameters);
+            if (wasClosed) await connection.OpenAsync();
+
+            try
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    // Definimos el llamado al SP de Buses
+                    command.CommandText = "CALL SetActivePromotionBuses(@p_id, @p_servicetype, @p_description, @p_whatsapp_id, @p_destinationname, @p_originname, @p_buscompanyname, @p_category, @p_imageurl, @p_ishotweek, @p_originalprice, @p_offerprice, @p_discountpercentage, @p_startdate, @p_enddate, @p_isactive, @p_typeexecuted)";
+
+                    // Agregamos los parámetros uno por uno (necesario para este enfoque)
+                    command.Parameters.Add(new MySqlParameter("p_id", promotion.Id > 0 ? (object)promotion.Id : DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_servicetype", serviceType));
+                    command.Parameters.Add(new MySqlParameter("p_description", promotion.Description ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_whatsapp_id", promotion.Whatsapp_Id > 0 ? (object)promotion.Whatsapp_Id : DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_destinationname", promotion.DestinationName ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_originname", promotion.OriginName ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_buscompanyname", promotion.BusCompanyName ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_category", promotion.Category ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_imageurl", promotion.ImageUrl ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_ishotweek", promotion.IsHotWeek));
+                    command.Parameters.Add(new MySqlParameter("p_originalprice", promotion.OriginalPrice));
+                    command.Parameters.Add(new MySqlParameter("p_offerprice", promotion.OfferPrice));
+                    command.Parameters.Add(new MySqlParameter("p_discountpercentage", promotion.DiscountPercentage));
+                    command.Parameters.Add(new MySqlParameter("p_startdate", promotion.StartDate));
+                    command.Parameters.Add(new MySqlParameter("p_enddate", promotion.EndDate));
+                    command.Parameters.Add(new MySqlParameter("p_isactive", promotion.IsActive));
+                    command.Parameters.Add(new MySqlParameter("p_typeexecuted", typeExecuted));
+
+                    if (typeExecuted == "INSERT")
+                    {
+                        // Ejecutamos el Reader para capturar el SELECT LAST_INSERT_ID() que hace tu SP
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                idGenerado = reader.GetInt32(0);
+                                promotion.Id = idGenerado;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Si es UPDATE o DELETE, no esperamos ID de vuelta
+                        await command.ExecuteNonQueryAsync();
+                        idGenerado = promotion.Id;
+                    }
+                }
+            }
+            finally
+            {
+                // Cerramos la conexión si nosotros la abrimos
+                if (wasClosed) await connection.CloseAsync();
+            }
+
+            return idGenerado;
         }
 
         public async Task AbmBusPromotionAsync(int id, string typeExecuted)
@@ -451,28 +486,69 @@ namespace Web_Turismo_Triunvirato.DataAccess
             await Database.ExecuteSqlRawAsync(sql, parameters);
         }
 
-        public async Task AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
+        public async Task<int> AbmActivityAsync(ActivitiesPromotion activity, string typeExecuted)
         {
-            // Cambiamos el nombre del SP
-            string sql = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_whatsapp_id, @p_location, @p_imageurl, @p_typeexecuted,@p_isactive)";
+            int idGenerado = activity.Id;
+
+            var connection = Database.GetDbConnection();
+            bool wasClosed = connection.State == System.Data.ConnectionState.Closed;
+            if (wasClosed) await connection.OpenAsync();
+
+            try
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    // Nota: Agregué @p_isactive al final por si tu SP lo requiere
+                    command.CommandText = "CALL SetActivePromotionActivities(@p_id, @p_title, @p_description, @p_whatsapp_id, @p_location, @p_imageurl, @p_typeexecuted, @p_isactive)";
+
+                    command.Parameters.Add(new MySqlParameter("p_id", activity.Id > 0 ? (object)activity.Id : DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_title", activity.Title ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_description", activity.Description ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_whatsapp_id", activity.Whatsapp_Id));
+                    command.Parameters.Add(new MySqlParameter("p_location", activity.Location ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_imageurl", activity.ImageUrl ?? (object)DBNull.Value));
+                    command.Parameters.Add(new MySqlParameter("p_typeexecuted", typeExecuted));
+                    command.Parameters.Add(new MySqlParameter("p_isactive", activity.IsActive));
+
+                    if (typeExecuted == "INSERT")
+                    {
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                idGenerado = Convert.ToInt32(reader[0]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+            }
+            finally
+            {
+                if (wasClosed) await connection.CloseAsync();
+            }
+            return idGenerado;
+        }
+
+        // Método específico para el borrado (como en Packages)
+        public async Task DeleteActivityAsync(int id, string typeExecuted)
+        {
+            string sql = "CALL DeleteActiveActivitiesPromotion(@p_id)";
 
             var parameters = new MySqlParameter[]
             {
-        new MySqlParameter("p_id", activity.Id > 0 ? (object)activity.Id : DBNull.Value),
-        new MySqlParameter("p_title", activity.Title),
-        new MySqlParameter("p_description", activity.Description),
-        new MySqlParameter("p_whatsapp_id", activity.Whatsapp_Id),
-        new MySqlParameter("p_location", activity.Location),
-        new MySqlParameter("p_imageurl", activity.ImageUrl),
-        new MySqlParameter("p_isactive", activity.IsActive),
-        new MySqlParameter("p_typeexecuted", typeExecuted)
+                new MySqlParameter("p_id", id),
+        
             };
-
             await Database.ExecuteSqlRawAsync(sql, parameters);
+
         }
 
 
-                // NUEVO MÉTODO para obtener una promoción de bus por ID
+        // NUEVO MÉTODO para obtener una promoción de bus por ID
         public async Task<BusPromotion> GetBusPromotionByIdAsync(int id)
         {
             return await BusPromotions.FirstOrDefaultAsync(p => p.Id == id);

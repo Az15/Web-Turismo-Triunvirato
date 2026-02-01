@@ -14,7 +14,9 @@ namespace Web_Turismo_Triunvirato.Models
         // La clave primaria para la entidad.
         [Key]
         public int Id { get; set; }
-
+        [Required]
+        [Display(Name = "Tipo de servicio")]
+        //public string ServiceType { get; set; } = "1";  
         public int entidad { get; set; }
 
         [DisplayName("Mensaje de Whatsapp")]
