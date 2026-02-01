@@ -91,3 +91,20 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    function cambiarImagenModal(idItem, urlNueva) {
+        const modalElement = document.getElementById('packageModal-' + idItem);
+        if (modalElement) {
+            const imgPrincipal = modalElement.querySelector('.img-principal-modal');
+            if (imgPrincipal) {
+                imgPrincipal.style.opacity = '0.5';
+                setTimeout(() => {
+                    imgPrincipal.src = urlNueva;
+                    imgPrincipal.style.opacity = '1';
+                }, 150);
+            }
+        }
+    }
+</script>

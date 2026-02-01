@@ -55,24 +55,21 @@
                             <img src="@item.ImageUrl" alt="@item.Title" style="max-height: 50px;" />
                         }
                     </td> *@
-                   <td>@(item.IsActive ? "Sí" : "No")</td> 
+                   <td>@(item.IsActive ? "Sí" : "No")</td>
                     <td>
                         <a asp-action="EditActividad" asp-route-id="@item.Id" class="btn btn-info btn-sm me-2">
                             <i class="fas fa-edit"></i> Editar
                         </a>
+
                         <form asp-controller="Admin" asp-action="DeleteActividad" method="post" style="display:inline-block;">
+                            @Html.AntiForgeryToken()
+                            @* El secreto está en esta línea de abajo: *@
+                            <input type="hidden" name="id" value="@item.Id" />
+
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar esta actividad?');">
                                 <i class="fas fa-trash-alt"></i> Eliminar
                             </button>
                         </form>
-
-@*                         <form asp-controller="Admin" asp-action="DeletePromotionBus" method="post" style="display:inline-block;">
-                            <input type="hidden" name="id" value="@item.Id" />
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar esta promoción?');">Eliminar</button>
-                        </form>
- *@
-
                     </td>
                 </tr>
             }

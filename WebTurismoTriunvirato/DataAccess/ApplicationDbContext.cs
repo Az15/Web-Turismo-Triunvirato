@@ -49,7 +49,8 @@ namespace Web_Turismo_Triunvirato.DataAccess
             modelBuilder.Entity<HotelPromotion>().ToTable("HotelPromotions");
             modelBuilder.Entity<FlightPromotion>().ToTable("FlightPromotions");
             modelBuilder.Entity<PackagePromotion>().ToTable("PackagePromotions");
-            modelBuilder.Entity<Imagen>().ToTable("imagenes");
+            modelBuilder.Entity<Imagen>().ToTable("imagenes"); 
+            modelBuilder.Entity<ActivitiesPromotion>().ToTable("ActivitiesPromotion");
 
 
             base.OnModelCreating(modelBuilder);
@@ -536,7 +537,7 @@ namespace Web_Turismo_Triunvirato.DataAccess
         // Método específico para el borrado (como en Packages)
         public async Task DeleteActivityAsync(int id, string typeExecuted)
         {
-            string sql = "CALL DeleteActiveActivitiesPromotion(@p_id)";
+            string sql = "CALL DeleteActiveActivitiesPromotion1(@p_id)";
 
             var parameters = new MySqlParameter[]
             {

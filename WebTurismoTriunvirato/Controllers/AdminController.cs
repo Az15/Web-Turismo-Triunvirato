@@ -1423,7 +1423,7 @@ namespace Web_Turismo_Triunvirato.Controllers
         public async Task<IActionResult> AdminActivities()
         {
             ViewData["Title"] = "Administrar Actividades";
-            var activitiesAdmin = await _dbContext.Activities.ToListAsync();
+            var activitiesAdmin = await _dbContext.GetActiveActivitiesAsync();
             return View("AdminActivities", activitiesAdmin);
         }
 
