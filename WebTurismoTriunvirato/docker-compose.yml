@@ -8,7 +8,7 @@ services:
  MYSQL_DATABASE: u364059446_turismo
  MYSQL_USER: u364059446_adm
  MYSQL_PASSWORD: "Tur1sm0.25."
- MYSQL_ROOT_PASSWORD: "Tur1sm0.25.."
+ MYSQL_ROOT_PASSWORD: "Tur1sm0.2025."
  volumes:
  - db_data:/var/lib/mysql
 
