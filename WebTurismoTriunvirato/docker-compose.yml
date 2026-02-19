@@ -1,26 +1,26 @@
-version: "3.8"
-
 services:
- db:
- image: mysql:8.0
- command: --default-authentication-plugin=mysql_native_password
- environment:
- MYSQL_DATABASE: u364059446_turismo
- MYSQL_USER: u364059446_adm
- MYSQL_PASSWORD: "Tur1sm0.25."
- MYSQL_ROOT_PASSWORD: "Tur1sm0.2025."
- volumes:
- - db_data:/var/lib/mysql
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: u364059446_turismo
+      MYSQL_USER: u364059446_adm
+      MYSQL_PASSWORD: "Tur1sm0.25."
+      MYSQL_ROOT_PASSWORD: "Tur1sm0.2025."
+    volumes:
+      - db_data:/var/lib/mysql
 
- app:
- build: .
- ports:
- - "8080:8080"
- depends_on:
- - db
- environment:
- - "ConnectionStrings:DefaultConnection=Server=db;Port=3306;Database=u364059446_turismo;Uid=u364059446_adm;Pwd=Tur1sm0.25.;"
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # En .NET es mejor con __ (doble guion bajo) para “anidar” secciones
+      ConnectionStrings__DefaultConnection: "Server=db;Port=3306;Database=u364059446_turismo;Uid=u364059446_adm;Pwd=Tur1sm0.25.;"
+      ASPNETCORE_URLS: "http://+:8080"
 
 volumes:
- db_data:
-
+  db_data:
