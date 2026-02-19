@@ -11,6 +11,11 @@ services:
       MYSQL_ROOT_PASSWORD: "Tur1sm0.2025."
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"Tur1sm0.2025.\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
   app:
     build:
@@ -18,7 +23,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       ConnectionStrings__DefaultConnection: "Server=db;Port=3306;Database=u364059446_turismo;Uid=u364059446_adm;Pwd=Tur1sm0.25.;"
       ASPNETCORE_URLS: "http://+:8080"
