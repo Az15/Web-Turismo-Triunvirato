@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   db:
     image: mysql:8.0
@@ -18,9 +20,9 @@ services:
     depends_on:
       - db
     environment:
-      # En .NET es mejor con __ (doble guion bajo) para “anidar” secciones
       ConnectionStrings__DefaultConnection: "Server=db;Port=3306;Database=u364059446_turismo;Uid=u364059446_adm;Pwd=Tur1sm0.25.;"
       ASPNETCORE_URLS: "http://+:8080"
+    restart: unless-stopped
 
 volumes:
   db_data:
